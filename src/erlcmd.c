@@ -150,7 +150,7 @@ void erlcmd_init(struct erlcmd *handler,
                          NULL
                          );
     if (!handler->stdin_read_pipe)
-        errx(EXIT_FAILURE, "Can't create overlapped i/o stdin pipe")
+        errx(EXIT_FAILURE, "Can't create overlapped i/o stdin pipe");
 
     handler->stdin_write_pipe = CreateFileA(
                         pipe_name,
@@ -162,7 +162,7 @@ void erlcmd_init(struct erlcmd *handler,
                         NULL                       // Template file
                       );
     if (!handler->stdin_write_pipe)
-        errx(EXIT_FAILURE, "Can't create write side of stdin pipe")
+        errx(EXIT_FAILURE, "Can't create write side of stdin pipe");
 
     handler->stdin_reader_thread = CreateThread(
                NULL,                   // default security attributes
