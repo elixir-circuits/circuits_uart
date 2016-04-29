@@ -11,7 +11,7 @@ port connections and more in Elixir. Feature highlights:
   * Receive input via messages or by polling (active and passive modes)
   * Unit tests (uses the [tty0tty](https://github.com/freemed/tty0tty) virtual null modem on Travis)
 
-** This library is new. Expect API changes and bugs, but we'll get there!! If you try it out, please consider helping out by contributed document improvements, fixes, or more unit tests. **
+** This library is new. Expect API changes (hopefully minor) and bugs, but we'll get there!! If you try it out, please consider helping out by contributing documentation improvements, fixes, or more unit tests. **
 
 ## Example use
 
@@ -79,19 +79,23 @@ get reported on the calls to `Nerves.UART.read/2` and `Nerves.UART.write/3`
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
 
-  1. Add nerves_uart to your list of dependencies in `mix.exs`:
+  1. Add `nerves_uart` to your list of dependencies in `mix.exs`:
 
         def deps do
           [{:nerves_uart, "~> 0.0.1"}]
         end
 
-  2. Ensure nerves_uart is started before your application:
+  2. List `:nerves_uart` as an application dependency:
 
         def application do
           [applications: [:nerves_uart]]
         end
 
-## System dependencies
+  3. Check that the C compiler dependencies are satisified (see below)
+
+  4. Run `mix deps.get` and `mix compile`
+
+### C compiler dependencies
 
 Since this library includes C code, `make`, `gcc`, and Erlang header and development
 libraries are required.
@@ -101,9 +105,8 @@ the `build-essential` and `erlang-dev` packages. For example:
 
     sudo apt-get install build-essential erlang-dev
 
-On Macs, you will need `gmake`. If you're using Homebrew, run
-
-    brew install gmake
+On Macs, run `gcc --version` or `make --version`. If they're not installed, you will
+be given instructions.
 
 On Windows, you will need MinGW. Assuming that you installed Erlang and
 Elixir via [Chocolatey](https://chocolatey.org/), install MinGW by
