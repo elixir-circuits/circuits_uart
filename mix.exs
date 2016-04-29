@@ -133,7 +133,7 @@ defmodule NervesUart.Mixfile do
 
   defp package do
     [
-      files: ["lib", "c_src", "mix.exs", "Makefile*", "README.md", "LICENSE"],
+      files: ["lib", "src", "test", "mix.exs", "Makefile", "README.md", "LICENSE"],
       maintainers: ["Frank Hunleth"],
       licenses: ["Apache-2"],
       links: %{"GitHub" => "https://github.com/nerves-project/nerves_uart",
