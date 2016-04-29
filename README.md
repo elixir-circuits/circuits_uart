@@ -1,4 +1,7 @@
 # Nerves.UART
+[![Build Status](https://travis-ci.org/nerves-project/nerves_uart.svg?branch=master)](https://travis-ci.org/nerves-project/nerves_uart)
+[![Build Status](https://ci.appveyor.com/api/projects/status/hm6s6269jtbiqxbv/branch/master?svg=true)](https://ci.appveyor.com/project/fhunleth/nerves-uart/branch/master)
+
 
 Nerves.UART allows you to access UARTs, serial ports, Bluetooth virtual serial
 port connections and more in Elixir. Feature highlights:

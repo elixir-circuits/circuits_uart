@@ -1,7 +1,57 @@
-language: elixir
+# Travis doesn't have Erlang on OSX, so we have to install it manually on both
+language: c
 
-elixir:
-    - 1.2.2
-otp_release:
-    - 18.2.1
+sudo: required
+dist: trusty
 
+os:
+    - linux
+    - osx
+
+compiler:
+    - gcc
+    - clang
+
+matrix:
+    exclude:
+        - os: osx
+          compiler: gcc
+        - os: linux
+          compiler: clang
+
+env:
+  - ELIXIR_VERSION=1.2.4
+
+before_install:
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        sudo apt-get update -qq;
+        sudo apt-get install -qq linux-headers-`uname -r`;
+        git clone --depth=50 https://github.com/freemed/tty0tty.git;
+        cd tty0tty/module && make && sudo cp tty0tty.ko /lib/modules/$(uname -r)/kernel/drivers/misc/;
+        cd -;
+        sudo depmod;
+        sudo modprobe tty0tty;
+        sudo chmod 666 /dev/tnt*;
+        ls -las /dev/tnt*;
+        wget https://s3.amazonaws.com/travis-otp-releases/binaries/$(lsb_release -is | tr "A-Z" "a-z")/$(lsb_release -rs)/$(uname -m)/erlang-18.3-nonroot.tar.bz2;
+        mkdir -p ~/otp && tar -xf erlang-18.3-nonroot.tar.bz2 -C ~/otp/;
+        mkdir -p ~/.kerl;
+        source $HOME/otp/18.3/activate;
+        wget https://github.com/elixir-lang/elixir/releases/download/v$ELIXIR_VERSION/Precompiled.zip;
+        unzip -d elixir Precompiled.zip;
+      else
+        brew update;
+        brew install elixir;
+      fi
+
+before_script:
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH=`pwd`/elixir/bin:$PATH; fi
+
+script:
+  - mix local.hex --force
+  - mix deps.get
+  - mix compile
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+      NERVES_UART_PORT1=tnt0 NERVES_UART_PORT2=tnt1 mix test;
+    fi
+  - mix docs

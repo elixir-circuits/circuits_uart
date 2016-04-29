@@ -40,7 +40,9 @@ DISTFILES += \
     mix.exs \
     Makefile \
     README.md \
-    test/nerves_uart_test.exs
+    test/nerves_uart_test.exs \
+    .travis.yml \
+    appveyor.yml
 
 win32 {
     SOURCES += \

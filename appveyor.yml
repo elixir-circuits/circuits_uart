@@ -1,0 +1,11 @@
+version: build{build}
+
+install:
+  - cinst elixir
+  - cinst mingw
+  - SET PATH=C:\ProgramData\chocolatey\lib\Elixir\bin;C:\tools\mingw64;%PATH%
+
+build_script:
+  - mix local.hex --force
+  - mix deps.get
+  - mix compile
