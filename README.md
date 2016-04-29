@@ -6,10 +6,10 @@
 Nerves.UART allows you to access UARTs, serial ports, Bluetooth virtual serial
 port connections and more in Elixir. Feature highlights:
 
-  * Linux, Mac, and Windows
+  * Mac, Windows, and desktop and embedded Linux
   * Enumerate serial ports
   * Receive input via messages or by polling (active and passive modes)
-  * Unit tests (this is only listed because unit tests seem to be sparse for libraries like this)
+  * Unit tests (uses the [tty0tty](https://github.com/freemed/tty0tty) virtual null modem on Travis)
 
 ** This library is new. Expect API changes and bugs, but we'll get there!! If you try it out, please consider helping out by contributed document improvements, fixes, or more unit tests. **
 
@@ -25,12 +25,14 @@ Discover what serial ports are attached:
       "COM16" => %{description: "Arduino Uno",
         manufacturer: "Arduino LLC (www.arduino.cc)", product_id: 67, vendor_id: 9025}}
 
-Start up a UART GenServer:
+Start the UART GenServer:
 
     iex> {:ok, pid} = Nerves.UART.start_link
     {:ok, #PID<0.132.0>}
 
-Open up the serial port or UART that you want from the list above:
+The GenServer doesn't open a port automatically, so open up a serial port or UART
+now. See the results from your call to `Nerves.UART.enumerate/0` for what's
+available on your system.
 
     iex> Nerves.UART.open(pid, "COM14", speed: 115200, active: false)
     :ok
@@ -133,7 +135,14 @@ Then run:
 
     mix test
 
-## FAQ: ei_copy why????
+## FAQ
+
+### A feature is missing
+
+Yes, I haven't gotten to a couple really important ones for some use cases.
+See `TODO.md` for now. Please ping me if you'd like to help.
+
+### ei_copy why????
 
 You may have noticed Erlang's `erl_interface` code copy/pasted into `src/ei_copy`.
 This is *only* used on Windows to work around issues linking to the distributed
