@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 //#define DEBUG
 
@@ -41,5 +42,7 @@ FILE *log_location;
 #define warnx(MSG, ...) do { fprintf(LOG_LOCATION, "nerves_uart: " MSG "\n", ## __VA_ARGS__); fflush(LOG_LOCATION); } while (0)
 #endif
 
+#define ONE_YEAR_MILLIS (1000ULL * 60 * 60 * 24 * 365)
+uint64_t current_time();
 
 #endif // UTIL_H

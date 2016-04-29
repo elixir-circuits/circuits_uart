@@ -114,21 +114,6 @@ static void record_errno()
     record_last_error(errno);
 }
 
-/**
- * @return the current time in milliseconds
- */
-static uint64_t current_time()
-{
-    struct timespec tp;
-    int rc = clock_gettime(CLOCK_MONOTONIC, &tp);
-    if (rc < 0)
-        errx(EXIT_FAILURE, "clock_gettime failed?");
-
-    return ((uint64_t) tp.tv_sec) * 1000 + tp.tv_nsec / 1000000;
-}
-
-#define ONE_YEAR_MILLIS (1000ULL * 60 * 60 * 24 * 365)
-
 static int to_baudrate_constant(int speed) {
     switch (speed) {
     case 0: return B0;
