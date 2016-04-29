@@ -6,6 +6,8 @@ defmodule Mix.Tasks.Compile.NervesUart do
     {exec, args} = case :os.type do
       {:unix, os} when os in [:freebsd, :openbsd] ->
         {"gmake", ["all"]}
+      {:win32, _} ->
+        {"mingw32-make", ["all"]}
       _ ->
         {"make", ["all"]}
     end
