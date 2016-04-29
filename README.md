@@ -47,7 +47,8 @@ See if anyone responds in the next 60 seconds:
     {:ok, "Hi"}
 
 Input is reported as soon as it is received, so you may need multiple calls to `read/2`
-to get everything you want.
+to get everything you want. If you have flow control enabled and stop calling
+`read/2`, the port will push back to the sender when its buffers fill up.
 
 Enough with passive mode, let's switch to active mode:
 
