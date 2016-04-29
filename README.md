@@ -120,7 +120,6 @@ The standard Elixir build process applies. Clone `nerves_uart` or
 download a source release and run:
 
     mix deps.get
-    mix deps.compile
     mix compile
 
 The unit tests require two serial ports connected via a NULL modem
@@ -128,7 +127,7 @@ cable to run. Define the names of the serial ports in the environment
 before running the tests. For example,
 
     export NERVES_UART_PORT1=ttyS0
-    export NERVES_UART_PORT2=ttyS0
+    export NERVES_UART_PORT2=ttyS1
 
 If you're on Linux, you don't need real serial ports. Download and install
 [tty0tty](https://github.com/freemed/tty0tty). Load the kernel module and
@@ -137,6 +136,10 @@ specify `tnt0` and `tnt1` for the serial ports.
 Then run:
 
     mix test
+
+If you're using `tty0tty`, the tests will run at full speed. Real serial ports
+seem to take a fraction of a second to close and re-open. I added a gratuitous
+delay to each test to work around this. It likely can be much shorter.
 
 ## FAQ
 
