@@ -135,7 +135,7 @@ defmodule NervesUart.Mixfile do
     [
       files: ["lib", "src", "test", "mix.exs", "Makefile", "README.md", "LICENSE"],
       maintainers: ["Frank Hunleth"],
-      licenses: ["Apache-2"],
+      licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/nerves-project/nerves_uart"}
     ]
   end
