@@ -87,7 +87,7 @@ end
 defmodule NervesUart.Mixfile do
   use Mix.Project
 
-  @version "0.0.1"
+  @version "0.0.2"
 
   @description """
   Discover and use UARTs and serial ports in Elixir.
@@ -95,7 +95,7 @@ defmodule NervesUart.Mixfile do
 
   def project do
     [app: :nerves_uart,
-     version: "0.0.1",
+     version: @version,
      elixir: "~> 1.2",
      name: "Nerves.UART",
      description: @description,
@@ -133,7 +133,7 @@ defmodule NervesUart.Mixfile do
 
   defp package do
     [
-      files: ["lib", "src/*.[ch]", "src/ei_copy/*.[ch]", "test", "mix.exs", "Makefile", "README.md", "LICENSE"],
+      files: ["lib", "src/*.[ch]", "src/ei_copy/*.[ch]", "test", "mix.exs", "Makefile", "README.md", "LICENSE", "CHANGELOG.md"],
       maintainers: ["Frank Hunleth"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/nerves-project/nerves_uart"}
