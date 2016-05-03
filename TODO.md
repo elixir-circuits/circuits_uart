@@ -1,6 +1,12 @@
 Todo list
 
   1. Add support for setting break, cts, rts, etc.
+  1. Add protocol parser support so that receive events can be chopped up by
+     line or by some other marker. This needs a slight amount of thought, since
+     we also need to slice by timeouts (e.g., read in 32 byte chunks unless a
+     partial one hangs around for too long). If we support returning things
+     other than binaries, then it seems reasonable to expect the send side
+     to translate. Also need to handle flush and drain.
   2. Add tests for different baudrate and parity configs
   3. Add tests for setting baudrate and flow control dynamically
   4. Add a read_exact call to block until exactly n bytes are read
