@@ -148,6 +148,14 @@ delay to each test to work around this. It likely can be much shorter.
 Yes, I haven't gotten to a couple really important ones for some use cases.
 See `TODO.md` for now. Please ping me if you'd like to help.
 
+### Do I have to use Nerves?
+
+No, this project doesn't have any dependencies on any Nerves components. The
+desire for some serial port library features on Nerves drove us to create it,
+but we also have host-based use cases. To be useful for us, the library must
+remain crossplatform and have few dependencies. We're just developing it under
+the Nerves umbrella.
+
 ### ei_copy why????
 
 You may have noticed Erlang's `erl_interface` code copy/pasted into `src/ei_copy`.
