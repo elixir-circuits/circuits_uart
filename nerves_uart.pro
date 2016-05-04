@@ -116,7 +116,6 @@ unix {
 }
 osx {
     INCLUDEPATH += /usr/local/Cellar/erlang/18.3/lib/erlang/usr/include
-    LIBS += -framework CoreFoundation
 }
 
 QMAKE_CFLAGS += -std=c99

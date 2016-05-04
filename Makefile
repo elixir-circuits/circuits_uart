@@ -57,10 +57,13 @@ endif
 ERL_CFLAGS ?= -I$(ERL_EI_INCLUDE_DIR)
 ERL_LDFLAGS ?= -L$(ERL_EI_LIBDIR) -lei
 
-# Mac-specific libraries
+# If compiling on OSX and not crosscompiling, include CoreFoundation and IOKit
+ifeq ($(CROSSCOMPILE),)
 ifeq ($(shell uname),Darwin)
 LDFLAGS += -framework CoreFoundation -framework IOKit
 endif
+endif
+
 endif
 
 OBJ=$(SRC:.c=.o)
