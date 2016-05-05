@@ -1,6 +1,7 @@
 Todo list
 
   1. Add support for setting break, cts, rts, etc.
+  1. Fix race condition between active mode and changing configurations
   1. Add protocol parser support so that receive events can be chopped up by
      line or by some other marker. This needs a slight amount of thought, since
      we also need to slice by timeouts (e.g., read in 32 byte chunks unless a
