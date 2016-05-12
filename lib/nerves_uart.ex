@@ -2,10 +2,15 @@ defmodule Nerves.UART do
   use GenServer
 
   # Many calls take timeouts for how long to wait for reading and writing
-  # ports. This is the additional time added to the GenServer message passing
+  # serial ports. This is the additional time added to the GenServer message passing
   # timeout so that the interprocess messaging timers don't hit before the
   # timeouts on the actual operations.
-  @timeout_slack 100
+  @genserver_timeout_slack 100
+
+  # There's a timeout when interacting with the port as well. If the port
+  # doesn't respond by timeout + @port_timeout_slack, then there's something
+  # wrong with it.
+  @port_timeout_slack 50
 
   @moduledoc """
   Find and use UARTs, serial ports, and more.
@@ -185,32 +190,32 @@ defmodule Nerves.UART do
   end
 
   def handle_call({:open, name, opts}, {from_pid, _}, state) do
-    {:ok, response} = call_port(state, :open, {name, opts})
+    response = call_port(state, :open, {name, opts})
     state = %{state | name: name, controlling_process: from_pid}
     {:reply, response, state}
   end
   def handle_call(:close, _from, state) do
-    {:ok, response} = call_port(state, :close, [])
+    response = call_port(state, :close, [])
     {:reply, response, state}
   end
   def handle_call({:read, timeout}, _from, state) do
-    {:ok, response} = call_port(state, :read, timeout)
+    response = call_port(state, :read, timeout, port_timeout(timeout))
     {:reply, response, state}
   end
   def handle_call({:write, value, timeout}, _from, state) do
-    {:ok, response} = call_port(state, :write, {value, timeout})
+    response = call_port(state, :write, {value, timeout}, port_timeout(timeout))
     {:reply, response, state}
   end
   def handle_call({:configure, opts}, _from, state) do
-    {:ok, response} = call_port(state, :configure, opts)
+    response = call_port(state, :configure, opts)
     {:reply, response, state}
   end
   def handle_call(:drain, _from, state) do
-    {:ok, response} = call_port(state, :drain, [])
+    response = call_port(state, :drain, [])
     {:reply, response, state}
   end
   def handle_call(:flush, _from, state) do
-    {:ok, response} = call_port(state, :flush, [])
+    response = call_port(state, :flush, [])
     {:reply, response, state}
   end
 
@@ -219,20 +224,23 @@ defmodule Nerves.UART do
     Port.close(state.port)
   end
 
-  def handle_info({_, {:data, message}}, state) do
+  def handle_info({_, {:data, <<?n, message::binary>>}}, state) do
     msg = :erlang.binary_to_term(message)
     handle_port(msg, state)
   end
 
-  defp call_port(state, command, arguments) do
+  defp call_port(state, command, arguments, timeout \\ 4000) do
     msg = {command, arguments}
     send state.port, {self, {:command, :erlang.term_to_binary(msg)}}
     # Block until the response comes back since the C side
     # doesn't want to handle any queuing of requests. REVISIT
     receive do
-      {_, {:data, response}} ->
-        {:ok, :erlang.binary_to_term(response)}
-        _ -> :error
+      {_, {:data, <<?r,response::binary>>}} ->
+        :erlang.binary_to_term(response)
+    after
+      timeout ->
+        # Not sure how this can be recovered
+        exit(:port_timed_out)
     end
   end
 
@@ -246,6 +254,9 @@ defmodule Nerves.UART do
   end
 
   defp genserver_timeout(timeout) do
-    max(timeout + @timeout_slack, @timeout_slack)
+    max(timeout + @genserver_timeout_slack, @genserver_timeout_slack)
+  end
+  defp port_timeout(timeout) do
+    max(timeout + @port_timeout_slack, @port_timeout_slack)
   end
 end

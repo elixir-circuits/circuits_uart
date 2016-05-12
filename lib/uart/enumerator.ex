@@ -10,7 +10,7 @@ defmodule Nerves.UART.Enumerator do
         :binary])
     result =
       receive do
-        {^port, {:data, message}} ->
+        {^port, {:data, <<?r, message::binary>>}} ->
           :erlang.binary_to_term(message)
       after
           5_000 ->

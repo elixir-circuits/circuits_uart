@@ -41,6 +41,8 @@ static struct uart *uart = NULL;
 static struct uart_config current_config;
 
 // Utilities
+static const char response_id = 'r';
+static const char notification_id = 'n';
 
 /**
  * @brief Send :ok back to Elixir
@@ -49,6 +51,7 @@ static void send_ok_response()
 {
     char resp[256];
     int resp_index = sizeof(uint16_t); // Space for payload size
+    resp[resp_index++] = response_id;
     ei_encode_version(resp, &resp_index);
     ei_encode_atom(resp, &resp_index, "ok");
     erlcmd_send(resp, resp_index);
@@ -63,6 +66,7 @@ static void send_error_response(const char *reason)
 {
     char resp[256];
     int resp_index = sizeof(uint16_t); // Space for payload size
+    resp[resp_index++] = response_id;
     ei_encode_version(resp, &resp_index);
     ei_encode_tuple_header(resp, &resp_index, 2);
     ei_encode_atom(resp, &resp_index, "error");
@@ -294,6 +298,7 @@ static void handle_read_completed(int rc, const uint8_t *data, size_t len)
     if (rc >= 0) {
         char *resp = malloc(32 + len);
         int resp_index = sizeof(uint16_t);
+        resp[resp_index++] = response_id;
         ei_encode_version(resp, &resp_index);
         ei_encode_tuple_header(resp, &resp_index, 2);
         ei_encode_atom(resp, &resp_index, "ok");
@@ -309,6 +314,7 @@ static void handle_notify_read(int error_reason, const uint8_t *data, size_t len
 {
     char *resp = malloc(64 + len);
     int resp_index = sizeof(uint16_t);
+    resp[resp_index++] = notification_id;
     ei_encode_version(resp, &resp_index);
 
     ei_encode_tuple_header(resp, &resp_index, 2);
@@ -543,6 +549,7 @@ static void enumerate_ports()
     debug("Found %d ports", port_list_len);
     char resp[4096];
     int resp_index = sizeof(uint16_t); // Space for payload size
+    resp[resp_index++] = response_id;
     ei_encode_version(resp, &resp_index);
 
     ei_encode_map_header(resp, &resp_index, port_list_len);
