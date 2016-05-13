@@ -20,10 +20,19 @@ defmodule UARTTest do
   end
 
   def common_setup() do
-    assert !is_nil(port1) && !is_nil(port2),
-      "Please define NERVES_UART_PORT1 and NERVES_UART_PORT2 in your
+    if is_nil(port1) || is_nil(port2) do
+      msg = "Please define NERVES_UART_PORT1 and NERVES_UART_PORT2 in your
   environment (e.g. to ttyS0 or COM1) and connect them via a null
-  modem cable."
+  modem cable.\n\n"
+
+      ports = UART.enumerate
+      if ports == [] do
+        msg = msg <> "No serial ports were found. Check your OS to see if they exist"
+      else
+        msg = msg <> "The following ports were found: #{inspect Map.keys(ports)}"
+      end
+      flunk msg
+    end
 
     if !String.starts_with?(port1, "tnt") do
         # Let things settle between tests for real serial ports
