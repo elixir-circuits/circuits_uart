@@ -63,9 +63,10 @@ struct uart {
     // Write handling
     int current_write_timeout;
     OVERLAPPED write_overlapped;
-
-
     const uint8_t *write_data;
+
+    // DCB state handling
+    DCB dcb;
 
     // Callbacks
     uart_write_completed_callback write_completed;
@@ -228,43 +229,63 @@ static int update_write_timeout(struct uart *port, int timeout)
     }
 }
 
-static int uart_config_line(HANDLE h, const struct uart_config *config)
+static int uart_init_dcb(struct uart *port)
 {
-    DCB dcb = { 0 };
-    dcb.DCBlength = sizeof(DCB);
-    if (!GetCommState(h, &dcb)) {
+    port->dcb.DCBlength = sizeof(DCB);
+    if (!GetCommState(port->h, &port->dcb)) {
+        debug("GetCommState failed");
         record_errno();
         return -1;
     }
 
-    dcb.BaudRate = config->speed;
-    dcb.Parity = to_windows_parity(config->parity);
-    dcb.ByteSize = config->data_bits;
-    dcb.StopBits = to_windows_stopbits(config->stop_bits);
+    // Force some fields to known states.
+    port->dcb.fRtsControl = RTS_CONTROL_DISABLE;
+    port->dcb.fDtrControl = DTR_CONTROL_DISABLE;
+    port->dcb.fBinary = TRUE;
 
-    dcb.fInX = FALSE;
-    dcb.fOutX = FALSE;
-    dcb.fOutxDsrFlow = FALSE;
-    dcb.fOutxCtsFlow = FALSE;
-    dcb.fRtsControl = RTS_CONTROL_DISABLE;
-    dcb.fDtrControl = DTR_CONTROL_DISABLE;
+    // The rest of the fields will be set in
+    // calls to uart_config_line.
+    return 0;
+}
+
+static int uart_config_line(struct uart *port, const struct uart_config *config)
+{
+    // Note:
+    //  dcb.fRtsControl and dcb.fDtrControl are not modified. Cached versions
+    //  of their current state are stored here so that they may be returned
+    //  without making a system call. This also means that the SetCommState
+    //  call will receive the RTS and DTR state that the user expects. The
+    //  Microsoft docs imply that these fields are only used when the device is
+    //  opened, but that doesn't make sense to me, since you have to open
+    //  the device to call SetCommState. Additionally, getting the RTS and DTR
+    //  states from Windows requires overlapped I/O (since we openned the handled
+    //  that way). Using cached results is so much easier. The case this breaks
+    //  is if the user wants to know what hardware flowcontrol is doing. This
+    //  seems like a debug case that is more easily satisfied with a scope.
+    port->dcb.BaudRate = config->speed;
+    port->dcb.Parity = to_windows_parity(config->parity);
+    port->dcb.ByteSize = config->data_bits;
+    port->dcb.StopBits = to_windows_stopbits(config->stop_bits);
+
+    port->dcb.fInX = FALSE;
+    port->dcb.fOutX = FALSE;
+    port->dcb.fOutxDsrFlow = FALSE;
+    port->dcb.fOutxCtsFlow = FALSE;
     switch (config->flow_control) {
     default:
     case UART_FLOWCONTROL_NONE:
         break;
     case UART_FLOWCONTROL_SOFTWARE:
-        dcb.fInX = TRUE;
-        dcb.fOutX = TRUE;
+        port->dcb.fInX = TRUE;
+        port->dcb.fOutX = TRUE;
         break;
     case UART_FLOWCONTROL_HARDWARE:
-        dcb.fOutxCtsFlow = TRUE;
-        dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
+        port->dcb.fOutxCtsFlow = TRUE;
+        port->dcb.fRtsControl = RTS_CONTROL_HANDSHAKE;
         break;
     }
 
-    dcb.fBinary = TRUE;
-
-    if (!SetCommState(h, &dcb)) {
+    if (!SetCommState(port->h, &port->dcb)) {
         record_errno();
         return -1;
     }
@@ -311,7 +332,8 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
         return -1;
     }
 
-    if (uart_config_line(port->h, config) < 0) {
+    if (uart_init_dcb(port) < 0 ||
+            uart_config_line(port, config) < 0) {
         CloseHandle(port->h);
         port->h = NULL;
         return -1;
@@ -380,7 +402,7 @@ int uart_configure(struct uart *port, const struct uart_config *config)
         }
     }
 
-    if (uart_config_line(port->h, config) < 0) {
+    if (uart_config_line(port, config) < 0) {
         debug("uart_config_line failed");
         record_errno();
         return -1;
@@ -512,6 +534,65 @@ int uart_flush(struct uart *port)
 
     // Clear out the receive queue
     PurgeComm(port->h, PURGE_RXCLEAR);
+    return 0;
+}
+
+int uart_set_rts(struct uart *port, bool val)
+{
+    DWORD func;
+    if (val) {
+        func = SETRTS;
+        port->dcb.fRtsControl = RTS_CONTROL_ENABLE; // Cache state
+    } else {
+        func = CLRRTS;
+        port->dcb.fRtsControl = RTS_CONTROL_DISABLE;
+    }
+    if (!EscapeCommFunction(port->h, func)) {
+        debug("EscapeCommFunction(SETRTS/CLRRTS) failed %d", (int) GetLastError());
+        record_errno();
+        return -1;
+    }
+
+    return 0;
+}
+
+int uart_set_dtr(struct uart *port, bool val)
+{
+    DWORD func;
+    if (val) {
+        func = SETDTR;
+        port->dcb.fDtrControl = DTR_CONTROL_ENABLE; // Cache state
+    } else {
+        func = CLRDTR;
+        port->dcb.fDtrControl = DTR_CONTROL_DISABLE;
+    }
+    if (!EscapeCommFunction(port->h, func)) {
+        debug("EscapeCommFunction(SETDTR/CLRDTR) failed %d", (int) GetLastError());
+        record_errno();
+        return -1;
+    }
+
+    return 0;
+}
+
+int uart_get_signals(struct uart *port, struct uart_signals *sig)
+{
+    DWORD modem_status;
+    if (!GetCommModemStatus(port->h, &modem_status)) {
+        debug("GetCommModemStatus failed %d", (int) GetLastError());
+        record_errno();
+        return -1;
+    }
+
+    sig->dsr = ((modem_status & MS_DSR_ON) != 0);
+    sig->dtr = (port->dcb.fDtrControl == DTR_CONTROL_ENABLE);
+    sig->rts = (port->dcb.fRtsControl == RTS_CONTROL_ENABLE);
+    sig->st = false; // Not supported on Windows
+    sig->sr = false; // Not supported on Windows
+    sig->cts = ((modem_status & MS_CTS_ON) != 0);
+    sig->cd = ((modem_status & MS_RLSD_ON) != 0);
+    sig->rng = ((modem_status & MS_RING_ON) != 0);
+
     return 0;
 }
 

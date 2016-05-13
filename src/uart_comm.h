@@ -45,6 +45,18 @@ struct uart_config
     enum uart_flow_control flow_control;
 };
 
+struct uart_signals
+{
+    bool dsr;
+    bool dtr;
+    bool rts;
+    bool st;
+    bool sr;
+    bool cts;
+    bool cd;
+    bool rng;
+};
+
 struct uart;
 
 void uart_default_config(struct uart_config *config);
@@ -157,6 +169,33 @@ int uart_flush(struct uart *port);
  * @return 0 on success
  */
 int uart_flush_all(struct uart *port);
+
+/**
+ * @brief Set or clear the Request To Send signal
+ *
+ * @param port the uart struct
+ * @param val true or false
+ * @return 0 on success
+ */
+int uart_set_rts(struct uart *port, bool val);
+
+/**
+ * @brief Set or clear the Data Terminal Ready signal
+ *
+ * @param port the uart struct
+ * @param val true or false
+ * @return 0 on success
+ */
+int uart_set_dtr(struct uart *port, bool val);
+
+/**
+ * @brief Read the state of all UART signals
+ *
+ * @param port the uart struct
+ * @param sig the state is returned here
+ * @return 0 on success
+ */
+int uart_get_signals(struct uart *port, struct uart_signals *sig);
 
 #if defined(__linux__) || defined(__APPLE__)
 struct pollfd;

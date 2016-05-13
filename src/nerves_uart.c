@@ -365,6 +365,83 @@ static void handle_flush(const char *req, int *req_index)
         send_error_response(uart_last_error());
 }
 
+static void encode_kv_bool(char *resp, int *resp_index, const char *key, int value)
+{
+    ei_encode_atom(resp, resp_index, key);
+    ei_encode_boolean(resp, resp_index, value);
+}
+
+static void handle_set_rts(const char *req, int *req_index)
+{
+    int val;
+    if (ei_decode_boolean(req, req_index, &val) < 0) {
+        send_error_response("einval");
+        return;
+    }
+
+    if (!uart_is_open(uart)) {
+        send_error_response("ebadf");
+        return;
+    }
+
+    if (uart_set_rts(uart, !!val) >= 0)
+        send_ok_response();
+    else
+        send_error_response(uart_last_error());
+}
+
+static void handle_set_dtr(const char *req, int *req_index)
+{
+    int val;
+    if (ei_decode_boolean(req, req_index, &val) < 0) {
+        send_error_response("einval");
+        return;
+    }
+
+    if (!uart_is_open(uart)) {
+        send_error_response("ebadf");
+        return;
+    }
+
+    if (uart_set_dtr(uart, !!val) >= 0)
+        send_ok_response();
+    else
+        send_error_response(uart_last_error());
+}
+
+static void handle_signals(const char *req, int *req_index)
+{
+    // No arguments
+    (void) req;
+    (void) req_index;
+
+    if (!uart_is_open(uart)) {
+        send_error_response("ebadf");
+        return;
+    }
+
+    struct uart_signals sig;
+    if (uart_get_signals(uart, &sig) >= 0) {
+        char resp[128];
+        int resp_index = sizeof(uint16_t);
+        resp[resp_index++] = response_id;
+        ei_encode_version(resp, &resp_index);
+        ei_encode_tuple_header(resp, &resp_index, 2);
+        ei_encode_atom(resp, &resp_index, "ok");
+        ei_encode_map_header(resp, &resp_index, 8);
+        encode_kv_bool(resp, &resp_index, "dsr", sig.dsr);
+        encode_kv_bool(resp, &resp_index, "dtr", sig.dtr);
+        encode_kv_bool(resp, &resp_index, "rts", sig.rts);
+        encode_kv_bool(resp, &resp_index, "st", sig.st);
+        encode_kv_bool(resp, &resp_index, "sr", sig.sr);
+        encode_kv_bool(resp, &resp_index, "cts", sig.cts);
+        encode_kv_bool(resp, &resp_index, "cd", sig.cd);
+        encode_kv_bool(resp, &resp_index, "rng", sig.rng);
+        erlcmd_send(resp, resp_index);
+    } else
+        send_error_response(uart_last_error());
+}
+
 struct request_handler {
     const char *name;
     void (*handler)(const char *req, int *req_index);
@@ -381,7 +458,9 @@ static struct request_handler request_handlers[] = {
 { "open", handle_open },
 { "configure", handle_configure },
 { "close", handle_close },
-
+{ "signals", handle_signals },
+{ "set_rts", handle_set_rts },
+{ "set_dtr", handle_set_dtr },
 { NULL, NULL }
 };
 

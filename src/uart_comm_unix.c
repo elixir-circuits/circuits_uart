@@ -710,6 +710,48 @@ int uart_flush_all(struct uart *port)
     return 0;
 }
 
+int uart_set_rts(struct uart *port, bool val)
+{
+    int status = TIOCM_RTS;
+    if (ioctl(port->fd, val ? TIOCMBIS : TIOCMBIC, &status) < 0) {
+        record_errno();
+        return -1;
+    }
+
+    return 0;
+}
+
+int uart_set_dtr(struct uart *port, bool val)
+{
+    int status = TIOCM_DTR;
+    if (ioctl(port->fd, val ? TIOCMBIS : TIOCMBIC, &status) < 0) {
+        record_errno();
+        return -1;
+    }
+
+    return 0;
+}
+
+int uart_get_signals(struct uart *port, struct uart_signals *sig)
+{
+    int status;
+    if (ioctl(port->fd, TIOCMGET, &status) == -1) {
+        record_errno();
+        return -1;
+    }
+
+    sig->dsr = ((status & (TIOCM_LE | TIOCM_DSR)) != 0);
+    sig->dtr = ((status & TIOCM_DTR) != 0);
+    sig->rts = ((status & TIOCM_RTS) != 0);
+    sig->st = ((status & TIOCM_ST) != 0);
+    sig->sr = ((status & TIOCM_SR) != 0);
+    sig->cts = ((status & TIOCM_CTS) != 0);
+    sig->cd = ((status & (TIOCM_CAR | TIOCM_CD)) != 0);
+    sig->rng = ((status & (TIOCM_RNG | TIOCM_RI)) != 0);
+
+    return 0;
+}
+
 /**
  * @brief Update the poll timeout based on the specified deadline
  */

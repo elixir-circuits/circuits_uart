@@ -28,11 +28,11 @@ defmodule Nerves.UART do
   Depending on the port and the operating system, not all fields may be
   returned. Informational fields are:
 
-    * `vendor_id` - The 16-bit USB vendor ID of the device providing the port. Vendor ID to name lists are managed through usb.org
-    * `product_id` - The 16-bit vendor supplied product ID
-    * `manufacturer` - The manufacturer of the port
-    * `description` - A description or product name
-    * `serial_number` - The device's serial number if it has one
+    * `:vendor_id` - The 16-bit USB vendor ID of the device providing the port. Vendor ID to name lists are managed through usb.org
+    * `:product_id` - The 16-bit vendor supplied product ID
+    * `:manufacturer` - The manufacturer of the port
+    * `:description` - A description or product name
+    * `:serial_number` - The device's serial number if it has one
   """
   def enumerate() do
     Nerves.UART.Enumerator.enumerate
@@ -176,6 +176,37 @@ defmodule Nerves.UART do
     GenServer.call pid, :flush
   end
 
+  @doc """
+  Returns a map of signal names and their current state (true or false).
+  Signals include:
+
+    * `:dsr` - Data Set Ready
+    * `:dtr` - Data Terminal Ready
+    * `:rts` - Request To Send
+    * `:st`  - Secondary Transmitted Data
+    * `:sr`  - Secondary Received Data
+    * `:cts` - Clear To Send
+    * `:cd`  - Data Carrier Detect
+    * `:rng` - Ring Indicator
+  """
+  def signals(pid) do
+    GenServer.call pid, :signals
+  end
+
+  @doc """
+  Set or clear the Data Terminal Ready signal.
+  """
+  def set_dtr(pid, value) when is_boolean(value) do
+    GenServer.call pid, {:set_dtr, value}
+  end
+
+  @doc """
+  Set or clear the Request To Send signal.
+  """
+  def set_rts(pid, value) when is_boolean(value) do
+    GenServer.call pid, {:set_rts, value}
+  end
+
   # gen_server callbacks
   def init([]) do
     executable = :code.priv_dir(:nerves_uart) ++ '/nerves_uart'
@@ -195,7 +226,7 @@ defmodule Nerves.UART do
     {:reply, response, state}
   end
   def handle_call(:close, _from, state) do
-    response = call_port(state, :close, [])
+    response = call_port(state, :close, nil)
     {:reply, response, state}
   end
   def handle_call({:read, timeout}, _from, state) do
@@ -211,11 +242,23 @@ defmodule Nerves.UART do
     {:reply, response, state}
   end
   def handle_call(:drain, _from, state) do
-    response = call_port(state, :drain, [])
+    response = call_port(state, :drain, nil)
     {:reply, response, state}
   end
   def handle_call(:flush, _from, state) do
-    response = call_port(state, :flush, [])
+    response = call_port(state, :flush, nil)
+    {:reply, response, state}
+  end
+  def handle_call(:signals, _from, state) do
+    response = call_port(state, :signals, nil)
+    {:reply, response, state}
+  end
+  def handle_call({:set_dtr, value}, _from, state) do
+    response = call_port(state, :set_dtr, value)
+    {:reply, response, state}
+  end
+  def handle_call({:set_rts, value}, _from, state) do
+    response = call_port(state, :set_rts, value)
     {:reply, response, state}
   end
 
