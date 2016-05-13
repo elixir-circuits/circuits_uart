@@ -156,6 +156,20 @@ but we also have host-based use cases. To be useful for us, the library must
 remain crossplatform and have few dependencies. We're just developing it under
 the Nerves umbrella.
 
+### Debugging tips
+
+If you're on Linux, the `tty0tty` emulated null modem removes the flakiness of
+real serial port drivers if that's the problem. The serial port monitor
+[jpnevulator](https://jpnevulator.snarl.nl/) is useful for monitoring the
+hardware signals and dumping data as hex byte values.
+
+On OSX and Windows, I've found that PL2303-based serial ports can be flakey.
+First, make sure that you don't have a counterfeit PL2303. On Windows, they show
+up in device manager with a warning symbol. On OSX, they seem to hang when
+closing the port. Non-counterfeit PL2303-based serial ports can pass the unit
+tests on Windows 10, but I have not been able to get them to pass on OSX.
+FTDI-based serial ports appear to work better on both operating systesm.
+
 ### ei_copy why????
 
 You may have noticed Erlang's `erl_interface` code copy/pasted into `src/ei_copy`.
