@@ -42,7 +42,10 @@ DISTFILES += \
     README.md \
     test/nerves_uart_test.exs \
     .travis.yml \
-    appveyor.yml
+    appveyor.yml \
+    test/hw_signals_test.exs \
+    test/test_helper.exs \
+    test/uart_test.exs
 
 win32 {
     SOURCES += \
