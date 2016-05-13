@@ -1,7 +1,5 @@
 Todo list
 
-  1. Add support for setting break, cts, rts, etc.
-  1. Fix race condition between active mode and changing configurations
   1. Add protocol parser support so that receive events can be chopped up by
      line or by some other marker. This needs a slight amount of thought, since
      we also need to slice by timeouts (e.g., read in 32 byte chunks unless a
@@ -22,8 +20,6 @@ Todo list
   7. Active mode could support flow control if we add pause and resume calls. This could be emulated by
      turning the active mode off for pause and back on for resume. This feels really manual, but
      node-serialport does it this way.
-  8. The options get passed through to C code untouched. Consider return {:error, :einval} rather than
-     crashing the process, since without debug on, it's hard to figure out what happened.
   9. See if undefining UNICODE on Windows is safe. Maybe a lot of sketchy UTF-16 to UTF-8 code
      can be removed? ** Basic tests suggest that this will work**
   10. What should be done if `open` is called multiple times. Currently, it re-opens, but
