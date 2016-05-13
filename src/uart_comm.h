@@ -35,6 +35,12 @@ enum uart_flow_control {
     UART_FLOWCONTROL_SOFTWARE
 };
 
+enum uart_direction {
+    UART_DIRECTION_RECEIVE = 0,
+    UART_DIRECTION_TRANSMIT,
+    UART_DIRECTION_BOTH
+};
+
 struct uart_config
 {
     bool active;
@@ -155,12 +161,13 @@ int uart_configure(struct uart *port, const struct uart_config *config);
 int uart_drain(struct uart *port);
 
 /**
- * @brief Flush the receive queue
+ * @brief Flush the receive and/or transmit queues
  *
  * @param port the uart struct
+ * @param direction which direction
  * @return 0 on success
  */
-int uart_flush(struct uart *port);
+int uart_flush(struct uart *port, enum uart_direction direction);
 
 /**
  * @brief Flush the tx and rx queues

@@ -350,16 +350,30 @@ static void handle_drain(const char *req, int *req_index)
 
 static void handle_flush(const char *req, int *req_index)
 {
-    // No arguments
-    (void) req;
-    (void) req_index;
+    char dirstr[MAXATOMLEN];
+    if (ei_decode_atom(req, req_index, dirstr) < 0) {
+        send_error_response("einval");
+        return;
+    }
+
+    enum uart_direction direction;
+    if (strcmp(dirstr, "receive") == 0)
+        direction = UART_DIRECTION_RECEIVE;
+    else if (strcmp(dirstr, "transmit") == 0)
+        direction = UART_DIRECTION_TRANSMIT;
+    else if (strcmp(dirstr, "both") == 0)
+        direction = UART_DIRECTION_BOTH;
+    else {
+        send_error_response("einval");
+        return;
+    }
 
     if (!uart_is_open(uart)) {
         send_error_response("ebadf");
         return;
     }
 
-    if (uart_flush(uart) >= 0)
+    if (uart_flush(uart, direction) >= 0)
         send_ok_response();
     else
         send_error_response(uart_last_error());

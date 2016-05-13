@@ -525,15 +525,31 @@ int uart_drain(struct uart *port)
     return 0;
 }
 
-int uart_flush(struct uart *port)
+int uart_flush(struct uart *port, enum uart_direction direction)
 {
     // NOTE: This could be supported if allowed by the Elixir GenServer.
     //       Not sure on the use case, though.
     if (port->read_pending)
         errx(EXIT_FAILURE, "Elixir is supposed to queue read operations");
 
-    // Clear out the receive queue
-    PurgeComm(port->h, PURGE_RXCLEAR);
+    DWORD flags;
+    switch (direction) {
+    case UART_DIRECTION_RECEIVE:
+        flags = PURGE_RXCLEAR;
+        break;
+
+    case UART_DIRECTION_TRANSMIT:
+        flags = PURGE_TXCLEAR;
+        break;
+
+    case UART_DIRECTION_BOTH:
+    default:
+        flags = PURGE_RXCLEAR | PURGE_TXCLEAR;
+        break;
+    }
+
+    // Clear out the queue(s)
+    PurgeComm(port->h, flags);
     return 0;
 }
 

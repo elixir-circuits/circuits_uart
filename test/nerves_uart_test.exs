@@ -116,8 +116,22 @@ defmodule NervesUARTTest do
     assert :ok = UART.open(uart1, UARTTest.port1, active: false)
     assert :ok = UART.open(uart2, UARTTest.port2, active: false)
 
-    assert :ok = UART.write(uart1, "hello")
+    assert :ok = UART.write(uart1, "a")
+    :timer.sleep 100
 
+    assert :ok = UART.flush(uart2, :receive)
+    assert {:ok, ""} = UART.read(uart2, 0)
+
+    assert :ok = UART.write(uart1, "b")
+    :timer.sleep 100
+
+    assert :ok = UART.flush(uart2, :both)
+    assert {:ok, ""} = UART.read(uart2, 0)
+
+    assert :ok = UART.write(uart1, "c")
+    :timer.sleep 100
+
+    # unspecifed direction should be :both
     assert :ok = UART.flush(uart2)
     assert {:ok, ""} = UART.read(uart2, 0)
 

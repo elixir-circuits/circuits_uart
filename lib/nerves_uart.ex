@@ -179,11 +179,13 @@ defmodule Nerves.UART do
   end
 
   @doc """
-  Flushes the receive buffer. See [tcflush(3)](http://linux.die.net/man/3/tcflush) for low level details on
+  Flushes the `:receive` buffer, the `:transmit` buffer, or `:both`.
+
+  See [tcflush(3)](http://linux.die.net/man/3/tcflush) for low level details on
   Linux or OSX. This calls `PurgeComm` on Windows.
   """
-  def flush(pid) do
-    GenServer.call pid, :flush
+  def flush(pid, direction \\ :both) do
+    GenServer.call pid, {:flush, direction}
   end
 
   @doc """
@@ -255,8 +257,8 @@ defmodule Nerves.UART do
     response = call_port(state, :drain, nil)
     {:reply, response, state}
   end
-  def handle_call(:flush, _from, state) do
-    response = call_port(state, :flush, nil)
+  def handle_call({:flush, direction}, _from, state) do
+    response = call_port(state, :flush, direction)
     {:reply, response, state}
   end
   def handle_call(:signals, _from, state) do
