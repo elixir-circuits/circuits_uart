@@ -87,4 +87,21 @@ defmodule HWSignalsTest do
     UART.close(uart2)
   end
 
+  test "set break api exists", %{uart1: uart1} do
+    # Currently, we can't detect a break signal, so just test
+    # that we can call the APIs.
+    :ok = UART.open(uart1, UARTTest.port1)
+
+    :ok = UART.set_break(uart1, true)
+    :ok = UART.set_break(uart1, false)
+
+    # :milli_seconds will be :milliseconds soon
+    start_time = System.monotonic_time(:milli_seconds)
+    :ok = UART.send_break(uart1, 250)
+    duration = System.monotonic_time(:milli_seconds) - start_time
+    assert duration >= 250
+
+    UART.close(uart1)
+  end
+
 end

@@ -732,6 +732,16 @@ int uart_set_dtr(struct uart *port, bool val)
     return 0;
 }
 
+int uart_set_break(struct uart *port, bool val)
+{
+    if (ioctl(port->fd, val ? TIOCSBRK : TIOCCBRK) < 0) {
+        record_errno();
+        return -1;
+    }
+
+    return 0;
+}
+
 int uart_get_signals(struct uart *port, struct uart_signals *sig)
 {
     int status;

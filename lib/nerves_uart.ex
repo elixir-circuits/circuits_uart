@@ -108,12 +108,22 @@ defmodule Nerves.UART do
 
   @doc """
   Send a continuous stream of zero bits for a duration in milliseconds.
-  If the duration is zero, then zero bits are transmitted by at least 0.25
-  seconds, but no more than 0.5 seconds. If non-zero, then zero bits are
-  transmitted for about that many milliseconds depending on the implementation.
+  By default, the zero bits are transmitted at least 0.25 seconds.
+
+  This is a convenience function for calling `set_break/2` to enable
+  the break signal, wait, and then turn it off.
   """
-  def send_break(pid, duration \\ 0) do
-    GenServer.call pid, {:send_break, duration}
+  def send_break(pid, duration \\ 250) do
+    set_break(pid, true)
+    :timer.sleep(duration)
+    set_break(pid, false)
+  end
+
+  @doc """
+  Start or stop sending a break signal.
+  """
+  def set_break(pid, value) when is_boolean(value) do
+    GenServer.call pid, {:set_break, value}
   end
 
   @doc """
@@ -259,6 +269,10 @@ defmodule Nerves.UART do
   end
   def handle_call({:set_rts, value}, _from, state) do
     response = call_port(state, :set_rts, value)
+    {:reply, response, state}
+  end
+  def handle_call({:set_break, value}, _from, state) do
+    response = call_port(state, :set_break, value)
     {:reply, response, state}
   end
 

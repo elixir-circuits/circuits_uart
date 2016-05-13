@@ -575,6 +575,23 @@ int uart_set_dtr(struct uart *port, bool val)
     return 0;
 }
 
+int uart_set_break(struct uart *port, bool val)
+{
+    BOOL rc;
+    if (val)
+        rc = SetCommBreak(port->h);
+    else
+        rc = ClearCommBreak(port->h);
+
+    if (!rc) {
+        debug("SendCommBreak or ClearCommBreak failed %d", (int) GetLastError());
+        record_errno();
+        return -1;
+    }
+
+    return 0;
+}
+
 int uart_get_signals(struct uart *port, struct uart_signals *sig)
 {
     DWORD modem_status;

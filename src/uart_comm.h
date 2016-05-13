@@ -189,6 +189,15 @@ int uart_set_rts(struct uart *port, bool val);
 int uart_set_dtr(struct uart *port, bool val);
 
 /**
+ * @brief Set or clear the break signal
+ *
+ * @param port the uart struct
+ * @param val true or false
+ * @return 0 on success
+ */
+int uart_set_break(struct uart *port, bool val);
+
+/**
  * @brief Read the state of all UART signals
  *
  * @param port the uart struct

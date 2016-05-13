@@ -409,6 +409,25 @@ static void handle_set_dtr(const char *req, int *req_index)
         send_error_response(uart_last_error());
 }
 
+static void handle_set_break(const char *req, int *req_index)
+{
+    int val;
+    if (ei_decode_boolean(req, req_index, &val) < 0) {
+        send_error_response("einval");
+        return;
+    }
+
+    if (!uart_is_open(uart)) {
+        send_error_response("ebadf");
+        return;
+    }
+
+    if (uart_set_break(uart, !!val) >= 0)
+        send_ok_response();
+    else
+        send_error_response(uart_last_error());
+}
+
 static void handle_signals(const char *req, int *req_index)
 {
     // No arguments
@@ -461,6 +480,7 @@ static struct request_handler request_handlers[] = {
 { "signals", handle_signals },
 { "set_rts", handle_set_rts },
 { "set_dtr", handle_set_dtr },
+{ "set_break", handle_set_break },
 { NULL, NULL }
 };
 
