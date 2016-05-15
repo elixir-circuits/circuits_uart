@@ -19,6 +19,7 @@ defmodule NervesUart.Mixfile do
      make_executable: make_executable,
      make_makefile: make_makefile,
      make_error_message: make_error_message,
+     make_clean: ["clean"],
      docs: [extras: ["README.md"]],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -31,7 +32,7 @@ defmodule NervesUart.Mixfile do
 
   defp deps do
     [
-      {:elixir_make, "~> 0.1.0"},
+      {:elixir_make, git: "https://github.com/elixir-lang/elixir_make.git", branch: "master"},
       {:earmark, "~> 0.2", only: :dev},
       {:ex_doc,  "~> 0.11", only: :dev}
     ]
