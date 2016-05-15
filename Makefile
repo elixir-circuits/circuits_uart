@@ -88,7 +88,4 @@ priv/nerves_uart$(EXEEXT): $(OBJ)
 
 clean:
 	$(MIX) clean
-	rm -f priv/nerves_uart$(EXEEXT) src/*.o
-
-realclean:
-	rm -fr _build priv/nerves_uart$(EXEEXT) src/*.o
+	rm -f priv/nerves_uart$(EXEEXT) src/*.o src/ei_copy/*.o
