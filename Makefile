@@ -7,13 +7,11 @@
 # ERL_EI_LIBDIR path to libei.a
 # LDFLAGS	linker flags for linking all binaries
 # ERL_LDFLAGS	additional linker flags for projects referencing Erlang libraries
-# MIX		path to mix
 
 LDFLAGS +=
 CFLAGS ?= -O2 -Wall -Wextra -Wno-unused-parameter
 CFLAGS += -std=c99 -D_GNU_SOURCE
 CC ?= $(CROSSCOMPILER)gcc
-MIX ?= mix
 
 SRC=$(wildcard src/*.c)
 
@@ -87,5 +85,4 @@ priv/nerves_uart$(EXEEXT): $(OBJ)
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
 
 clean:
-	$(MIX) clean
 	rm -f priv/nerves_uart$(EXEEXT) src/*.o src/ei_copy/*.o
