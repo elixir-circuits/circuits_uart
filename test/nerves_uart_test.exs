@@ -28,22 +28,9 @@ defmodule NervesUARTTest do
     UART.close(uart1)
   end
 
-  test "open bogus serial port", %{uart1: uart1} do
-    assert {:error, :enoent} = UART.open(uart1, "bogustty")
-  end
-
   test "open same port twice", %{uart1: uart1, uart2: uart2} do
     assert :ok = UART.open(uart1, UARTTest.port1)
     assert {:error, _} = UART.open(uart2, UARTTest.port1)
-
-    UART.close(uart1)
-  end
-
-  test "using a port without opening it", %{uart1: uart1} do
-    assert {:error, :ebadf} = UART.write(uart1, "hello")
-    assert {:error, :ebadf} = UART.read(uart1)
-    assert {:error, :ebadf} = UART.flush(uart1)
-    assert {:error, :ebadf} = UART.drain(uart1)
 
     UART.close(uart1)
   end
