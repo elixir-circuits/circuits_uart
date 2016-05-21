@@ -9,3 +9,4 @@ build_script:
   - mix local.hex --force
   - mix deps.get
   - mix compile
+  - mix test test/uartless_test.exs

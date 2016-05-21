@@ -53,5 +53,7 @@ script:
   - mix compile
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
       NERVES_UART_PORT1=tnt0 NERVES_UART_PORT2=tnt1 mix test;
+    else
+      mix test test/uartless_test.exs;
     fi
   - mix docs
