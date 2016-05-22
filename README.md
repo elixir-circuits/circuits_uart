@@ -114,6 +114,14 @@ running the following in an administrative command prompt:
 
     choco install mingw
 
+On Nerves, you're set - just add `nerves_uart` to your `mix.exs`. Nerves
+contains everything needed by default. If you do use Nerves, though, keep in
+mind that the C code is crosscompiled for your target hardware and will
+not work on your host (the port will crash when you call `start_link` or
+`enumerate`. If you want to try out `nerves_uart` on your host
+machine, the easiest way is to either clone the source or add `nerves_uart` as a
+dependency to a regular (non-Nerves) Elixir project.
+
 ## Building and running the unit tests
 
 The standard Elixir build process applies. Clone `nerves_uart` or
@@ -147,6 +155,12 @@ delay to each test to work around this. It likely can be much shorter.
 
 Yes, I haven't gotten to a couple really important ones for some use cases.
 See `TODO.md` for now. Please ping me if you'd like to help.
+
+### How can I use the serial port on Linux without sudo?
+
+Serial port files are almost always owned by the `dialout` group. Add yourself
+to the `dialout` group by running `sudo adduser yourusername dialout`. Then log
+out and back in again, and you should be able to access the serial port.
 
 ### Do I have to use Nerves?
 
