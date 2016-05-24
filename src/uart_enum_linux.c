@@ -72,22 +72,21 @@ static int is_tty_filename(const struct dirent *d)
         return 0;
 }
 
-static int try_read(const char *directory, const char *filename, char **result)
+static int try_read_all(const char *directory, const char *filename, char **result)
 {
+    static const size_t max_filesize = 4096;
+
     int rc = 0;
     char path[PATH_MAX];
     sprintf(path, "%s/%s", directory, filename);
     FILE *fp = fopen(path, "r");
     if (fp) {
-        *result = malloc(256);
-        size_t amount_read = fread(*result, 1, 256, fp);
+        *result = malloc(max_filesize);
+        size_t amount_read = fread(*result, 1, max_filesize - 1, fp);
         fclose(fp);
         if (amount_read != 0) {
-            // Terminate the read in string and clear out anything after the first newline
+            // NULL terminate the string
             (*result)[amount_read] = '\0';
-            char *newline = strchr(*result, '\n');
-            if (newline)
-                *newline = '\0';
             rc = 1;
         } else
             free(*result);
@@ -95,10 +94,21 @@ static int try_read(const char *directory, const char *filename, char **result)
     return rc;
 }
 
+static int try_read_first_line(const char *directory, const char *filename, char **result)
+{
+    int rc = try_read_all(directory, filename, result);
+    if (rc) {
+        char *newline = strchr(*result, '\n');
+        if (newline)
+            *newline = '\0';
+    }
+    return rc;
+}
+
 static int try_hex_read(const char *directory, const char *filename, int *result)
 {
     char *str;
-    int rc = try_read(directory, filename, &str);
+    int rc = try_read_first_line(directory, filename, &str);
     if (rc) {
         *result = strtol(str, NULL, 16);
         free(str);
@@ -108,11 +118,11 @@ static int try_hex_read(const char *directory, const char *filename, int *result
 
 static int get_serialport_info(const char *sys_devices_path, struct serial_info *info)
 {
-    int rc = try_read(sys_devices_path, "manufacturer", &info->manufacturer);
-    rc |= try_read(sys_devices_path, "serial", &info->serial_number);
+    int rc = try_read_first_line(sys_devices_path, "manufacturer", &info->manufacturer);
+    rc |= try_read_first_line(sys_devices_path, "serial", &info->serial_number);
     rc |= try_hex_read(sys_devices_path, "idVendor", &info->vid);
     rc |= try_hex_read(sys_devices_path, "idProduct", &info->pid);
-    rc |= try_read(sys_devices_path, "product", &info->description);
+    rc |= try_read_first_line(sys_devices_path, "product", &info->description);
 
     if (info->manufacturer && info->vid == 0) {
         // Try to get the vid from the manufacturer field.
@@ -146,7 +156,7 @@ static char *get_driver(const char *tty_path)
 {
     char *uevent_str;
     char *driver = NULL;
-    if (try_read(tty_path, "device/uevent", &uevent_str)) {
+    if (try_read_all(tty_path, "device/uevent", &uevent_str)) {
         driver = parse_uevent(uevent_str, "DRIVER");
         free(uevent_str);
     }
