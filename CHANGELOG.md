@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.0.5
+
+  * Bugs fixed
+    * Fixed enumeration of ttyACM devices on Linux
+
 ## v0.0.4
 
   * New features
