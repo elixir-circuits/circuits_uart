@@ -41,6 +41,13 @@ EXEEXT=.exe
 else
 # Non-Windows
 
+# -lrt is needed for clock_gettime() on linux with glibc before version 2.17
+# (for example raspbian wheezy)
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+  LDFLAGS += -lrt
+endif
+
 # Look for the EI library and header files
 # For crosscompiled builds, ERL_EI_INCLUDE_DIR and ERL_EI_LIBDIR must be
 # passed into the Makefile.
