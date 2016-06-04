@@ -9,7 +9,11 @@
 # ERL_LDFLAGS	additional linker flags for projects referencing Erlang libraries
 # MIX		path to mix
 
-LDFLAGS += -lrt
+LDFLAGS +=
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+  LdFLAGS += -lrt
+endif
 CFLAGS ?= -O2 -Wall -Wextra -Wno-unused-parameter
 CFLAGS += -std=c99 -D_GNU_SOURCE
 CC ?= $(CROSSCOMPILER)gcc
