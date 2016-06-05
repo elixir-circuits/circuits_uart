@@ -10,10 +10,14 @@
 # MIX		path to mix
 
 LDFLAGS +=
+
+# -lrt is needed for clock_gettime() on linux with glibc before version 2.17
+# (for example raspbian wheezy)
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
   LdFLAGS += -lrt
 endif
+
 CFLAGS ?= -O2 -Wall -Wextra -Wno-unused-parameter
 CFLAGS += -std=c99 -D_GNU_SOURCE
 CC ?= $(CROSSCOMPILER)gcc
