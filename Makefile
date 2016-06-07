@@ -10,14 +10,6 @@
 # MIX		path to mix
 
 LDFLAGS +=
-
-# -lrt is needed for clock_gettime() on linux with glibc before version 2.17
-# (for example raspbian wheezy)
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Linux)
-  LdFLAGS += -lrt
-endif
-
 CFLAGS ?= -O2 -Wall -Wextra -Wno-unused-parameter
 CFLAGS += -std=c99 -D_GNU_SOURCE
 CC ?= $(CROSSCOMPILER)gcc
@@ -48,6 +40,13 @@ EXEEXT=.exe
 
 else
 # Non-Windows
+
+# -lrt is needed for clock_gettime() on linux with glibc before version 2.17
+# (for example raspbian wheezy)
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+  LDFLAGS += -lrt
+endif
 
 # Look for the EI library and header files
 # For crosscompiled builds, ERL_EI_INCLUDE_DIR and ERL_EI_LIBDIR must be
