@@ -32,7 +32,7 @@ defmodule NervesUart.Mixfile do
 
   defp deps do
     [
-      {:elixir_make, git: "https://github.com/elixir-lang/elixir_make.git", branch: "master"},
+      {:elixir_make, "~> 0.1"},
       {:earmark, "~> 0.2", only: :dev},
       {:ex_doc,  "~> 0.11", only: :dev}
     ]
