@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.0.6
+
+  * New features
+    * Use elixir_make
+
 ## v0.0.5
 
   * Bugs fixed
