@@ -13,7 +13,7 @@ defmodule NervesUart.Mixfile do
      elixir: "~> 1.2",
      name: "Nerves.UART",
      description: @description,
-     package: package,
+     package: package(),
      source_url: "https://github.com/nerves-project/nerves_uart",
      compilers: [:elixir_make] ++ Mix.compilers,
      make_executable: make_executable,
@@ -23,7 +23,7 @@ defmodule NervesUart.Mixfile do
      docs: [extras: ["README.md"]],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   def application do
