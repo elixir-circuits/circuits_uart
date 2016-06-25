@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.0.7
+
+  * Bugs fixed
+    * Force elixir_make v0.3.0 so that it works OTP 19
+
 ## v0.0.6
 
   * New features

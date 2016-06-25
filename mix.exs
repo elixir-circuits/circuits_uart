@@ -1,7 +1,7 @@
 defmodule NervesUart.Mixfile do
   use Mix.Project
 
-  @version "0.0.6"
+  @version "0.0.7"
 
   @description """
   Discover and use UARTs and serial ports in Elixir.
