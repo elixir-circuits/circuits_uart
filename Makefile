@@ -75,13 +75,15 @@ OBJ=$(SRC:.c=.o)
 
 .PHONY: all clean
 
-all: priv/nerves_uart$(EXEEXT)
+all: priv priv/nerves_uart$(EXEEXT)
 
 %.o: %.c
 	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
 
+priv:
+	mkdir -p priv
+
 priv/nerves_uart$(EXEEXT): $(OBJ)
-	@mkdir -p priv
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
 
 clean:
