@@ -239,7 +239,7 @@ static int uart_init_dcb(struct uart *port)
     }
 
     // Force some fields to known states.
-    port->dcb.fRtsControl = RTS_CONTROL_DISABLE;
+    port->dcb.fRtsControl = RTS_CONTROL_ENABLE;
     port->dcb.fDtrControl = DTR_CONTROL_DISABLE;
     port->dcb.fBinary = TRUE;
 
