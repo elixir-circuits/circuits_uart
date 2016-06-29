@@ -13,6 +13,13 @@ CFLAGS ?= -O2 -Wall -Wextra -Wno-unused-parameter
 CFLAGS += -std=c99 -D_GNU_SOURCE
 CC ?= $(CROSSCOMPILER)gcc
 
+###################
+# If you're having trouble with the serial port, commenting in the following line
+# may give some more hints. By default, log messages are appended to nerves_uart.log.
+# See src/nerves_uart.c to change this. Be sure to rebuild everything by invoking
+# "mix clean" and then "mix compile", so that the flag takes effect.
+#CFLAGS += -DDEBUG
+
 SRC=$(wildcard src/*.c)
 
 # Windows-specific updates

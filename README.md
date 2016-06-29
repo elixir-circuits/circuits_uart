@@ -156,12 +156,6 @@ delay to each test to work around this. It likely can be much shorter.
 Yes, I haven't gotten to a couple really important ones for some use cases.
 See `TODO.md` for now. Please ping me if you'd like to help.
 
-### How can I use the serial port on Linux without sudo?
-
-Serial port files are almost always owned by the `dialout` group. Add yourself
-to the `dialout` group by running `sudo adduser yourusername dialout`. Then log
-out and back in again, and you should be able to access the serial port.
-
 ### Do I have to use Nerves?
 
 No, this project doesn't have any dependencies on any Nerves components. The
@@ -170,7 +164,25 @@ but we also have host-based use cases. To be useful for us, the library must
 remain crossplatform and have few dependencies. We're just developing it under
 the Nerves umbrella.
 
+### How can I use the serial port on Linux without sudo?
+
+Serial port files are almost always owned by the `dialout` group. Add yourself
+to the `dialout` group by running `sudo adduser yourusername dialout`. Then log
+out and back in again, and you should be able to access the serial port.
+
+### Why is my Arduino Leonardo (or other native USB Arduino) not receiving data on Windows?
+
+Try enabling software flow control. It is currently not understood why this
+fixes the issue, but other terminal programs that work with these devices have
+the software flow control fields enabled in the Windows DCB settings. If you
+understand the issue, please let us know.
+
 ### Debugging tips
+
+If you're having trouble and suspect the C code, edit the `Makefile` to enable
+debug logging. See the `Makefile` for instructions on how to do this. Debug
+logging is appended to a file by default, but can be sent to `stderr` or another
+location by editing `src/nerves_uart.c`.
 
 If you're on Linux, the `tty0tty` emulated null modem removes the flakiness of
 real serial port drivers if that's the problem. The serial port monitor

@@ -6,3 +6,4 @@ erl_crash.dump
 *.ez
 *.o
 /doc
+nerves_uart.log
