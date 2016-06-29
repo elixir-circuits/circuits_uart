@@ -251,7 +251,8 @@ static int uart_init_dcb(struct uart *port)
 static int uart_config_line(struct uart *port, const struct uart_config *config)
 {
     // Note:
-    //  dcb.fRtsControl and dcb.fDtrControl are not modified. Cached versions
+    //  dcb.fRtsControl and dcb.fDtrControl are not modified unless switching
+    //  away from hardware flow control. Cached versions
     //  of their current state are stored here so that they may be returned
     //  without making a system call. This also means that the SetCommState
     //  call will receive the RTS and DTR state that the user expects. The
@@ -271,6 +272,10 @@ static int uart_config_line(struct uart *port, const struct uart_config *config)
     port->dcb.fOutX = FALSE;
     port->dcb.fOutxDsrFlow = FALSE;
     port->dcb.fOutxCtsFlow = FALSE;
+
+    if (port->dcb.fRtsControl == RTS_CONTROL_HANDSHAKE)
+        port->dcb.fRtsControl = RTS_CONTROL_ENABLE;
+
     switch (config->flow_control) {
     default:
     case UART_FLOWCONTROL_NONE:
