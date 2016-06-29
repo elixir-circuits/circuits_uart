@@ -1,4 +1,4 @@
-defmodule NervesUart.Mixfile do
+defmodule Nerves.UART.Mixfile do
   use Mix.Project
 
   @version "0.0.7"
