@@ -2,16 +2,22 @@ defmodule UARTTest do
   use ExUnit.Case
   alias Nerves.UART
 
-  # Define the following environment variables for your environment:
-  #
-  #   NERVES_UART_PORT1 - e.g., COM1 or ttyS0
-  #   NERVES_UART_PORT2
-  #
-  # The unit tests expect those ports to exist, be different ports,
-  # and be connected to each other through a null modem cable.
-  #
-  # On Linux, it's possible to use tty0tty. See
-  # https://github.com/freemed/tty0tty.
+  @moduledoc """
+  This module provides common setup code for unit tests that require real
+  or emulated serial ports to work.
+
+  Define the following environment variables for your environment:
+
+    NERVES_UART_PORT1 - e.g., COM1 or ttyS0
+    NERVES_UART_PORT2
+
+  The unit tests expect those ports to exist, be different ports,
+  and be connected to each other through a null modem cable.
+
+  On Linux, it's possible to use tty0tty. See
+  https://github.com/freemed/tty0tty.
+  """
+
   def port1() do
     System.get_env("NERVES_UART_PORT1")
   end
@@ -21,16 +27,16 @@ defmodule UARTTest do
 
   def common_setup() do
     if is_nil(port1) || is_nil(port2) do
-      msg = "Please define NERVES_UART_PORT1 and NERVES_UART_PORT2 in your
+      header = "Please define NERVES_UART_PORT1 and NERVES_UART_PORT2 in your
   environment (e.g. to ttyS0 or COM1) and connect them via a null
   modem cable.\n\n"
 
       ports = UART.enumerate
-      if ports == [] do
-        msg = msg <> "No serial ports were found. Check your OS to see if they exist"
-      else
-        msg = msg <> "The following ports were found: #{inspect Map.keys(ports)}"
-      end
+      msg =
+        case ports do
+          [] -> header <> "No serial ports were found. Check your OS to see if they exist"
+          _ -> header <> "The following ports were found: #{inspect Map.keys(ports)}"
+        end
       flunk msg
     end
 
