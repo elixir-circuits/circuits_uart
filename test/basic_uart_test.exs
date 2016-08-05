@@ -1,6 +1,6 @@
 Code.require_file "uart_test.exs", __DIR__
 
-defmodule NervesUARTTest do
+defmodule BasicUARTTest do
   use ExUnit.Case
   alias Nerves.UART
 
