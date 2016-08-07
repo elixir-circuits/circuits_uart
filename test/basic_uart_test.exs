@@ -187,7 +187,7 @@ defmodule BasicUARTTest do
     assert_receive {:nerves_uart, ^port2, "a"}
 
     # Only one message should be sent
-    refute_receive {:nerves_uart, _}
+    refute_receive {:nerves_uart, _, _}
 
     # Try another write
     assert :ok = UART.write(uart1, "b")
@@ -218,13 +218,13 @@ defmodule BasicUARTTest do
     assert :ok = UART.configure(uart2, active: false)
     assert :ok = UART.write(uart1, "c")
     assert {:ok, "c"} = UART.read(uart2, 100)
-    refute_receive {:nerves_uart, _}
+    refute_receive {:nerves_uart, _, _}
 
     assert :ok = UART.configure(uart2, active: true)
     assert :ok = UART.write(uart1, "d")
     assert_receive {:nerves_uart, ^port2, "d"}
 
-    refute_receive {:nerves_uart, _}
+    refute_receive {:nerves_uart, _, _}
 
     UART.close(uart1)
     UART.close(uart2)

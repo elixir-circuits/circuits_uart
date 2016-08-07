@@ -16,6 +16,19 @@ defmodule Nerves.UART do
   Find and use UARTs, serial ports, and more.
   """
 
+  defmodule State do
+    @moduledoc false
+    defstruct [
+      port: nil,
+      controlling_process: nil,
+      name: nil,
+      framing: Nerves.UART.Framing.None,
+      framing_state: nil,
+      rx_framing_timeout: 0,
+      queued_messages: []
+    ]
+  end
+
   # Public API
   @doc """
   Return a map of available ports with information about each one. The map
@@ -53,17 +66,36 @@ defmodule Nerves.UART do
   end
 
   @doc """
-  Open a serial port. Pass one
-  or more of the following options to configure the port:
+  Open a serial port.
 
-    * `:active n`       - where n is true or false (see discussion below)
-    * `:speed n`        - n is the baudrate of the board (e.g., 115200)
-    * `:data_bits n`    - n is the number of data bits (e.g., 5, 6, 7, or 8)
-    * `:stop_bits n`    - n is the number of stop bits (e.g., 1 or 2)
-    * `:parity n`       - n is `:none`, `:even`, `:odd`, `:space`, or `:mark`
+  The following options are available:
+
+    * `:active` - (`true` or `false`) specifies whether data is received as
+       messages or by calling `read/2`. See discussion below.
+
+    * `:speed` - (number) set the initial baudrate (e.g., 115200)
+
+    * `:data_bits` - (5, 6, 7, 8) set the number of data bits (usually 8)
+
+    * `:stop_bits` - (1, 2) set the number of stop bits (usually 1)
+
+    * `:parity` - (`:none`, `:even`, `:odd`, `:space`, or `:mark`) set the
+      parity. Usually this is `:none`. Other values:
       * `:space` means that the parity bit is always 0
       * `:mark` means that the parity bit is always 1
-    * `:flow_control n` - n is :none, :hardware, or :software
+
+    * `:flow_control` - (`:none`, `:hardware`, or `:software`) set the flow control
+      strategy.
+
+    * `:framing` - (`module` or ``{module, args}`) set the framing for data.
+      The `module` must implement the `Nerves.UART.Framing` behaviour. See
+      `Nerves.UART.Framing.None` and `Nerves.UART.Framing.Line`. The default
+      is `Nerves.UART.Framing.None`.
+
+    * `:rx_framing_timeout` - (milliseconds) this specifies how long incomplete
+      frames will wait for the remainder to be received. Timed out partial
+      frames are reported as `{:partial, data}`. A timeout of <= 0 means to
+      wait forever.
 
   Active mode defaults to true and means that data received on the
   UART is reported in messages. The messages have the following form:
@@ -228,28 +260,72 @@ defmodule Nerves.UART do
         :use_stdio,
         :binary,
         :exit_status])
-    state = %{port: port, controlling_process: nil, name: nil}
+    state = %State{port: port}
     {:ok, state}
   end
 
   def handle_call({:open, name, opts}, {from_pid, _}, state) do
+    new_framing = Keyword.get(opts, :framing, nil)
+    new_rx_framing_timeout
+      = Keyword.get(opts, :rx_framing_timeout, state.rx_framing_timeout)
+
     response = call_port(state, :open, {name, opts})
-    state = %{state | name: name, controlling_process: from_pid}
+    state = %{state | name: name,
+              controlling_process: from_pid,
+              rx_framing_timeout: new_rx_framing_timeout} |>
+              change_framing(new_framing)
+
     {:reply, response, state}
   end
   def handle_call(:close, _from, state) do
     response = call_port(state, :close, nil)
     {:reply, response, state}
   end
-  def handle_call({:read, timeout}, _from, state) do
-    response = call_port(state, :read, timeout, port_timeout(timeout))
-    {:reply, response, state}
+  def handle_call({:read, _timeout}, _from, %{queued_messages: [message | rest]} = state) do
+    # Return the queued response.
+    new_state = %{state | queued_messages: rest}
+    {:reply, {:ok, message}, new_state}
+  end
+  def handle_call({:read, timeout}, from, state) do
+    # Poll the serial port
+    case call_port(state, :read, timeout, port_timeout(timeout)) do
+      {:ok, <<>>} ->
+        # Timeout
+        {:reply, {:ok, <<>>}, state}
+      {:ok, buffer} ->
+        # More data
+        {_rc, messages, new_framing_state} =
+          apply(state.framing, :remove_framing, [buffer, state.framing_state])
+        new_state = %{state | framing_state: new_framing_state}
+        if messages == [] do
+          # If nothing, poll some more
+          handle_call({:read, timeout}, from, new_state)
+        else
+          # Return the first message
+          [first_message | rest] = messages
+          new_state = %{new_state | queued_messages: rest}
+          {:reply, {:ok, first_message}, new_state}
+        end
+      response ->
+        # Error
+        {:reply, response, state}
+    end
   end
   def handle_call({:write, value, timeout}, _from, state) do
-    response = call_port(state, :write, {value, timeout}, port_timeout(timeout))
-    {:reply, response, state}
+    {:ok, framed_data, new_framing_state} =
+      apply(state.framing, :add_framing, [value, state.framing_state])
+
+    response = call_port(state, :write, {framed_data, timeout}, port_timeout(timeout))
+    new_state = %{state | framing_state: new_framing_state}
+    {:reply, response, new_state}
   end
   def handle_call({:configure, opts}, _from, state) do
+    new_framing = Keyword.get(opts, :framing, nil)
+    new_rx_framing_timeout
+      = Keyword.get(opts, :rx_framing_timeout, state.rx_framing_timeout)
+    state = %{state | rx_framing_timeout: new_rx_framing_timeout}
+     |> change_framing(new_framing)
+
     response = call_port(state, :configure, opts)
     {:reply, response, state}
   end
@@ -288,6 +364,15 @@ defmodule Nerves.UART do
     handle_port(msg, state)
   end
 
+  defp change_framing(state, nil), do: state
+  defp change_framing(state, framing_mod) when is_atom(framing_mod) do
+    change_framing(state, {framing_mod, []})
+  end
+  defp change_framing(state, {framing_mod, framing_args}) do
+    {:ok, framing_state} = apply(framing_mod, :init, [framing_args])
+    %{state | framing: framing_mod, framing_state: framing_state}
+  end
+
   defp call_port(state, command, arguments, timeout \\ 4000) do
     msg = {command, arguments}
     send state.port, {self, {:command, :erlang.term_to_binary(msg)}}
@@ -303,13 +388,27 @@ defmodule Nerves.UART do
     end
   end
 
-  defp handle_port({:notif, data}, state) do
+  defp handle_port({:notif, data}, state) when is_binary(data) do
     #IO.puts "Received data on port #{state.name}"
-    msg = {:nerves_uart, state.name, data}
+    {_rc, messages, new_framing_state} =
+      apply(state.framing, :remove_framing, [data, state.framing_state])
+    new_state = %{state | framing_state: new_framing_state}
     if state.controlling_process do
-      send state.controlling_process, msg
+      Enum.each(messages, &(report_message(new_state, &1)))
+    end
+    {:noreply, new_state}
+  end
+  defp handle_port({:notif, data}, state) do
+    # Report an error from the port
+    if state.controlling_process do
+      report_message(state, data)
     end
     {:noreply, state}
+  end
+
+  defp report_message(state, message) do
+    event = {:nerves_uart, state.name, message}
+    send(state.controlling_process, event)
   end
 
   defp genserver_timeout(timeout) do
