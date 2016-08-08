@@ -78,4 +78,5 @@ defmodule FramingLineTest do
     assert {:ok, [{:partial, "ABCD"}, {:partial, "EFGH"}], line} = Line.remove_framing("ABCDEFGH", line)
     assert Line.buffer_empty?(line) == true
   end
+
 end

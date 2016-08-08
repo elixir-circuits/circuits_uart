@@ -109,7 +109,7 @@ defmodule FramingTest do
   test "framing timeouts in active mode", %{uart1: uart1, uart2: uart2} do
     assert :ok = UART.open(uart1, UARTTest.port1)
     assert :ok = UART.open(uart2, UARTTest.port2,
-                          active: false,
+                          active: true,
                           framing: {UART.Framing.Line, max_length: 10},
                           rx_framing_timeout: 500)
     port2 = UARTTest.port2()
