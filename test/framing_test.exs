@@ -53,6 +53,7 @@ defmodule FramingTest do
     UART.close(uart2)
   end
 
+  if false do # Not supported yet
   test "framing timeouts in passive mode", %{uart1: uart1, uart2: uart2} do
     assert :ok = UART.open(uart1, UARTTest.port1)
     assert :ok = UART.open(uart2, UARTTest.port2,
@@ -66,6 +67,7 @@ defmodule FramingTest do
 
     UART.close(uart1)
     UART.close(uart2)
+  end
   end
 
   test "receive a line in active mode", %{uart1: uart1, uart2: uart2} do
