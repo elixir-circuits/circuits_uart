@@ -64,6 +64,8 @@ Enough with passive mode, let's switch to active mode:
     {:nerves_uart, "COM14", "a"}
     {:nerves_uart, "COM14", "b"}
     {:nerves_uart, "COM14", "c"}
+    {:nerves_uart, "COM14", "\r"}
+    {:nerves_uart, "COM14", "\n"}
     :ok
 
 It turns out that `COM14` is a USB to serial port. Let's unplug it and see what
@@ -74,6 +76,38 @@ happens:
 
 Oops. Well, when it appears again, it can be reopened. In passive mode, errors
 get reported on the calls to `Nerves.UART.read/2` and `Nerves.UART.write/3`
+
+Back to receiving data, it's a little annoying that characters arrive one by one.
+That's because our computer is really fast compared to the serial port, but if
+something slows it down, we could receive two or more characters at a time. Rather than
+reassemble the characters into lines, we can ask `nerves_uart` to do it for us:
+
+    iex> Nerves.UART.configure(pid, framing: {Nerves.UART.Framing.Line, separator: "\r\n"})
+    :ok
+
+This tells `nerves_uart` to append a `\r\n` to each call to `write/2` and to report
+each line separately in active and passive mode. You can set this configuration
+in the call to `open/3` as well. Here's what we get now:
+
+    iex> flush
+    {:nerves_uart, "COM14", "abc"}   # Note that the "\r\n" is trimmed
+    :ok
+
+If your serial data is framed differently, check out the `Nerves.UART.Framing` behaviour
+and implement your own.
+
+You can also set a timeout so that a partial line doesn't hang around in the receive
+buffer forever:
+
+    iex> Nerves.UART.configure(pid, rx_framing_timeout: 500)
+    :ok
+
+    # Assume that the sender sent the letter "A" without sending anything else
+    # for 500 ms.
+
+    iex> flush
+    {:nerves_uart, "COM14", {:partial, "A"}}
+
 
 ## Installation
 
