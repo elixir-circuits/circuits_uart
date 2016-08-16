@@ -45,7 +45,16 @@ DISTFILES += \
     appveyor.yml \
     test/hw_signals_test.exs \
     test/test_helper.exs \
-    test/uart_test.exs
+    test/uart_test.exs \
+    test/basic_uart_test.exs \
+    test/framing_line_test.exs \
+    test/framing_test.exs \
+    test/uartless_test.exs \
+    lib/uart/framing.ex \
+    lib/uart/enumerator.ex \
+    lib/uart/framing/none.ex \
+    lib/uart/framing/line.ex \
+    CHANGELOG.md
 
 win32 {
     SOURCES += \
