@@ -101,7 +101,7 @@ static int parse_option_list(const char *req, int *req_index, struct uart_config
             return -1;
         }
 
-        char key[16];
+        char key[64];
         if (ei_decode_atom(req, req_index, key) < 0) {
             debug("expecting atoms for option keys");
             return -1;
@@ -178,7 +178,7 @@ static void handle_open(const char *req, int *req_index)
             term_size != 2)
         errx(EXIT_FAILURE, ":open requires a 2-tuple");
 
-    char name[32];
+    char name[64];
     long binary_len;
     if (ei_get_type(req, req_index, &term_type, &term_size) < 0 ||
             term_type != ERL_BINARY_EXT ||
