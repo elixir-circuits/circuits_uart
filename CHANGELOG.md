@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.1.0
+
+  * New features
+    * Add support for adding and removing framing on data
+      transferred over the serial port.
+    * Add line framing implementation to support receiving
+      notifications only for complete lines (lines ending
+      in '\n' or '\r\n') or lines that are longer than a set
+      length.
+
+  * Bugs fixed
+    * Enable RTS when not using it. Keeping it cleared
+      was stopping transmission on devices that supported
+      flow control when the user wasn't using it.
+    * Fix quirks on Windows when using com0com. This should
+      improve support with at least one other serial driver
+      based on user error reports.
+
+  * Known limitations
+    * Framing receive timeouts only work in active mode.
+      (I.e., you're waiting for a complete line to be received,
+      but if it takes too long, then you want to receive a
+      notification of a partial line.) Passive mode support is coming.
+
 ## v0.0.7
 
   * Bugs fixed
