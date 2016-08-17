@@ -89,7 +89,7 @@ defmodule Nerves.UART do
     * `:flow_control` - (`:none`, `:hardware`, or `:software`) set the flow control
       strategy.
 
-    * `:framing` - (`module` or ``{module, args}`) set the framing for data.
+    * `:framing` - (`module` or `{module, args}`) set the framing for data.
       The `module` must implement the `Nerves.UART.Framing` behaviour. See
       `Nerves.UART.Framing.None` and `Nerves.UART.Framing.Line`. The default
       is `Nerves.UART.Framing.None`.

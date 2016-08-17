@@ -2,22 +2,24 @@ defmodule Nerves.UART.Framing.Line do
   @behaviour Nerves.UART.Framing
 
   @moduledoc """
-  Each message is one line. This framer appends and removes newline sequences
+  Each message is one line. This framer appends and removes newline sequences
   as part of the framing. Buffering is performed internally, so users can get
-  the complete messages under normal circumstances. A couple boundary
-  conditions exist that may require special attention:
+  the complete messages under normal circumstances. Attention should be paid
+  to the following:
 
-  1. Lines should have a fixed max length so that a misbehaving sender can't
-     cause unbounded buffer expansion. When the max length is reached, a
+  1. Lines must have a fixed max length so that a misbehaving sender can't
+     cause unbounded buffer expansion. When the max length is passed, a
      `{:partial, data}` is reported. The application can decide what to do with
-     this. Note that the next reported line will likely be truncated.
+     this.
   2. The separation character varies depending on the target device. Some
-     devices require "\r\n" sequences, so be sure to specify this.
-  3. It may also be desirable to set a `:rx_framer_timeout` to prevent
-     characters received in error from collecting during idle times.
+     devices require "\r\n" sequences, so be sure to specify this. Currently
+     only one or two character separators are supported.
+  3. It may be desirable to set a `:rx_framer_timeout` to prevent
+     characters received in error from collecting during idle times. When the
+     receive timer expires, `{:partial, data}` is reported.
   4. Line separators must be ASCII characters (0-127) or be valid UTF-8
      sequences. If the device only sends ASCII, high characters (128-255)
-     should work as well. [Editors note: please report if using extended
+     should work as well. [Note: please report if using extended
      characters.]
   """
 

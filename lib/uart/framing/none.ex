@@ -2,7 +2,7 @@ defmodule Nerves.UART.Framing.None do
   @behaviour Nerves.UART.Framing
 
   @moduledoc """
-  Don't apply or removing any framing.
+  Don't apply or removing any framing.
   """
 
   def init(_args), do: {:ok, nil}
