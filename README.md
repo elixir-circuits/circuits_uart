@@ -9,9 +9,14 @@ port connections and more in Elixir. Feature highlights:
   * Mac, Windows, and desktop and embedded Linux
   * Enumerate serial ports
   * Receive input via messages or by polling (active and passive modes)
+  * Add and remove framing on serial data - line-based framing included for use
+    with GPS, cellular, satellite and other modules
   * Unit tests (uses the [tty0tty](https://github.com/freemed/tty0tty) virtual null modem on Travis)
 
-** This library is new. Expect API changes (hopefully minor) and bugs, but we'll get there!! If you try it out, please consider helping out by contributing documentation improvements, fixes, or more unit tests. **
+Something doesn't work for you? Check out below and the
+[docs](https://hexdocs.pm/nerves_uart/). Chat with other users on the nerves
+channel on the [elixir-lang slack](https://elixir-slackin.herokuapp.com/), or
+file an issue or PR.
 
 ## Example use
 
