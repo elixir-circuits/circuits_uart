@@ -715,7 +715,9 @@ int main(int argc, char *argv[])
     // Erlang on Windows really doesn't like logging to stderr.
     log_location = stderr;
 #else
-    FILE *fp = fopen("nerves_uart.log", "w+");
+    char logfile[64];
+    sprintf(logfile, "nerves_uart-%d.log", (int) GetCurrentProcessId());
+    FILE *fp = fopen(logfile, "w+");
     log_location = fp;
 
     debug("Starting...");
