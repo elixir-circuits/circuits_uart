@@ -70,12 +70,29 @@ defmodule FramingLineTest do
 
   test "handles max length" do
     {:ok, line} = Line.init(max_length: 4)
-    assert {:ok, [{:partial, "ABCD"}], ^line} = Line.remove_framing("ABCD", line)
 
+    # One partial result
     assert {:in_frame, [{:partial, "ABCD"}], line} = Line.remove_framing("ABCDEFG", line)
     assert {:ok, ["EFG"], line} = Line.remove_framing("\n", line)
 
-    assert {:ok, [{:partial, "ABCD"}, {:partial, "EFGH"}], line} = Line.remove_framing("ABCDEFGH", line)
+    # Multiple partial results
+    assert {:in_frame, [{:partial, "ABCD"}, {:partial, "EFGH"}], line} = Line.remove_framing("ABCDEFGHI", line)
+
+    # Add one by one to get a partial result
+    assert {:in_frame, [], line} = Line.remove_framing("J", line)
+    assert {:in_frame, [], line} = Line.remove_framing("K", line)
+    assert {:in_frame, [], line} = Line.remove_framing("L", line)
+    assert {:in_frame, [{:partial, "IJKL"}], line} = Line.remove_framing("M", line)
+    assert Line.buffer_empty?(line) == false
+  end
+
+  test "handles max length at end of line" do
+    {:ok, line} = Line.init(max_length: 4)
+    assert {:ok, ["ABCD"], ^line} = Line.remove_framing("ABCD\n", line)
+
+    assert {:in_frame, [], line} = Line.remove_framing("EFGH", line)
+    assert {:ok, ["EFGH"], line} = Line.remove_framing("\n", line)
+
     assert Line.buffer_empty?(line) == true
   end
 

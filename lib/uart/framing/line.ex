@@ -85,7 +85,7 @@ defmodule Nerves.UART.Framing.Line do
   end
   # Handle line too long case
   defp process_data(separator, sep_length, max_length, processed, to_process, lines)
-                    when byte_size(processed) == max_length do
+                    when byte_size(processed) == max_length and to_process != <<>> do
     new_lines = lines ++ [{:partial, processed}]
     process_data(separator, sep_length, max_length, <<>>, to_process, new_lines)
   end
