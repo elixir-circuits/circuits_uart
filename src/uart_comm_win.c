@@ -299,7 +299,6 @@ static int uart_config_line(struct uart *port, const struct uart_config *config)
 
 static int start_async_reads(struct uart *port) {
     debug("Starting async read");
-
     BOOL rc = WaitCommEvent(
                 port->h,
                 &port->received_event_mask,
@@ -397,7 +396,8 @@ int uart_configure(struct uart *port, const struct uart_config *config)
         port->active_mode_enabled = config->active;
         if (port->active_mode_enabled) {
             port->desired_event_mask |= EV_RXCHAR;
-            SetCommMask(port->h, port->desired_event_mask);
+            if (!SetCommMask(port->h, port->desired_event_mask))
+                errx(EXIT_FAILURE, "uart_configure: SetCommMask failure unexpected: 0x%08x, Error=%d", (int) port->desired_event_mask, (int) GetLastError());
 
             if (start_async_reads(port) < 0) {
                 CloseHandle(port->h);
@@ -406,7 +406,8 @@ int uart_configure(struct uart *port, const struct uart_config *config)
             }
         } else {
             port->desired_event_mask &= ~EV_RXCHAR;
-            SetCommMask(port->h, port->desired_event_mask);
+            if (!SetCommMask(port->h, port->desired_event_mask))
+                errx(EXIT_FAILURE, "uart_configure: SetCommMask failure unexpected: 0x%08x, Error=%d", (int) port->desired_event_mask, (int) GetLastError());
         }
     }
 
@@ -501,6 +502,7 @@ void uart_write(struct uart *port, const uint8_t *data, size_t len, int timeout)
 
 void uart_read(struct uart *port, int timeout)
 {
+    debug("uart_read");
     if (port->active_mode_enabled) {
         debug("don't call read when in active mode");
         record_last_error(ERROR_INVALID_PARAMETER);
@@ -516,7 +518,8 @@ void uart_read(struct uart *port, int timeout)
 
     if (! (port->desired_event_mask & EV_RXCHAR)) {
         port->desired_event_mask |= EV_RXCHAR;
-        SetCommMask(port->h, port->desired_event_mask);
+        if (!SetCommMask(port->h, port->desired_event_mask))
+            errx(EXIT_FAILURE, "uart_read: SetCommMask failure unexpected: 0x%08x, Error=%d", (int) port->desired_event_mask, (int) GetLastError());
     }
 
     if (start_async_reads(port) < 0) {
@@ -670,21 +673,22 @@ static void update_timeout(uint64_t deadline, DWORD *timeout)
 
 int uart_add_wfmo_handles(struct uart *port, HANDLE *handles, DWORD *timeout)
 {
+    debug("uart_add_wfmo_handles");
     int count = 0;
     // Check if a file handle is open and waiting
     if (port->h) {
         if (port->write_data) {
-            debug("Adding write handle");
+            debug("  adding write handle");
             handles[count] = port->write_overlapped.hEvent;
             count++;
         }
         if (port->read_pending) {
-            debug("Adding read handle (passive mode)");
+            debug("  adding read handle (passive mode)");
             update_timeout(port->read_completion_deadline, timeout);
             handles[count] = port->events_overlapped.hEvent;
             count++;
         } else if (port->active_mode_enabled) {
-            debug("Adding read handle (active mode)");
+            debug("  adding read handle (active mode)");
             handles[count] = port->events_overlapped.hEvent;
             count++;
         }
@@ -695,6 +699,7 @@ int uart_add_wfmo_handles(struct uart *port, HANDLE *handles, DWORD *timeout)
 void uart_process_handle(struct uart *port, HANDLE *event)
 {
     if (event == port->write_overlapped.hEvent) {
+        debug("uart_process_handle: write event");
         if (port->write_data) {
             ResetEvent(port->write_overlapped.hEvent);
             DWORD bytes_written;
@@ -711,30 +716,40 @@ void uart_process_handle(struct uart *port, HANDLE *event)
         }
     }
     if (event == port->events_overlapped.hEvent) {
+        debug("uart_process_handle: event event");
         ResetEvent(port->events_overlapped.hEvent);
         if (port->read_pending || port->active_mode_enabled) {
             DWORD amount_read;
             BOOL rc = GetOverlappedResult(port->h, &port->events_overlapped, &amount_read, FALSE);
             DWORD last_error = rc ? NO_ERROR : GetLastError();
-            debug("Got a events event: %d %d %d!!", rc, (int) last_error, (int) amount_read);
+            debug("Got an events event: %d %d %d!!", rc, (int) last_error, (int) amount_read);
 
             // If still incomplete, try again later.
             // TODO: Clean up next line
-            if (last_error == ERROR_IO_INCOMPLETE)
+            if (last_error == ERROR_IO_INCOMPLETE) {
+                debug("incomplete -> trying again");
                 return;
+            }
 
             if (rc) {
                 // Replace line below when supporting hw line events in addition
                 // to EV_RXCHAR.
                 if (!(port->received_event_mask & EV_RXCHAR)) {
-                    debug("Spurious EV_RXCHAR");
+                    debug("spurious EV_RXCHAR");
                     return;
                 }
 
                 rc = ReadFile(port->h, port->read_buffer, sizeof(port->read_buffer), &amount_read, &port->read_overlapped);
-                debug("ReadFile event: %d %d %d!!", rc, (int) GetLastError(), (int) amount_read);
+                debug("ReadFile returned: %d %d %d!!", rc, (int) GetLastError(), (int) amount_read);
 
                 if (rc) {
+                    // Synchronouse return
+#ifdef DEBUG
+                    if (amount_read) {
+                        port->read_buffer[amount_read] = 0;
+                        debug("  sync read %d bytes: %s", (int) amount_read, port->read_buffer);
+                    }
+#endif
                     last_error = NO_ERROR;
                 } else {
                     // This case seems to occur more with passive mode reads.
@@ -745,6 +760,12 @@ void uart_process_handle(struct uart *port, HANDLE *event)
                         ResetEvent(port->read_overlapped.hEvent);
                         rc = GetOverlappedResult(port->h, &port->read_overlapped, &amount_read, FALSE);
                         debug("ReadFile result: %d %d %d!!", rc, (int) GetLastError(), (int) amount_read);
+#ifdef DEBUG
+                        if (amount_read) {
+                            port->read_buffer[amount_read] = 0;
+                            debug("  async read %d bytes: %s", (int) amount_read, port->read_buffer);
+                        }
+#endif
                         last_error = rc ? NO_ERROR : GetLastError();
                     } else {
                         // Unrecoverable error
@@ -789,8 +810,8 @@ void uart_process_timeout(struct uart *port)
 
         // Stop waiting for RXCHAR events
         port->desired_event_mask &= ~EV_RXCHAR;
-        BOOL rc = SetCommMask(port->h, port->desired_event_mask);
-        debug("SetCommMask -> %d", rc); (void) rc;
+        if (!SetCommMask(port->h, port->desired_event_mask))
+            errx(EXIT_FAILURE, "uart_process_timeout: SetCommMask failure unexpected: 0x%08x, Error=%d", (int) port->desired_event_mask, (int) GetLastError());
 
         // The Windows doc says that changing the CommMask will cause pending
         // overlapped ops to return immediately. Things should be set up so
