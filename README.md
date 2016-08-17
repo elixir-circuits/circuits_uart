@@ -171,9 +171,12 @@ before running the tests. For example,
     export NERVES_UART_PORT1=ttyS0
     export NERVES_UART_PORT2=ttyS1
 
-If you're on Linux, you don't need real serial ports. Download and install
-[tty0tty](https://github.com/freemed/tty0tty). Load the kernel module and
-specify `tnt0` and `tnt1` for the serial ports.
+If you're on Windows or Linux, you don't need real serial ports. For linux,
+download and install [tty0tty](https://github.com/freemed/tty0tty). Load the
+kernel module and specify `tnt0` and `tnt1` for the serial ports. On Windows,
+download and install [com0com](https://sourceforge.net/projects/com0com/)
+(Look for version 2.2.2.0 if the latest hasn't been signed). The ports on
+Windows are `CNCA0` and `CNCB0`.
 
 Then run:
 
