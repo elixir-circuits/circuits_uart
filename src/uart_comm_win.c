@@ -304,11 +304,14 @@ static int start_async_reads(struct uart *port) {
                 port->h,
                 &port->received_event_mask,
                 &port->events_overlapped);
-    debug("WaitCommEvent returned rc=%d, lasterror=%d", (int) rc, (int) GetLastError());
-    if (rc || GetLastError() != ERROR_IO_PENDING) {
+    if (rc) {
+        debug("WaitCommEvent returned synchronously");
+    } else if (GetLastError() != ERROR_IO_PENDING) {
         debug("start_async_reads WaitCommEvent failed?? %d", (int) GetLastError());
         record_errno();
         return -1;
+    } else {
+        debug("WaitCommEvent returned asynchronously");
     }
 
     return 0;
@@ -483,13 +486,17 @@ void uart_write(struct uart *port, const uint8_t *data, size_t len, int timeout)
                   data,
                   len,
                   NULL,
-                  &port->write_overlapped) ||
-            GetLastError() != ERROR_IO_PENDING) {
+                  &port->write_overlapped)) {
+        debug("WriteFile synchronous completion signalled.");
+        // Based on trial and error, the proper handling here is the same as
+        // the asynchronous completion case that we'd expect.
+    } else if (GetLastError() != ERROR_IO_PENDING) {
         debug("WriteFile failed %d", (int) GetLastError());
         record_errno();
         port->write_completed(-1, data);
+    } else {
+        debug("WriteFile asynchronous completion");
     }
-    debug("Write back: %d", (int) GetLastError());
 }
 
 void uart_read(struct uart *port, int timeout)
