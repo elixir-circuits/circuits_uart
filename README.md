@@ -212,13 +212,6 @@ Serial port files are almost always owned by the `dialout` group. Add yourself
 to the `dialout` group by running `sudo adduser yourusername dialout`. Then log
 out and back in again, and you should be able to access the serial port.
 
-### Why is my Arduino Leonardo (or other native USB Arduino) not receiving data on Windows?
-
-Try enabling software flow control. It is currently not understood why this
-fixes the issue, but other terminal programs that work with these devices have
-the software flow control fields enabled in the Windows DCB settings. If you
-understand the issue, please let us know.
-
 ### Debugging tips
 
 If you're having trouble and suspect the C code, edit the `Makefile` to enable
