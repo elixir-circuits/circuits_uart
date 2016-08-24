@@ -346,8 +346,10 @@ defmodule Nerves.UART do
     {:reply, response, state}
   end
   def handle_call({:flush, direction}, _from, state) do
-    response = call_port(state, :flush, direction)
-    {:reply, response, state}
+    fstate = apply(state.framing, :flush, [direction, state.framing_state])
+    new_state = %{state | framing_state: fstate}
+    response = call_port(new_state, :flush, direction)
+    {:reply, response, new_state}
   end
   def handle_call(:signals, _from, state) do
     response = call_port(state, :signals, nil)
