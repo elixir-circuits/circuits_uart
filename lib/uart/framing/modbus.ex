@@ -54,15 +54,27 @@ defmodule Nerves.UART.Framing.Modbus do
     state
   end
 
-  defp buffer_empty?(state) do
+  def buffer_empty?(state) do
     state.processed == <<>> and state.in_process == <<>>
   end
 
   # if we don't know our expected length, but we have enough data in this packet to find it
   defp process_data(data, nil, in_process, state) when byte_size(data) >= 3 do
-    data_length = byte_size(in_process <> data) - 5 # remove the 5 control bytes to get how many bytes of payload we have
     <<_slave_id, _cmd, length, _other::binary>> = data
+    new_state = %{state | expected_length: length}
+    process_data(data, length, in_process, new_state)
+  end
 
+  # deal with data that's too long 
+  defp process_data(data, expected_length, in_process, state) when (byte_size(in_process <> data) > (expected_length+5)) do
+    combined_data = in_process <> data
+    relevant_data = Kernel.binary_part(combined_data, 0, expected_length+5) # +5 for the 5 control bytes
+    new_lines = state.lines ++ [relevant_data]
+    %{state | in_process: <<>>, processed: <<>>, line_index: 0, lines: new_lines}
+  end
+
+  defp process_data(data, length, in_process, state) when byte_size(data) >= 3 do
+    data_length = byte_size(in_process <> data) - 5 # remove the 5 control bytes to get how many bytes of payload we have
     {lines, state_in_process, line_idx} = case (length == data_length) do
       true -> {state.lines++[in_process<>data], <<>>, 0} # we got the whole thing in 1 pass, so we're done
       _ -> {[], in_process<>data, byte_size(data)-1} # need to keep reading
@@ -85,8 +97,6 @@ defmodule Nerves.UART.Framing.Modbus do
     new_lines = state.lines ++ [in_process <> data]
     %{state | in_process: <<>>, processed: <<>>, line_index: 0, lines: new_lines}
   end
-
-  # @TODO guard class for when byte size is greater than expected length?
 
   defp process_data(data, _expected_length, in_process, state) do
     new_state = %{state | in_process: in_process <> data, line_index: byte_size(data)}
