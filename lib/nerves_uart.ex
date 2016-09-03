@@ -67,7 +67,7 @@ defmodule Nerves.UART do
   @doc """
   Start up a UART GenServer.
   """
-  @spec start_link([keyword]) :: {:ok, pid} | {:error, term}
+  @spec start_link([term]) :: {:ok, pid} | {:error, term}
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, [], opts)
   end
