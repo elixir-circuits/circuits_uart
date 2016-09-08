@@ -10,3 +10,6 @@ build_script:
   - mix deps.get
   - mix compile
   - mix test test/uartless_test.exs
+
+artifacts:
+  - path: priv/nerves_uart.exe
