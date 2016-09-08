@@ -34,6 +34,9 @@ ifeq ($(CC),cc)
 CC = gcc
 endif
 
+# Statically link on Windows to simplify distribution of pre-built version
+LDFLAGS += -static
+
 # To avoid linking issues, use copy/pasted version of ei.
 # YES, this is unfortunate, but it was easier than
 # battling mingw/visual c++ differences.
