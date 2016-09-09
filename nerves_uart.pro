@@ -54,7 +54,8 @@ DISTFILES += \
     lib/uart/enumerator.ex \
     lib/uart/framing/none.ex \
     lib/uart/framing/line.ex \
-    CHANGELOG.md
+    CHANGELOG.md \
+    RELEASE.md
 
 win32 {
     SOURCES += \

@@ -18,15 +18,17 @@
      and missing files.
   9. Tag
   10. Push last commit(s) *and* tag to GitHub
-  11. Wait for the Travis builds to complete successfully. They should work
+  11. Wait for the CI builds to complete successfully. They should work
       assuming that no code changes were made between the last build and the tag,
       but wait to be safe.
-  12. Run `mix hex.publish`
-  13. Update the deps on a sample project that uses nerves_uart to make sure that it
+  12. Copy the nerves_uart.exe artifact created by the Appveyor CI build
+      to `prebuilt/nerves_uart.exe`
+  13. Run `mix hex.publish`
+  14. Update the deps on a sample project that uses nerves_uart to make sure that it
       downloads and builds the new nerves_uart.
-  14. Copy the latest CHANGELOG.md entry to the GitHub releases description.
+  15. Copy the latest CHANGELOG.md entry to the GitHub releases description.
       Publish the release on GitHub.
-  15. Start the next dev cycle. Start a new section in `CHANGELOG.md` and
+  16. Start the next dev cycle. Start a new section in `CHANGELOG.md` and
       update the version in `mix.exs` to a `-dev` version.
-  16. Push changes up to GitHub
+  17. Push changes up to GitHub
 
