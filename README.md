@@ -121,7 +121,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
   1. Add `nerves_uart` to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:nerves_uart, "~> 0.1.0"}]
+          [{:nerves_uart, "~> 0.1.1"}]
         end
 
   2. List `:nerves_uart` as an application dependency:

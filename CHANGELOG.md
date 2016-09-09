@@ -1,6 +1,10 @@
 # Changelog
 
-## v0.2.0-dev
+## v0.1.1
+
+  * New features
+    * Enable experimental feature on Windows to use prebuilt
+      port binary. Feedback appreciated.
 
 ## v0.1.0
 
