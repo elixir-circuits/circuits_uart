@@ -74,30 +74,27 @@ defmodule Nerves.UART.Framing.Line do
     state.processed == <<>> and state.in_process == <<>>
   end
 
-  # Found a separator with more data to go
-  # NOTE: is there any way to avoid hardcoding the possible separator lengths
-  #       here?
-  defp process_data(separator, 1, max_length, processed, <<separator::binary-size(1), rest::binary>>, lines) do
-    new_lines = lines ++ [processed]
-    process_data(separator, 1, max_length, <<>>, rest, new_lines)
-  end
-  defp process_data(separator, 2, max_length, processed, <<separator::binary-size(2), rest::binary>>, lines) do
-    new_lines = lines ++ [processed]
-    process_data(separator, 2, max_length, <<>>, rest, new_lines)
-  end
-  # Handle line too long case
-  defp process_data(separator, sep_length, max_length, processed, to_process, lines)
-                    when byte_size(processed) == max_length and to_process != <<>> do
-    new_lines = lines ++ [{:partial, processed}]
-    process_data(separator, sep_length, max_length, <<>>, to_process, new_lines)
-  end
   # Handle not enough data case
   defp process_data(_separator, sep_length, _max_length, processed, to_process, lines)
                     when byte_size(to_process) < sep_length do
     {processed, to_process, lines}
   end
-  # Handle one character
-  defp process_data(separator, sep_length, max_length, processed, <<next_char::binary-size(1), rest::binary>>, lines) do
-    process_data(separator, sep_length, max_length, processed <> next_char, rest, lines)
+
+  # Process data until separator or next char
+  defp process_data(separator, sep_length, max_length, processed, to_process, lines) do
+    case to_process do
+      # Handle separater
+      <<^separator::binary-size(sep_length), rest::binary>> ->
+        new_lines = lines ++ [processed]
+        process_data(separator, sep_length, max_length, <<>>, rest, new_lines)
+      # Handle line too long case
+      to_process when byte_size(processed) == max_length and to_process != <<>> ->
+        new_lines = lines ++ [{:partial, processed}]
+        process_data(separator, sep_length, max_length, <<>>, to_process, new_lines)
+      # Handle next char
+      <<next_char::binary-size(1), rest::binary>> ->
+        process_data(separator, sep_length, max_length, processed <> next_char, rest, lines)
+    end
   end
+
 end
