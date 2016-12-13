@@ -22,25 +22,31 @@ file an issue or PR.
 
 Discover what serial ports are attached:
 
-    iex> Nerves.UART.enumerate
-    %{"COM14" => %{description: "USB Serial Port", manufacturer: "FTDI", product_id: 24577,
-        vendor_id: 1027},
-      "COM5" => %{description: "Prolific USB-to-Serial Comm Port",
-        manufacturer: "Prolific", product_id: 8963, vendor_id: 1659},
-      "COM16" => %{description: "Arduino Uno",
-        manufacturer: "Arduino LLC (www.arduino.cc)", product_id: 67, vendor_id: 9025}}
+```elixir
+iex> Nerves.UART.enumerate
+%{"COM14" => %{description: "USB Serial Port", manufacturer: "FTDI", product_id: 24577,
+    vendor_id: 1027},
+  "COM5" => %{description: "Prolific USB-to-Serial Comm Port",
+    manufacturer: "Prolific", product_id: 8963, vendor_id: 1659},
+  "COM16" => %{description: "Arduino Uno",
+    manufacturer: "Arduino LLC (www.arduino.cc)", product_id: 67, vendor_id: 9025}}
+```
 
 Start the UART GenServer:
 
-    iex> {:ok, pid} = Nerves.UART.start_link
-    {:ok, #PID<0.132.0>}
+```elixir
+iex> {:ok, pid} = Nerves.UART.start_link
+{:ok, #PID<0.132.0>}
+```
 
 The GenServer doesn't open a port automatically, so open up a serial port or UART
 now. See the results from your call to `Nerves.UART.enumerate/0` for what's
 available on your system.
 
-    iex> Nerves.UART.open(pid, "COM14", speed: 115200, active: false)
-    :ok
+```elixir
+iex> Nerves.UART.open(pid, "COM14", speed: 115200, active: false)
+:ok
+```
 
 This opens the serial port up at 115200 baud and turns off active mode. This means that
 you'll have to manually call `Nerves.UART.read` to receive input. In active mode, input
@@ -48,13 +54,17 @@ from the serial port will be sent as messages. See the docs for all options.
 
 Write something to the serial port:
 
-    iex> Nerves.UART.write(pid, "Hello there\r\n")
-    :ok
+```elixir
+iex> Nerves.UART.write(pid, "Hello there\r\n")
+:ok
+```
 
 See if anyone responds in the next 60 seconds:
 
-    iex> Nerves.UART.read(pid, 60000)
-    {:ok, "Hi"}
+```elixir
+iex> Nerves.UART.read(pid, 60000)
+{:ok, "Hi"}
+```
 
 Input is reported as soon as it is received, so you may need multiple calls to `read/2`
 to get everything you want. If you have flow control enabled and stop calling
@@ -62,22 +72,26 @@ to get everything you want. If you have flow control enabled and stop calling
 
 Enough with passive mode, let's switch to active mode:
 
-    iex> Nerves.UART.configure(pid, active: true)
-    :ok
+```elixir
+iex> Nerves.UART.configure(pid, active: true)
+:ok
 
-    iex> flush
-    {:nerves_uart, "COM14", "a"}
-    {:nerves_uart, "COM14", "b"}
-    {:nerves_uart, "COM14", "c"}
-    {:nerves_uart, "COM14", "\r"}
-    {:nerves_uart, "COM14", "\n"}
-    :ok
+iex> flush
+{:nerves_uart, "COM14", "a"}
+{:nerves_uart, "COM14", "b"}
+{:nerves_uart, "COM14", "c"}
+{:nerves_uart, "COM14", "\r"}
+{:nerves_uart, "COM14", "\n"}
+:ok
+```
 
 It turns out that `COM14` is a USB to serial port. Let's unplug it and see what
 happens:
 
-    iex> flush
-    {:nerves_uart, "COM14", {:error, :eio}}
+```elixir
+iex> flush
+{:nerves_uart, "COM14", {:error, :eio}}
+```
 
 Oops. Well, when it appears again, it can be reopened. In passive mode, errors
 get reported on the calls to `Nerves.UART.read/2` and `Nerves.UART.write/3`
@@ -87,16 +101,20 @@ That's because our computer is really fast compared to the serial port, but if
 something slows it down, we could receive two or more characters at a time. Rather than
 reassemble the characters into lines, we can ask `nerves_uart` to do it for us:
 
-    iex> Nerves.UART.configure(pid, framing: {Nerves.UART.Framing.Line, separator: "\r\n"})
-    :ok
+```elixir
+iex> Nerves.UART.configure(pid, framing: {Nerves.UART.Framing.Line, separator: "\r\n"})
+:ok
+```
 
 This tells `nerves_uart` to append a `\r\n` to each call to `write/2` and to report
 each line separately in active and passive mode. You can set this configuration
 in the call to `open/3` as well. Here's what we get now:
 
-    iex> flush
-    {:nerves_uart, "COM14", "abc"}   # Note that the "\r\n" is trimmed
-    :ok
+```elixir
+iex> flush
+{:nerves_uart, "COM14", "abc"}   # Note that the "\r\n" is trimmed
+:ok
+```
 
 If your serial data is framed differently, check out the `Nerves.UART.Framing` behaviour
 and implement your own.
@@ -104,14 +122,16 @@ and implement your own.
 You can also set a timeout so that a partial line doesn't hang around in the receive
 buffer forever:
 
-    iex> Nerves.UART.configure(pid, rx_framing_timeout: 500)
-    :ok
+```elixir
+iex> Nerves.UART.configure(pid, rx_framing_timeout: 500)
+:ok
 
-    # Assume that the sender sent the letter "A" without sending anything else
-    # for 500 ms.
+# Assume that the sender sent the letter "A" without sending anything else
+# for 500 ms.
 
-    iex> flush
-    {:nerves_uart, "COM14", {:partial, "A"}}
+iex> flush
+{:nerves_uart, "COM14", {:partial, "A"}}
+```
 
 
 ## Installation
@@ -120,15 +140,19 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
   1. Add `nerves_uart` to your list of dependencies in `mix.exs`:
 
-        def deps do
-          [{:nerves_uart, "~> 0.1.1"}]
-        end
+  ```elixir
+  def deps do
+    [{:nerves_uart, "~> 0.1.1"}]
+  end
+  ```
 
   2. List `:nerves_uart` as an application dependency:
 
-        def application do
-          [applications: [:nerves_uart]]
-        end
+  ```elixir
+  def application do
+    [applications: [:nerves_uart]]
+  end
+  ```
 
   3. Check that the C compiler dependencies are satisified (see below)
 
@@ -142,7 +166,9 @@ libraries are required.
 On Linux systems, this usually requires you to install
 the `build-essential` and `erlang-dev` packages. For example:
 
-    sudo apt-get install build-essential erlang-dev
+```sh
+sudo apt-get install build-essential erlang-dev
+```
 
 On Macs, run `gcc --version` or `make --version`. If they're not installed, you will
 be given instructions.
@@ -154,7 +180,9 @@ the port binary yourself, you will need MinGW. Assuming that you installed Erlan
 Elixir via [Chocolatey](https://chocolatey.org/), install MinGW by
 running the following in an administrative command prompt:
 
-    choco install mingw
+```sh
+choco install mingw
+```
 
 On Nerves, you're set - just add `nerves_uart` to your `mix.exs`. Nerves
 contains everything needed by default. If you do use Nerves, though, keep in
@@ -169,15 +197,19 @@ dependency to a regular (non-Nerves) Elixir project.
 The standard Elixir build process applies. Clone `nerves_uart` or
 download a source release and run:
 
-    mix deps.get
-    mix compile
+```sh
+mix deps.get
+mix compile
+```
 
 The unit tests require two serial ports connected via a NULL modem
 cable to run. Define the names of the serial ports in the environment
 before running the tests. For example,
 
-    export NERVES_UART_PORT1=ttyS0
-    export NERVES_UART_PORT2=ttyS1
+```sh
+export NERVES_UART_PORT1=ttyS0
+export NERVES_UART_PORT2=ttyS1
+```
 
 If you're on Windows or Linux, you don't need real serial ports. For linux,
 download and install [tty0tty](https://github.com/freemed/tty0tty). Load the
@@ -188,7 +220,9 @@ Windows are `CNCA0` and `CNCB0`.
 
 Then run:
 
-    mix test
+```sh
+mix test
+```
 
 If you're using `tty0tty`, the tests will run at full speed. Real serial ports
 seem to take a fraction of a second to close and re-open. I added a gratuitous
