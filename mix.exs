@@ -24,7 +24,7 @@ defmodule Nerves.UART.Mixfile do
   # If the platform doesn't have make installed, try to
   # use a prebuilt version of the port binary
   defp make_or_prebuilt() do
-    if run_make? do
+    if run_make?() do
       [compilers: [:elixir_make] ++ Mix.compilers,
        make_executable: make_executable(),
        make_makefile: "Makefile",
@@ -63,7 +63,7 @@ defmodule Nerves.UART.Mixfile do
     case :os.type() do
       {:win32, _} ->
         # If mingw32-make isn't installed, then try prebuilt version
-        location = make_executable |> System.find_executable
+        location = make_executable() |> System.find_executable
         location != nil
       _ ->
         # Non-windows platforms should have make and gcc if they

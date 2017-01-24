@@ -436,7 +436,7 @@ defmodule Nerves.UART do
 
   defp call_port(state, command, arguments, timeout \\ 4000) do
     msg = {command, arguments}
-    send state.port, {self, {:command, :erlang.term_to_binary(msg)}}
+    send state.port, {self(), {:command, :erlang.term_to_binary(msg)}}
     # Block until the response comes back since the C side
     # doesn't want to handle any queuing of requests. REVISIT
     receive do
