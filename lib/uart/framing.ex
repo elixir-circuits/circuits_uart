@@ -47,5 +47,5 @@ defmodule Nerves.UART.Framing do
   """
   @callback flush(direction :: :receive | :transmit | :both, state :: term) ::
     new_state when new_state: term
-    
+
 end
