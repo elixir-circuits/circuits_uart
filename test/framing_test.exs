@@ -80,7 +80,6 @@ defmodule FramingTest do
     assert :ok = UART.write(uart1, "A")
     refute_receive {:nerves_uart, _, _}
 
-
     # Terminate the line and check that receive gets it
     assert :ok = UART.write(uart1, "\n")
     # QUESTION: Trim the framing or not?
@@ -123,7 +122,6 @@ defmodule FramingTest do
     UART.close(uart1)
     UART.close(uart2)
   end
-
 
   test "active mode gets error when write fails", %{uart1: uart1} do
     # This only works with tty0tty since it fails write operations if no

@@ -139,7 +139,7 @@ defmodule BasicUARTTest do
     lots_o_data = :binary.copy("a", 5000)
 
     # Allow 10 seconds for write to give it time to complete
-    assert :ok = UART.write(uart1, lots_o_data, 10000)
+    assert :ok = UART.write(uart1, lots_o_data, 10_000)
 
     UART.close(uart1)
     UART.close(uart2)
