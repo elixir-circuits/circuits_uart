@@ -63,7 +63,7 @@ defmodule Nerves.UART.Mixfile do
     case :os.type() do
       {:win32, _} ->
         # If mingw32-make isn't installed, then try prebuilt version
-        location = make_executable() |> System.find_executable
+        location = System.find_executable(make_executable())
         location != nil
       _ ->
         # Non-windows platforms should have make and gcc if they
