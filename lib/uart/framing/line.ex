@@ -12,7 +12,7 @@ defmodule Nerves.UART.Framing.Line do
      `{:partial, data}` is reported. The application can decide what to do with
      this.
   2. The separation character varies depending on the target device. Some
-     devices require "\r\n" sequences, so be sure to specify this. Currently
+     devices require "\\r\\n" sequences, so be sure to specify this. Currently
      only one or two character separators are supported.
   3. It may be desirable to set a `:rx_framer_timeout` to prevent
      characters received in error from collecting during idle times. When the
