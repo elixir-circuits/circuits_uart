@@ -101,6 +101,12 @@ static void record_last_error(int err)
     case EIO:
         last_error = "eio";
         break;
+    case EINTR:
+        last_error = "eintr";
+        break;
+    case ENOTTY:
+        last_error = "enotty";
+        break;
     case EINVAL:
     default:
         debug("Got unexpected error: %d", err);
