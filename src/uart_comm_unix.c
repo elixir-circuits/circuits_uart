@@ -109,7 +109,7 @@ static void record_last_error(int err)
         break;
     case EINVAL:
     default:
-        debug("Got unexpected error: %d", err);
+        debug("Got unexpected error: %d (%s)", err, strerror(err));
         last_error = "einval";
         break;
     }
