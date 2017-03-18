@@ -10,7 +10,7 @@ defmodule Nerves.UART.Mixfile do
   def project() do
     [app: :nerves_uart,
      version: @version,
-     elixir: "~> 1.2",
+     elixir: "~> 1.3",
      name: "Nerves.UART",
      description: @description,
      package: package(),
