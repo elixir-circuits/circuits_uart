@@ -120,7 +120,8 @@ static void record_errno()
     record_last_error(errno);
 }
 
-static int to_baudrate_constant(int speed) {
+static int to_baudrate_constant(int speed)
+{
     switch (speed) {
     case 0: return B0;
     case 50: return B50;
@@ -160,6 +161,11 @@ static int to_baudrate_constant(int speed) {
     }
 }
 
+static int is_custom_speed(int speed)
+{
+    return to_baudrate_constant(speed) < 0;
+}
+
 static int to_databits_constant(int bits)
 {
     switch (bits) {
@@ -188,13 +194,10 @@ static int set_custom_speed(int fd, int speed)
     return ioctl(fd, TIOCSSERIAL, &serinfo);
 #elif defined(__APPLE__)
     // Custom baud rates supported on Tiger and beyond
-    // TODO: How does this interact with tcsetattr? Does it override? Is the one that's set last win?
-    //       Do we need to call it after every tcsetattr or do we clear it when going back to
-    //       a Posix baud rate?
-
-      speed_t sio_speed = speed;
-      return ioctl(fd,  IOSSIOSPEED, &sio_speed);
-
+    // NOTE: Apple appears to be picky. Once setting this, calling
+    //       tcsetattr() even with unchanged arguments seems to fail.
+    speed_t sio_speed = speed;
+    return ioctl(fd,  IOSSIOSPEED, &sio_speed);
 #else
     return -1;
 #endif
@@ -252,13 +255,14 @@ static int uart_config_line(int fd, const struct uart_config *config)
     } else {
         // Use custom baudrate
 
-#ifdef __linux__
+#if defined(__linux__)
         // Linux lets you set custom baudrates for the B38400 option
         cfsetispeed(&options, B38400);
         cfsetospeed(&options, B38400);
 #endif
-        if (set_custom_speed(fd, config->speed) < 0)
-            return -1;
+
+        // Custom speed options that don't involve tcsetattr() are
+        // done later.
     }
 
     // Specify data bits
@@ -397,27 +401,29 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
 
     if (port->fd < 0) {
         debug("open failed on '%s'", name);
-        record_errno();
-        return -1;
+        goto handle_error;
     }
 
     // Lock the serial port for exclusive use (we don't want others messing with it by accident)
     if (flock(port->fd, LOCK_EX | LOCK_NB) < 0) {
         debug("flock failed on '%s'", name);
-        record_errno();
-        return -1;
+        goto handle_error;
     }
 
     if (uart_config_line(port->fd, config) < 0) {
         debug("uart_config_line failed");
-        record_errno();
-        return -1;
+        goto handle_error;
     }
 
     if (uart_config_flowcontrol(port->fd, config) < 0) {
         debug("uart_config_flowcontrol failed");
-        record_errno();
-        return -1;
+        goto handle_error;
+    }
+
+    if (is_custom_speed(config->speed) &&
+            set_custom_speed(port->fd, config->speed) < 0) {
+        debug("set_custom_speed failed");
+        goto handle_error;
     }
 
     port->active_mode_enabled = config->active;
@@ -426,6 +432,14 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
     tcflush(port->fd, TCIOFLUSH);
 
     return 0;
+
+handle_error:
+    record_errno();
+
+    if (port->fd >= 0)
+        close(port->fd);
+    port->fd = -1;
+    return -1;
 }
 
 int uart_is_open(struct uart *port)
