@@ -26,7 +26,7 @@ defmodule UARTTest do
   end
 
   def common_setup() do
-    if is_nil(port1) || is_nil(port2) do
+    if is_nil(port1()) || is_nil(port2()) do
       header = "Please define NERVES_UART_PORT1 and NERVES_UART_PORT2 in your
   environment (e.g. to ttyS0 or COM1) and connect them via a null
   modem cable.\n\n"
@@ -40,7 +40,7 @@ defmodule UARTTest do
       flunk msg
     end
 
-    if !String.starts_with?(port1, "tnt") do
+    if !String.starts_with?(port1(), "tnt") do
         # Let things settle between tests for real serial ports
         :timer.sleep(500)
     end
