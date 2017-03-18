@@ -42,8 +42,7 @@ defmodule Nerves.UART.Mixfile do
 
   defp deps() do
     [
-      {:elixir_make, "~> 0.3"},
-      {:earmark, "~> 0.2", only: :dev},
+      {:elixir_make, "~> 0.4", runtime: false},
       {:ex_doc,  "~> 0.11", only: :dev}
     ]
   end
