@@ -174,12 +174,9 @@ sudo apt-get install build-essential erlang-dev
 On Macs, run `gcc --version` or `make --version`. If they're not installed, you will
 be given instructions.
 
-On Windows, if you're obtaining `nerves_uart` from `hex.pm`, you'll get
-a precompiled version of the C code. This will be used if the proper build
-tools aren't detected. If you're running from `git` or would like to compile
-the port binary yourself, you will need MinGW. Assuming that you installed Erlang and
-Elixir via [Chocolatey](https://chocolatey.org/), install MinGW by
-running the following in an administrative command prompt:
+On Windows, if you're obtaining `nerves_uart` from `hex.pm`, you'll need
+MinGW to compile the C code. I use [Chocolatey](https://chocolatey.org/)
+and install MinGW by running the following in an administrative command prompt:
 
 ```sh
 choco install mingw

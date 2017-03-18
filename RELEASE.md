@@ -21,8 +21,7 @@
   11. Wait for the CI builds to complete successfully. They should work
       assuming that no code changes were made between the last build and the tag,
       but wait to be safe.
-  12. Copy the nerves_uart.exe artifact created by the Appveyor CI build
-      to `prebuilt/nerves_uart.exe`
+  12. [SKIP FOR NOW] Copy the nerves_uart.exe artifact created by the Appveyor CI build to `prebuilt/nerves_uart.exe`
   13. Run `mix hex.publish`
   14. Update the deps on a sample project that uses nerves_uart to make sure that it
       downloads and builds the new nerves_uart.
