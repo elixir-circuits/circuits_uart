@@ -50,8 +50,9 @@ defmodule Nerves.UART.Mixfile do
   defp package() do
     [
       files: ["lib", "src/*.[ch]", "src/ei_copy/*.[ch]", "test",
-              "mix.exs", "Makefile", "README.md", "LICENSE", "CHANGELOG.md",
-              "prebuilt/nerves_uart.exe"],
+              "mix.exs", "Makefile", "README.md", "LICENSE", "CHANGELOG.md"
+              #   "prebuilt/nerves_uart.exe"
+            ],
       maintainers: ["Frank Hunleth"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/nerves-project/nerves_uart"}
