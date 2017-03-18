@@ -1,5 +1,7 @@
 # Changelog
 
+## v0.1.3-dev
+
 ## v0.1.2
 
 Prebuilt port binaries are no longer distributed in hex.pm for Windows users.
