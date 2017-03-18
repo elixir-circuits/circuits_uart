@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.2
+
+Prebuilt port binaries are no longer distributed in hex.pm for Windows users.
+You'll need to install MinGW. Feedback was that it didn't work as well as I
+thought it would.
+
+  * Bug fixes
+    * Fix custom baudrates not working on OSX. Thanks to salzig for identifying
+      the problem and helping to debug it.
+    * Pass flush request through to framer as well as the serial port
+    * Minor code cleanup
+
 ## v0.1.1
 
   * New features
