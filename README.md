@@ -147,17 +147,9 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
   end
   ```
 
-  2. List `:nerves_uart` as an application dependency:
+  2. Check that the C compiler dependencies are satisified (see below)
 
-  ```elixir
-  def application do
-    [applications: [:nerves_uart]]
-  end
-  ```
-
-  3. Check that the C compiler dependencies are satisified (see below)
-
-  4. Run `mix deps.get` and `mix compile`
+  3. Run `mix deps.get` and `mix compile`
 
 ### C compiler dependencies
 
