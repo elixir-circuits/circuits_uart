@@ -27,6 +27,13 @@ defmodule Nerves.UART.Framing do
   Remove the framing off received data. If a partial frame is left over at the
   end, then `:in_frame` should be returned. All of the frames received should
   be returned in the second tuple.
+  
+  The terms returned as the second part of the tuple can be anything. They can be
+  the binary messages without the framing, structs based on your commands, or anything
+  else. If you have errors in the protocol, for example a bad checksum, one convention
+  is to return an error tuple `{:error, :echksum, message}`.
+  For debugging you may want to include the message and framing with the error for
+  simpler debugging.
   """
   @callback remove_framing(new_data :: binary, state :: term) ::
     {:in_frame, [term], new_state} |
