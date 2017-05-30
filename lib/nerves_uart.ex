@@ -220,7 +220,7 @@ defmodule Nerves.UART do
     * `:ebadf` - the UART is closed
     * `:einval` - the UART is in active mode
   """
-  @spec read(pid, integer) :: binary | {:error, term}
+  @spec read(pid, integer) :: {:ok, binary} | {:error, term}
   def read(pid, timeout \\ 5000) do
     GenServer.call pid, {:read, timeout}, genserver_timeout(timeout)
   end
