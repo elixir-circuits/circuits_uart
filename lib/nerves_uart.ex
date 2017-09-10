@@ -299,11 +299,13 @@ defmodule Nerves.UART do
     is_active = Keyword.get(opts, :active, true)
 
     response = call_port(state, :open, {name, opts})
-    new_state = %{state | name: name,
-              controlling_process: from_pid,
-              rx_framing_timeout: new_rx_framing_timeout,
-              is_active: is_active} |>
-              change_framing(new_framing)
+    new_state = change_framing(
+      %{state | name: name,
+                controlling_process: from_pid,
+                rx_framing_timeout: new_rx_framing_timeout,
+                is_active: is_active},
+      new_framing
+    )
 
     {:reply, response, new_state}
   end
@@ -312,8 +314,10 @@ defmodule Nerves.UART do
     response = call_port(state, :close, nil)
 
     # Clean up the Elixir side
-    new_state = %{state | name: nil, framing_state: nil, queued_messages: []}
-      |> handle_framing_timer(:ok)
+    new_state = handle_framing_timer(
+      %{state | name: nil, framing_state: nil, queued_messages: []},
+      :ok
+    )
 
     {:reply, response, new_state}
   end
@@ -332,8 +336,7 @@ defmodule Nerves.UART do
         # More data
         {rc, messages, new_framing_state} =
           apply(state.framing, :remove_framing, [buffer, state.framing_state])
-        new_state = %{state | framing_state: new_framing_state} |>
-          handle_framing_timer(rc)
+        new_state = handle_framing_timer(%{state | framing_state: new_framing_state}, rc)
         if messages == [] do
           # If nothing, poll some more
           handle_call({:read, timeout}, from, new_state)
@@ -361,8 +364,10 @@ defmodule Nerves.UART do
     new_rx_framing_timeout
       = Keyword.get(opts, :rx_framing_timeout, state.rx_framing_timeout)
     is_active = Keyword.get(opts, :active, state.is_active)
-    state = %{state | rx_framing_timeout: new_rx_framing_timeout, is_active: is_active}
-     |> change_framing(new_framing)
+    state = change_framing(
+      %{state | rx_framing_timeout: new_rx_framing_timeout, is_active: is_active},
+      new_framing
+    )
 
     response = call_port(state, :configure, opts)
     {:reply, response, state}
@@ -407,8 +412,10 @@ defmodule Nerves.UART do
     {:ok, messages, new_framing_state} =
       apply(state.framing, :frame_timeout, [state.framing_state])
 
-    new_state = %{state | rx_framing_tref: nil, framing_state: new_framing_state}
-      |> notify_timedout_messages(messages)
+    new_state = notify_timedout_messages(
+      %{state | rx_framing_tref: nil, framing_state: new_framing_state},
+      messages
+    )
 
     {:noreply, new_state}
   end
@@ -440,7 +447,7 @@ defmodule Nerves.UART do
     # Block until the response comes back since the C side
     # doesn't want to handle any queuing of requests. REVISIT
     receive do
-      {_, {:data, <<?r,response::binary>>}} ->
+      {_, {:data, <<?r, response::binary>>}} ->
         :erlang.binary_to_term(response)
     after
       timeout ->
@@ -453,8 +460,10 @@ defmodule Nerves.UART do
     #IO.puts "Received data on port #{state.name}"
     {rc, messages, new_framing_state} =
       apply(state.framing, :remove_framing, [data, state.framing_state])
-    new_state = %{state | framing_state: new_framing_state} |>
-      handle_framing_timer(rc)
+    new_state = handle_framing_timer(
+      %{state | framing_state: new_framing_state},
+      rc
+    )
 
     if state.controlling_process do
       Enum.each(messages, &(report_message(new_state, &1)))
