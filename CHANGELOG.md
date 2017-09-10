@@ -1,6 +1,9 @@
 # Changelog
 
-## v0.1.3-dev
+## v1.0.0-dev
+
+  * Bug fixes
+    * Documentation and code cleanup
 
 ## v0.1.2
 
