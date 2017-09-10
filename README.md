@@ -220,11 +220,6 @@ delay to each test to work around this. It likely can be much shorter.
 
 ## FAQ
 
-### A feature is missing
-
-Yes, I haven't gotten to a couple really important ones for some use cases.
-See `TODO.md` for now. Please ping me if you'd like to help.
-
 ### Do I have to use Nerves?
 
 No, this project doesn't have any dependencies on any Nerves components. The

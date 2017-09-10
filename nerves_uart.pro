@@ -36,7 +36,6 @@ HEADERS += \
 
 DISTFILES += \
     lib/nerves_uart.ex \
-    TODO.md \
     mix.exs \
     Makefile \
     README.md \
