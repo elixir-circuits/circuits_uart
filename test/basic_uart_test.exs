@@ -177,6 +177,45 @@ defmodule BasicUARTTest do
     UART.close(uart2)
   end
 
+  test "error writing to a closed port", %{uart1: uart1, uart2: uart2} do
+    assert :ok = UART.open(uart2, UARTTest.port2, active: false)
+
+    # port1 not yet opened
+    assert {:error, :ebadf} = UART.write(uart1, "A")
+
+    # port1 opened
+    assert :ok = UART.open(uart1, UARTTest.port1, active: false)
+    assert :ok = UART.write(uart1, "A")
+    assert {:ok, "A"} = UART.read(uart2)
+
+    # port1 closed
+    assert :ok = UART.close(uart1)
+    assert {:error, :ebadf} = UART.write(uart1, "B")
+
+    UART.close(uart1)
+    UART.close(uart2)
+  end
+
+  test "error writing to a closed port when using framing", %{uart1: uart1, uart2: uart2} do
+    framing = {UART.Framing.Line, separator: "\n"}
+    assert :ok = UART.open(uart2, UARTTest.port2, active: false, framing: framing)
+
+    # port1 not yet opened
+    assert {:error, :ebadf} = UART.write(uart1, "A")
+
+    # port1 opened
+    assert :ok = UART.open(uart1, UARTTest.port1, active: false, framing: framing)
+    assert :ok = UART.write(uart1, "A")
+    assert {:ok, "A"} = UART.read(uart2)
+
+    # port1 closed
+    assert :ok = UART.close(uart1)
+    assert {:error, :ebadf} = UART.write(uart1, "B")
+
+    UART.close(uart1)
+    UART.close(uart2)
+  end
+
   test "active mode receive", %{uart1: uart1, uart2: uart2} do
     assert :ok = UART.open(uart1, UARTTest.port1, active: false)
     assert :ok = UART.open(uart2, UARTTest.port2, active: true)
