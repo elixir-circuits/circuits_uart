@@ -314,8 +314,9 @@ defmodule Nerves.UART do
     response = call_port(state, :close, nil)
 
     # Clean up the Elixir side
+    new_framing_state = apply(state.framing, :flush, [:both, state.framing_state])
     new_state = handle_framing_timer(
-      %{state | name: nil, framing_state: nil, queued_messages: []},
+      %{state | name: nil, framing_state: new_framing_state, queued_messages: []},
       :ok
     )
 
