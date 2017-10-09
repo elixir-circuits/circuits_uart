@@ -203,10 +203,24 @@ export NERVES_UART_PORT2=ttyS1
 
 If you're on Windows or Linux, you don't need real serial ports. For linux,
 download and install [tty0tty](https://github.com/freemed/tty0tty). Load the
-kernel module and specify `tnt0` and `tnt1` for the serial ports. On Windows,
-download and install [com0com](https://sourceforge.net/projects/com0com/)
-(Look for version 2.2.2.0 if the latest hasn't been signed). The ports on
-Windows are `CNCA0` and `CNCB0`.
+kernel module and specify `tnt0` and `tnt1` for the serial ports. Check the
+`tty0tty` README.md, but this should looks something like:
+
+```sh
+cd tty0tty/module
+make
+sudo cp tty0tty.ko /lib/modules/$(uname -r)/kernel/drivers/misc/
+sudo depmod
+sudo modprobe tty0tty
+sudo chmod 666 /dev/tnt*
+
+export NERVES_UART_PORT1=tnt0
+export NERVES_UART_PORT2=tnt1
+```
+
+On Windows, download and install
+[com0com](https://sourceforge.net/projects/com0com/) (Look for version 2.2.2.0
+if the latest hasn't been signed). The ports on Windows are `CNCA0` and `CNCB0`.
 
 Then run:
 
