@@ -76,7 +76,8 @@ defmodule FramingLineTest do
     assert {:ok, ["EFG"], line} = Line.remove_framing("\n", line)
 
     # Multiple partial results
-    assert {:in_frame, [{:partial, "ABCD"}, {:partial, "EFGH"}], line} = Line.remove_framing("ABCDEFGHI", line)
+    assert {:in_frame, [{:partial, "ABCD"}, {:partial, "EFGH"}], line} =
+             Line.remove_framing("ABCDEFGHI", line)
 
     # Add one by one to get a partial result
     assert {:in_frame, [], line} = Line.remove_framing("J", line)
@@ -95,5 +96,4 @@ defmodule FramingLineTest do
 
     assert Line.buffer_empty?(line) == true
   end
-
 end

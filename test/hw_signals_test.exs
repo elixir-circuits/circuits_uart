@@ -1,15 +1,15 @@
-Code.require_file "uart_test.exs", __DIR__
+Code.require_file("uart_test.exs", __DIR__)
 
 defmodule HWSignalsTest do
   use ExUnit.Case
   alias Nerves.UART
 
   setup do
-    UARTTest.common_setup
+    UARTTest.common_setup()
   end
 
   test "signals has expected fields", %{uart1: uart1} do
-    :ok = UART.open(uart1, UARTTest.port1)
+    :ok = UART.open(uart1, UARTTest.port1())
     {:ok, signals} = UART.signals(uart1)
 
     assert Map.has_key?(signals, :dsr)
@@ -25,7 +25,7 @@ defmodule HWSignalsTest do
   end
 
   test "rts set works", %{uart1: uart1} do
-    :ok = UART.open(uart1, UARTTest.port1)
+    :ok = UART.open(uart1, UARTTest.port1())
 
     :ok = UART.set_rts(uart1, true)
     {:ok, signals} = UART.signals(uart1)
@@ -39,7 +39,7 @@ defmodule HWSignalsTest do
   end
 
   test "dtr set works", %{uart1: uart1} do
-    :ok = UART.open(uart1, UARTTest.port1)
+    :ok = UART.open(uart1, UARTTest.port1())
 
     :ok = UART.set_dtr(uart1, true)
     {:ok, signals} = UART.signals(uart1)
@@ -53,15 +53,16 @@ defmodule HWSignalsTest do
   end
 
   test "null modem cable wiring", %{uart1: uart1, uart2: uart2} do
-    :ok = UART.open(uart1, UARTTest.port1)
-    :ok = UART.open(uart2, UARTTest.port2)
+    :ok = UART.open(uart1, UARTTest.port1())
+    :ok = UART.open(uart2, UARTTest.port2())
 
     # If this test fails, double check that your null modem cable
     # has RTS connected to CTS, and DTR connected to DSR and CD.
 
     # RTS -> CTS
     :ok = UART.set_rts(uart1, true)
-    :timer.sleep(50) # Set isn't instantaneous on real ports
+    # Set isn't instantaneous on real ports
+    :timer.sleep(50)
     {:ok, signals} = UART.signals(uart2)
     assert true == signals.cts
 
@@ -90,7 +91,7 @@ defmodule HWSignalsTest do
   test "set break api exists", %{uart1: uart1} do
     # Currently, we can't detect a break signal, so just test
     # that we can call the APIs.
-    :ok = UART.open(uart1, UARTTest.port1)
+    :ok = UART.open(uart1, UARTTest.port1())
 
     :ok = UART.set_break(uart1, true)
     :ok = UART.set_break(uart1, false)
@@ -103,5 +104,4 @@ defmodule HWSignalsTest do
 
     UART.close(uart1)
   end
-
 end

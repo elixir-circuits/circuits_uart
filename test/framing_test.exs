@@ -1,4 +1,4 @@
-Code.require_file "uart_test.exs", __DIR__
+Code.require_file("uart_test.exs", __DIR__)
 
 defmodule FramingTest do
   use ExUnit.Case
@@ -10,13 +10,17 @@ defmodule FramingTest do
   """
 
   setup do
-    UARTTest.common_setup
+    UARTTest.common_setup()
   end
 
   test "receive a line in passive mode", %{uart1: uart1, uart2: uart2} do
-    assert :ok = UART.open(uart1, UARTTest.port1)
-    assert :ok = UART.open(uart2, UARTTest.port2, active: false,
-      framing: {UART.Framing.Line, max_length: 4})
+    assert :ok = UART.open(uart1, UARTTest.port1())
+
+    assert :ok =
+             UART.open(uart2, UARTTest.port2(), active: false, framing: {
+               UART.Framing.Line,
+               max_length: 4
+             })
 
     # Send something that's not a line and check that we don't receive it
     assert :ok = UART.write(uart1, "A")
@@ -41,8 +45,8 @@ defmodule FramingTest do
   end
 
   test "framing gets applied when transmitting", %{uart1: uart1, uart2: uart2} do
-    assert :ok = UART.open(uart1, UARTTest.port1, framing: UART.Framing.Line)
-    assert :ok = UART.open(uart2, UARTTest.port2, active: false)
+    assert :ok = UART.open(uart1, UARTTest.port1(), framing: UART.Framing.Line)
+    assert :ok = UART.open(uart2, UARTTest.port2(), active: false)
 
     # Transmit something and check that a linefeed gets applied
     assert :ok = UART.write(uart1, "A")
@@ -53,27 +57,38 @@ defmodule FramingTest do
     UART.close(uart2)
   end
 
-  if false do # Not supported yet
-  test "framing timeouts in passive mode", %{uart1: uart1, uart2: uart2} do
-    assert :ok = UART.open(uart1, UARTTest.port1)
-    assert :ok = UART.open(uart2, UARTTest.port2,
-                          active: false,
-                          framing: {UART.Framing.Line, max_length: 10},
-                          rx_framing_timeout: 500)
+  # Not supported yet
+  if false do
+    test "framing timeouts in passive mode", %{uart1: uart1, uart2: uart2} do
+      assert :ok = UART.open(uart1, UARTTest.port1())
 
-    # Send something that's not a line and check that it times out
-    assert :ok = UART.write(uart1, "A")
-    assert {:ok, {:partial, "A"}} = UART.read(uart2, 1000)
+      assert :ok =
+               UART.open(
+                 uart2,
+                 UARTTest.port2(),
+                 active: false,
+                 framing: {UART.Framing.Line, max_length: 10},
+                 rx_framing_timeout: 500
+               )
 
-    UART.close(uart1)
-    UART.close(uart2)
-  end
+      # Send something that's not a line and check that it times out
+      assert :ok = UART.write(uart1, "A")
+      assert {:ok, {:partial, "A"}} = UART.read(uart2, 1000)
+
+      UART.close(uart1)
+      UART.close(uart2)
+    end
   end
 
   test "receive a line in active mode", %{uart1: uart1, uart2: uart2} do
-    assert :ok = UART.open(uart1, UARTTest.port1)
-    assert :ok = UART.open(uart2, UARTTest.port2, active: true,
-                           framing: {UART.Framing.Line, max_length: 4})
+    assert :ok = UART.open(uart1, UARTTest.port1())
+
+    assert :ok =
+             UART.open(uart2, UARTTest.port2(), active: true, framing: {
+               UART.Framing.Line,
+               max_length: 4
+             })
+
     port2 = UARTTest.port2()
 
     # Send something that's not a line and check that we don't receive it
@@ -108,11 +123,17 @@ defmodule FramingTest do
   end
 
   test "framing timeouts in active mode", %{uart1: uart1, uart2: uart2} do
-    assert :ok = UART.open(uart1, UARTTest.port1)
-    assert :ok = UART.open(uart2, UARTTest.port2,
-                          active: true,
-                          framing: {UART.Framing.Line, max_length: 10},
-                          rx_framing_timeout: 500)
+    assert :ok = UART.open(uart1, UARTTest.port1())
+
+    assert :ok =
+             UART.open(
+               uart2,
+               UARTTest.port2(),
+               active: true,
+               framing: {UART.Framing.Line, max_length: 10},
+               rx_framing_timeout: 500
+             )
+
     port2 = UARTTest.port2()
 
     # Send something that's not a line and check that it times out
@@ -127,10 +148,9 @@ defmodule FramingTest do
     # This only works with tty0tty since it fails write operations if no
     # receiver.
 
-    if String.starts_with?(UARTTest.port1, "tnt") do
-      assert :ok = UART.open(uart1, UARTTest.port1, active: true,
-                             framing: UART.Framing.Line)
-      port1 = UARTTest.port1
+    if String.starts_with?(UARTTest.port1(), "tnt") do
+      assert :ok = UART.open(uart1, UARTTest.port1(), active: true, framing: UART.Framing.Line)
+      port1 = UARTTest.port1()
 
       assert {:error, :einval} = UART.write(uart1, "a")
       assert_receive {:nerves_uart, ^port1, {:error, :einval}}
@@ -138,5 +158,4 @@ defmodule FramingTest do
       UART.close(uart1)
     end
   end
-
 end

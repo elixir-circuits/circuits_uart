@@ -8,31 +8,34 @@ defmodule Nerves.UART.Mixfile do
   """
 
   def project() do
-    [app: :nerves_uart,
-     version: @version,
-     elixir: "~> 1.3",
-     name: "Nerves.UART",
-     description: @description,
-     package: package(),
-     source_url: "https://github.com/nerves-project/nerves_uart",
-     docs: [extras: ["README.md"]],
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()] ++ make_or_prebuilt()
+    [
+      app: :nerves_uart,
+      version: @version,
+      elixir: "~> 1.3",
+      name: "Nerves.UART",
+      description: @description,
+      package: package(),
+      source_url: "https://github.com/nerves-project/nerves_uart",
+      docs: [extras: ["README.md"]],
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      deps: deps()
+    ] ++ make_or_prebuilt()
   end
 
   # If the platform doesn't have make installed, try to
   # use a prebuilt version of the port binary
   defp make_or_prebuilt() do
     if run_make?() do
-      [compilers: [:elixir_make] ++ Mix.compilers,
-       make_executable: make_executable(),
-       make_makefile: "Makefile",
-       make_error_message: make_error_message(),
-       make_clean: ["clean"]
+      [
+        compilers: [:elixir_make] ++ Mix.compilers(),
+        make_executable: make_executable(),
+        make_makefile: "Makefile",
+        make_error_message: make_error_message(),
+        make_clean: ["clean"]
       ]
     else
-      [aliases: ["compile": ["compile", &copy_prebuilt/1]]]
+      [aliases: [compile: ["compile", &copy_prebuilt/1]]]
     end
   end
 
@@ -43,16 +46,24 @@ defmodule Nerves.UART.Mixfile do
   defp deps() do
     [
       {:elixir_make, "~> 0.4", runtime: false},
-      {:ex_doc,  "~> 0.11", only: :dev}
+      {:ex_doc, "~> 0.11", only: :dev}
     ]
   end
 
   defp package() do
     [
-      files: ["lib", "src/*.[ch]", "src/ei_copy/*.[ch]", "test",
-              "mix.exs", "Makefile", "README.md", "LICENSE", "CHANGELOG.md"
-              #   "prebuilt/nerves_uart.exe"
-            ],
+      files: [
+        "lib",
+        "src/*.[ch]",
+        "src/ei_copy/*.[ch]",
+        "test",
+        "mix.exs",
+        "Makefile",
+        "README.md",
+        "LICENSE",
+        "CHANGELOG.md"
+        #   "prebuilt/nerves_uart.exe"
+      ],
       maintainers: ["Frank Hunleth"],
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/nerves-project/nerves_uart"}
@@ -65,6 +76,7 @@ defmodule Nerves.UART.Mixfile do
         # If mingw32-make isn't installed, then try prebuilt version
         location = System.find_executable(make_executable())
         location != nil
+
       _ ->
         # Non-windows platforms should have make and gcc if they
         # have Elixir.
@@ -76,6 +88,7 @@ defmodule Nerves.UART.Mixfile do
     case :os.type() do
       {:win32, _} ->
         "mingw32-make"
+
       _ ->
         :default
     end
@@ -102,8 +115,9 @@ defmodule Nerves.UART.Mixfile do
   defp copy_prebuilt(_) do
     case :os.type() do
       {:win32, _} ->
-        Mix.shell.info("Copying prebuilt port binary")
+        Mix.shell().info("Copying prebuilt port binary")
         File.cp("prebuilt/nerves_uart.exe", "priv/nerves_uart.exe")
+
       _ ->
         Mix.raise("Couldn't find 'make' and no prebuilt port binary to use.")
     end
