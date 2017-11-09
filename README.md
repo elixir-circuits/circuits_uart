@@ -271,7 +271,7 @@ FTDI-based serial ports appear to work better on both operating systesm.
 
 You may have noticed Erlang's `erl_interface` code copy/pasted into `src/ei_copy`.
 This is *only* used on Windows to work around issues linking to the distributed
-version of `erl_interface`. That was was compiled with Visual Studio. This project uses MinGW, and
+version of `erl_interface`. That was compiled with Visual Studio. This project uses MinGW, and
 even though the C ABIs are the same between the compilers, Visual Studio adds stack
 protection calls that I couldn't figure out how to work around.
 
