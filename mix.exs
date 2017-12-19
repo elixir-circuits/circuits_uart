@@ -1,11 +1,9 @@
 defmodule Nerves.UART.Mixfile do
   use Mix.Project
 
-  @version "1.0.0-dev"
+  @version "1.0.0"
 
-  @description """
-  Discover and use UARTs and serial ports in Elixir.
-  """
+  @description "Discover and use UARTs and serial ports in Elixir."
 
   def project() do
     [

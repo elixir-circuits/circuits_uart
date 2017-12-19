@@ -1,8 +1,10 @@
 # Changelog
 
-## v1.0.0-dev
+## v1.0.0
 
   * Bug fixes
+    * Flush framing when closing a port
+    * Fix broken spec's
     * Documentation and code cleanup
 
 ## v0.1.2
