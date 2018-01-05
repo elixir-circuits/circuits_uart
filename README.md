@@ -275,6 +275,12 @@ version of `erl_interface`. That was compiled with Visual Studio. This project u
 even though the C ABIs are the same between the compilers, Visual Studio adds stack
 protection calls that I couldn't figure out how to work around.
 
+### How does Nerves.UART communicate with the serial port?
+
+Nerves.UART uses a [Port](https://hexdocs.pm/elixir/Port.html) and C code. 
+Elixir/Erlang ports have nothing to do with the serial ports of the operating system. 
+They share the same name but are different concepts.
+
 ## Acknowledgments
 
 When building this library, [node-serialport](https://github.com/voodootikigod/node-serialport)
