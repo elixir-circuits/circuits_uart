@@ -20,7 +20,7 @@ defmodule Nerves.UART.Mixfile do
       deps: deps(),
       compilers: [:elixir_make] ++ Mix.compilers(),
       make_executable: make_executable(),
-      make_makefile: "Makefile",
+      make_makefile: "src/Makefile",
       make_error_message: make_error_message(),
       make_clean: ["clean"],
       make_env: make_env()
@@ -57,13 +57,12 @@ defmodule Nerves.UART.Mixfile do
         "lib",
         "src/*.[ch]",
         "src/ei_copy/*.[ch]",
+        "src/Makefile",
         "test",
         "mix.exs",
-        "Makefile",
         "README.md",
         "LICENSE",
         "CHANGELOG.md"
-        #   "prebuilt/nerves_uart.exe"
       ],
       maintainers: ["Frank Hunleth"],
       licenses: ["Apache-2.0"],

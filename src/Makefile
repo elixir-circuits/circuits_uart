@@ -60,12 +60,10 @@ endif
 # For crosscompiled builds, ERL_EI_INCLUDE_DIR and ERL_EI_LIBDIR must be
 # passed into the Makefile.
 ifeq ($(ERL_EI_INCLUDE_DIR),)
-ERL_ROOT_DIR = $(shell erl -eval "io:format(\"~s~n\", [code:root_dir()])" -s init stop -noshell)
-ifeq ($(ERL_ROOT_DIR),)
-   $(error Could not find the Erlang installation. Check to see that 'erl' is in your PATH)
+$(error ERL_EI_INCLUDE_DIR not set. Invoke via mix)
 endif
-ERL_EI_INCLUDE_DIR = "$(ERL_ROOT_DIR)/usr/include"
-ERL_EI_LIBDIR = "$(ERL_ROOT_DIR)/usr/lib"
+ifeq ($(ERL_EI_LIBDIR),)
+$(error ERL_EI_LIBDIR not set. Invoke via mix)
 endif
 
 # Set Erlang-specific compile and linker flags
