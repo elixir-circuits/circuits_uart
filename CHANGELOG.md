@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.1
+
+  * Improvements
+    * Refactored Makefile logic to avoid 1-2 second hit when building. This was
+      due to erl being called to get the directory containing the erl interface
+      include/lib paths. Now mix.exs passes them down.
+    * Trivial Elixir 1.6 formatting tweaks
+
 ## v1.0.0
 
   * Bug fixes
