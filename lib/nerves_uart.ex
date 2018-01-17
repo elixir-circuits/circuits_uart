@@ -83,7 +83,7 @@ defmodule Nerves.UART do
   @doc """
   Stop the UART GenServer.
   """
-  @spec stop(GenServer.server) :: :ok
+  @spec stop(GenServer.server()) :: :ok
   def stop(pid) do
     GenServer.stop(pid)
   end
@@ -141,7 +141,7 @@ defmodule Nerves.UART do
     * `:eagain`  - the port is already open
     * `:eacces`  - permission was denied when opening the port
   """
-  @spec open(GenServer.server, binary, [uart_option]) :: :ok | {:error, term}
+  @spec open(GenServer.server(), binary, [uart_option]) :: :ok | {:error, term}
   def open(pid, name, opts \\ []) do
     GenServer.call(pid, {:open, name, opts})
   end
@@ -150,7 +150,7 @@ defmodule Nerves.UART do
   Close the serial port. The GenServer continues to run so that a port can
   be opened again.
   """
-  @spec close(GenServer.server) :: :ok | {:error, term}
+  @spec close(GenServer.server()) :: :ok | {:error, term}
   def close(pid) do
     GenServer.call(pid, :close)
   end
@@ -159,7 +159,7 @@ defmodule Nerves.UART do
   Change the serial port configuration after `open/3` has been called. See
   `open/3` for the valid options.
   """
-  @spec configure(GenServer.server, [uart_option]) :: :ok | {:error, term}
+  @spec configure(GenServer.server(), [uart_option]) :: :ok | {:error, term}
   def configure(pid, opts) do
     GenServer.call(pid, {:configure, opts})
   end
@@ -171,7 +171,7 @@ defmodule Nerves.UART do
   This is a convenience function for calling `set_break/2` to enable
   the break signal, wait, and then turn it off.
   """
-  @spec send_break(GenServer.server, integer) :: :ok | {:error, term}
+  @spec send_break(GenServer.server(), integer) :: :ok | {:error, term}
   def send_break(pid, duration \\ 250) do
     :ok = set_break(pid, true)
     :timer.sleep(duration)
@@ -181,7 +181,7 @@ defmodule Nerves.UART do
   @doc """
   Start or stop sending a break signal.
   """
-  @spec set_break(GenServer.server, boolean) :: :ok | {:error, term}
+  @spec set_break(GenServer.server(), boolean) :: :ok | {:error, term}
   def set_break(pid, value) when is_boolean(value) do
     GenServer.call(pid, {:set_break, value})
   end
@@ -200,7 +200,7 @@ defmodule Nerves.UART do
 
     * `:ebadf` - the UART is closed
   """
-  @spec write(GenServer.server, binary | [byte], integer) :: :ok | {:error, term}
+  @spec write(GenServer.server(), binary | [byte], integer) :: :ok | {:error, term}
   def write(pid, data, timeout) when is_binary(data) do
     GenServer.call(pid, {:write, data, timeout}, genserver_timeout(timeout))
   end
@@ -212,7 +212,7 @@ defmodule Nerves.UART do
   @doc """
   Write data to the opened UART with the default timeout.
   """
-  @spec write(GenServer.server, binary | [byte]) :: :ok | {:error, term}
+  @spec write(GenServer.server(), binary | [byte]) :: :ok | {:error, term}
   def write(pid, data) do
     write(pid, data, 5000)
   end
@@ -229,7 +229,7 @@ defmodule Nerves.UART do
     * `:ebadf` - the UART is closed
     * `:einval` - the UART is in active mode
   """
-  @spec read(GenServer.server, integer) :: {:ok, binary} | {:error, term}
+  @spec read(GenServer.server(), integer) :: {:ok, binary} | {:error, term}
   def read(pid, timeout \\ 5000) do
     GenServer.call(pid, {:read, timeout}, genserver_timeout(timeout))
   end
@@ -238,7 +238,7 @@ defmodule Nerves.UART do
   Waits until all data has been transmitted. See [tcdrain(3)](http://linux.die.net/man/3/tcdrain) for low level
   details on Linux or OSX. This is not implemented on Windows.
   """
-  @spec drain(GenServer.server) :: :ok | {:error, term}
+  @spec drain(GenServer.server()) :: :ok | {:error, term}
   def drain(pid) do
     GenServer.call(pid, :drain)
   end
@@ -249,7 +249,7 @@ defmodule Nerves.UART do
   See [tcflush(3)](http://linux.die.net/man/3/tcflush) for low level details on
   Linux or OSX. This calls `PurgeComm` on Windows.
   """
-  @spec flush(GenServer.server) :: :ok | {:error, term}
+  @spec flush(GenServer.server()) :: :ok | {:error, term}
   def flush(pid, direction \\ :both) do
     GenServer.call(pid, {:flush, direction})
   end
@@ -267,7 +267,7 @@ defmodule Nerves.UART do
     * `:cd`  - Data Carrier Detect
     * `:rng` - Ring Indicator
   """
-  @spec signals(GenServer.server) :: map | {:error, term}
+  @spec signals(GenServer.server()) :: map | {:error, term}
   def signals(pid) do
     GenServer.call(pid, :signals)
   end
@@ -275,7 +275,7 @@ defmodule Nerves.UART do
   @doc """
   Set or clear the Data Terminal Ready signal.
   """
-  @spec set_dtr(GenServer.server, boolean) :: :ok | {:error, term}
+  @spec set_dtr(GenServer.server(), boolean) :: :ok | {:error, term}
   def set_dtr(pid, value) when is_boolean(value) do
     GenServer.call(pid, {:set_dtr, value})
   end
@@ -283,7 +283,7 @@ defmodule Nerves.UART do
   @doc """
   Set or clear the Request To Send signal.
   """
-  @spec set_rts(GenServer.server, boolean) :: :ok | {:error, term}
+  @spec set_rts(GenServer.server(), boolean) :: :ok | {:error, term}
   def set_rts(pid, value) when is_boolean(value) do
     GenServer.call(pid, {:set_rts, value})
   end

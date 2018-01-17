@@ -17,10 +17,15 @@ defmodule FramingTest do
     assert :ok = UART.open(uart1, UARTTest.port1())
 
     assert :ok =
-             UART.open(uart2, UARTTest.port2(), active: false, framing: {
-               UART.Framing.Line,
-               max_length: 4
-             })
+             UART.open(
+               uart2,
+               UARTTest.port2(),
+               active: false,
+               framing: {
+                 UART.Framing.Line,
+                 max_length: 4
+               }
+             )
 
     # Send something that's not a line and check that we don't receive it
     assert :ok = UART.write(uart1, "A")
@@ -84,10 +89,15 @@ defmodule FramingTest do
     assert :ok = UART.open(uart1, UARTTest.port1())
 
     assert :ok =
-             UART.open(uart2, UARTTest.port2(), active: true, framing: {
-               UART.Framing.Line,
-               max_length: 4
-             })
+             UART.open(
+               uart2,
+               UARTTest.port2(),
+               active: true,
+               framing: {
+                 UART.Framing.Line,
+                 max_length: 4
+               }
+             )
 
     port2 = UARTTest.port2()
 
