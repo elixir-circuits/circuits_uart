@@ -89,7 +89,7 @@ all: priv priv/nerves_uart$(EXEEXT)
 	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
 
 priv:
-	mkdir -p priv
+	mkdir priv
 
 priv/nerves_uart$(EXEEXT): $(OBJ)
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
