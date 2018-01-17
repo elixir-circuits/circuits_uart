@@ -3,15 +3,15 @@
 # CC            C compiler
 # CROSSCOMPILE	crosscompiler prefix, if any
 # CFLAGS	compiler flags for compiling all C files
-# ERL_CFLAGS	additional compiler flags for files using Erlang header files
-# ERL_EI_LIBDIR path to libei.a
 # LDFLAGS	linker flags for linking all binaries
+# ERL_CFLAGS	additional compiler flags for files using Erlang header files
 # ERL_LDFLAGS	additional linker flags for projects referencing Erlang libraries
+# ERL_EI_INCLUDE_DIR path to Erlang interface header files
+# ERL_EI_LIBDIR path to libei.a
 
 LDFLAGS +=
 CFLAGS ?= -O2 -Wall -Wextra -Wno-unused-parameter
 CFLAGS += -std=c99 -D_GNU_SOURCE
-CC ?= $(CROSSCOMPILER)gcc
 
 ###################
 # If you're having trouble with the serial port, commenting in the following line

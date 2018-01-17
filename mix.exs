@@ -18,12 +18,26 @@ defmodule Nerves.UART.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-        compilers: [:elixir_make] ++ Mix.compilers(),
-        make_executable: make_executable(),
-        make_makefile: "Makefile",
-        make_error_message: make_error_message(),
-        make_clean: ["clean"]
+      compilers: [:elixir_make] ++ Mix.compilers(),
+      make_executable: make_executable(),
+      make_makefile: "Makefile",
+      make_error_message: make_error_message(),
+      make_clean: ["clean"],
+      make_env: make_env()
     ]
+  end
+
+  defp make_env() do
+    case System.get_env("ERL_EI_INCLUDE_DIR") do
+      nil ->
+        %{
+          "ERL_EI_INCLUDE_DIR" => "#{:code.root_dir()}/usr/include",
+          "ERL_EI_LIBDIR" => "#{:code.root_dir()}/usr/lib"
+        }
+
+      _ ->
+        %{}
+    end
   end
 
   def application() do
@@ -84,5 +98,4 @@ defmodule Nerves.UART.Mixfile do
       _ -> :default
     end
   end
-
 end
