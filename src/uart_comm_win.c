@@ -334,6 +334,9 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
                           OPEN_EXISTING,
                           FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
                           NULL);
+
+    port->active_mode_enabled = config->active;
+
     if (port->h == INVALID_HANDLE_VALUE) {
         record_errno();
         return -1;
@@ -345,7 +348,6 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
         port->h = NULL;
         return -1;
     }
-    port->active_mode_enabled = config->active;
 
     // Reset timeouts to wait forever
     update_write_timeout(port, -1);
@@ -384,10 +386,6 @@ int uart_is_open(struct uart *port)
 
 int uart_configure(struct uart *port, const struct uart_config *config)
 {
-    // Updating closed ports is easy.
-    if (port->h == NULL)
-        return 0;
-
     // Update active mode
     if (config->active != port->active_mode_enabled) {
         if (port->read_pending)
@@ -410,6 +408,10 @@ int uart_configure(struct uart *port, const struct uart_config *config)
                 errx(EXIT_FAILURE, "uart_configure: SetCommMask failure unexpected: 0x%08x, Error=%d", (int) port->desired_event_mask, (int) GetLastError());
         }
     }
+
+    // Updating closed ports is easy.
+    if (port->h == NULL)
+        return 0;
 
     if (uart_config_line(port, config) < 0) {
         debug("uart_config_line failed");

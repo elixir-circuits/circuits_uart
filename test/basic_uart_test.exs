@@ -196,6 +196,27 @@ defmodule BasicUARTTest do
     UART.close(uart2)
   end
 
+  test "error message is only reported to read/write call when passive mode is configured explicitly", %{uart1: uart1} do
+    :ok = UART.configure(uart1, active: false)
+    {:error, :enoent} = UART.open(uart1, UARTTest.port1()<>"_does_not_exist")
+
+    receive do
+      {:nerves_uart, _port, {:error, :ebadf}} -> flunk("Error messages should only be reported on read/write calls in passive mode")
+    after
+      0 -> :ok
+    end
+  end
+
+  test "error message is only reported to read/write call when passive mode is configured on open", %{uart1: uart1} do
+    {:error, :enoent} = UART.open(uart1, UARTTest.port1()<>"_does_not_exist", active: false)
+
+    receive do
+      {:nerves_uart, _port, {:error, :ebadf}} -> flunk("Error messages should only be reported on read/write calls in passive mode")
+    after
+      0 -> :ok
+    end
+  end
+
   test "error writing to a closed port when using framing", %{uart1: uart1, uart2: uart2} do
     framing = {UART.Framing.Line, separator: "\n"}
     assert :ok = UART.open(uart2, UARTTest.port2(), active: false, framing: framing)
