@@ -399,6 +399,8 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
     port->fd = open(uart_path, O_RDWR | O_NOCTTY | O_CLOEXEC | O_NONBLOCK);
     free(uart_path);
 
+    port->active_mode_enabled = config->active;
+
     if (port->fd < 0) {
         debug("open failed on '%s'", name);
         goto handle_error;
@@ -426,8 +428,6 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
         goto handle_error;
     }
 
-    port->active_mode_enabled = config->active;
-
     // Clear garbage data from RX/TX queues
     tcflush(port->fd, TCIOFLUSH);
 
@@ -449,10 +449,6 @@ int uart_is_open(struct uart *port)
 
 int uart_configure(struct uart *port, const struct uart_config *config)
 {
-    // Updating closed ports is easy.
-    if (port->fd < 0)
-        return 0;
-
     // Update active mode
     if (config->active != port->active_mode_enabled) {
         if (port->read_pending)
@@ -460,6 +456,10 @@ int uart_configure(struct uart *port, const struct uart_config *config)
 
         port->active_mode_enabled = config->active;
     }
+
+    // Updating closed ports is easy.
+    if (port->fd < 0)
+        return 0;
 
     if (uart_config_line(port->fd, config) < 0) {
         debug("uart_config_line failed");

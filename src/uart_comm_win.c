@@ -334,6 +334,9 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
                           OPEN_EXISTING,
                           FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
                           NULL);
+
+    port->active_mode_enabled = config->active;
+
     if (port->h == INVALID_HANDLE_VALUE) {
         record_errno();
         return -1;
@@ -345,7 +348,6 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
         port->h = NULL;
         return -1;
     }
-    port->active_mode_enabled = config->active;
 
     // Reset timeouts to wait forever
     update_write_timeout(port, -1);
@@ -384,12 +386,18 @@ int uart_is_open(struct uart *port)
 
 int uart_configure(struct uart *port, const struct uart_config *config)
 {
+    bool active_mode_changed = false;
+    if (config->active != port->active_mode_enabled) {
+      port->active_mode_enabled = config->active;
+      active_mode_changed = true;
+    }
+
     // Updating closed ports is easy.
     if (port->h == NULL)
         return 0;
 
     // Update active mode
-    if (config->active != port->active_mode_enabled) {
+    if (active_mode_changed) {
         if (port->read_pending)
             errx(EXIT_FAILURE, "Elixir is supposed to queue read ops");
 
