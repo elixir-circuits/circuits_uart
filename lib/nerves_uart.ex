@@ -112,8 +112,8 @@ defmodule Nerves.UART do
 
     * `:framing` - (`module` or `{module, args}`) set the framing for data.
       The `module` must implement the `Nerves.UART.Framing` behaviour. See
-      `Nerves.UART.Framing.None` and `Nerves.UART.Framing.Line`. The default
-      is `Nerves.UART.Framing.None`.
+      `Nerves.UART.Framing.None`, `Nerves.UART.Framing.Line`, and
+      `Nerves.UART.Framing.FourByte`. The default is `Nerves.UART.Framing.None`.
 
     * `:rx_framing_timeout` - (milliseconds) this specifies how long incomplete
       frames will wait for the remainder to be received. Timed out partial

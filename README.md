@@ -118,7 +118,7 @@ iex> flush
 ```
 
 If your serial data is framed differently, check out the `Nerves.UART.Framing` behaviour
-and implement your own.
+and implement your own. `Nerves.UART.Framing.FourByte` is a particularly simple example of a framer.
 
 You can also set a timeout so that a partial line doesn't hang around in the receive
 buffer forever:
@@ -277,8 +277,8 @@ protection calls that I couldn't figure out how to work around.
 
 ### How does Nerves.UART communicate with the serial port?
 
-Nerves.UART uses a [Port](https://hexdocs.pm/elixir/Port.html) and C code. 
-Elixir/Erlang ports have nothing to do with the serial ports of the operating system. 
+Nerves.UART uses a [Port](https://hexdocs.pm/elixir/Port.html) and C code.
+Elixir/Erlang ports have nothing to do with the serial ports of the operating system.
 They share the same name but are different concepts.
 
 ## Acknowledgments
