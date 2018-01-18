@@ -66,13 +66,12 @@ defmodule Nerves.UART.Framing.Line do
     %{state | processed: <<>>, in_process: <<>>}
   end
 
-  def flush(_direction, state) do
+  def flush(:transmit, state) do
     state
   end
 
-  def buffer_empty?(state) do
-    state.processed == <<>> and state.in_process == <<>>
-  end
+  def buffer_empty?(%State{processed: <<>>, in_process: <<>>}), do: true
+  def buffer_empty?(_state), do: false
 
   # Handle not enough data case
   defp process_data(_separator, sep_length, _max_length, processed, to_process, lines)
