@@ -386,8 +386,18 @@ int uart_is_open(struct uart *port)
 
 int uart_configure(struct uart *port, const struct uart_config *config)
 {
-    // Update active mode
+    bool active_mode_changed = false;
     if (config->active != port->active_mode_enabled) {
+      port->active_mode_enabled = config->active;
+      active_mode_changed = true;
+    }
+
+    // Updating closed ports is easy.
+    if (port->h == NULL)
+        return 0;
+
+    // Update active mode
+    if (active_mode_changed) {
         if (port->read_pending)
             errx(EXIT_FAILURE, "Elixir is supposed to queue read ops");
 
@@ -408,10 +418,6 @@ int uart_configure(struct uart *port, const struct uart_config *config)
                 errx(EXIT_FAILURE, "uart_configure: SetCommMask failure unexpected: 0x%08x, Error=%d", (int) port->desired_event_mask, (int) GetLastError());
         }
     }
-
-    // Updating closed ports is easy.
-    if (port->h == NULL)
-        return 0;
 
     if (uart_config_line(port, config) < 0) {
         debug("uart_config_line failed");
