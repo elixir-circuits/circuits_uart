@@ -435,8 +435,8 @@ defmodule Nerves.UART do
     {:reply, response, state}
   end
 
-  def terminate(reason, state) do
-    IO.puts("Going to terminate: #{inspect(reason)}")
+  def terminate(_reason, state) do
+    # IO.puts("Going to terminate: #{inspect(reason)}")
     Port.close(state.port)
   end
 
@@ -465,7 +465,7 @@ defmodule Nerves.UART do
   end
 
   defp notify_timedout_messages(%{is_active: false} = state, messages) do
-    IO.puts("Queuing... #{inspect(messages)}")
+    # IO.puts("Queuing... #{inspect(messages)}")
     new_queued_messages = state.queued_messages ++ messages
     %{state | queued_messages: new_queued_messages}
   end
