@@ -120,8 +120,8 @@ defmodule Nerves.UART do
       frames are reported as `{:partial, data}`. A timeout of <= 0 means to
       wait forever.
 
-  Active mode defaults to true and means that data received on the
-  UART is reported in messages. The messages have the following form:
+  Active mode defaults to true and means that data received on the UART is
+  reported in messages. The messages have the following form:
 
      `{:nerves_uart, serial_port_name, data}`
 
@@ -129,10 +129,10 @@ defmodule Nerves.UART do
 
      `{:nerves_uart, serial_port_name, {:error, reason}}`
 
-  When in active mode, flow control can not be used to push back on the
-  sender and messages will accumulated in the mailbox should data arrive
-  fast enough. If this is an issue, set `:active` to false and call
-  `read/2` manually when ready for more data.
+  When in active mode, flow control can not be used to push back on the sender
+  and messages will accumulated in the mailbox should data arrive fast enough.
+  If this is an issue, set `:active` to false and call `read/2` manually when
+  ready for more data.
 
   On success, `open/3` returns `:ok`. On error, `{:error, reason}` is returned.
   The following are some reasons:
@@ -235,8 +235,9 @@ defmodule Nerves.UART do
   end
 
   @doc """
-  Waits until all data has been transmitted. See [tcdrain(3)](http://linux.die.net/man/3/tcdrain) for low level
-  details on Linux or OSX. This is not implemented on Windows.
+  Waits until all data has been transmitted. See
+  [tcdrain(3)](http://linux.die.net/man/3/tcdrain) for low level details on
+  Linux or OSX. This is not implemented on Windows.
   """
   @spec drain(GenServer.server()) :: :ok | {:error, term}
   def drain(pid) do
