@@ -196,33 +196,39 @@ defmodule BasicUARTTest do
     UART.close(uart2)
   end
 
-  test "error message on open is reported when active mode is configured explicitly", %{uart1: uart1} do
+  test "error message on open is reported when active mode is configured explicitly", %{
+    uart1: uart1
+  } do
     :ok = UART.configure(uart1, active: true)
-    {:error, :enoent} = UART.open(uart1, UARTTest.port1()<>"_does_not_exist")
+    {:error, :enoent} = UART.open(uart1, UARTTest.port1() <> "_does_not_exist")
     assert_receive {:nerves_uart, _port, {:error, :ebadf}}
   end
 
   test "error message on open is reported when active mode is configured on open", %{uart1: uart1} do
-    {:error, :enoent} = UART.open(uart1, UARTTest.port1()<>"_does_not_exist", active: true)
+    {:error, :enoent} = UART.open(uart1, UARTTest.port1() <> "_does_not_exist", active: true)
     assert_receive {:nerves_uart, _port, {:error, :ebadf}}
   end
 
-  test "error message on open is only reported to read/write call when passive mode is configured explicitly", %{uart1: uart1} do
+  test "error message on open is only reported to read/write call when passive mode is configured explicitly",
+       %{uart1: uart1} do
     :ok = UART.configure(uart1, active: false)
-    {:error, :enoent} = UART.open(uart1, UARTTest.port1()<>"_does_not_exist")
+    {:error, :enoent} = UART.open(uart1, UARTTest.port1() <> "_does_not_exist")
 
     receive do
-      {:nerves_uart, _port, {:error, :ebadf}} -> flunk("Error messages should only be reported on read/write calls in passive mode")
+      {:nerves_uart, _port, {:error, :ebadf}} ->
+        flunk("Error messages should only be reported on read/write calls in passive mode")
     after
       0 -> :ok
     end
   end
 
-  test "error message on open is only reported to read/write call when passive mode is configured on open", %{uart1: uart1} do
-    {:error, :enoent} = UART.open(uart1, UARTTest.port1()<>"_does_not_exist", active: false)
+  test "error message on open is only reported to read/write call when passive mode is configured on open",
+       %{uart1: uart1} do
+    {:error, :enoent} = UART.open(uart1, UARTTest.port1() <> "_does_not_exist", active: false)
 
     receive do
-      {:nerves_uart, _port, {:error, :ebadf}} -> flunk("Error messages should only be reported on read/write calls in passive mode")
+      {:nerves_uart, _port, {:error, :ebadf}} ->
+        flunk("Error messages should only be reported on read/write calls in passive mode")
     after
       0 -> :ok
     end
