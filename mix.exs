@@ -14,7 +14,7 @@ defmodule Nerves.UART.Mixfile do
       description: @description,
       package: package(),
       source_url: "https://github.com/nerves-project/nerves_uart",
-      docs: [extras: ["README.md"]],
+      docs: [extras: ["README.md"], main: "readme"],
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
