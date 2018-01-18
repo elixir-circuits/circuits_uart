@@ -74,10 +74,23 @@ defmodule Nerves.UART do
 
   @doc """
   Start up a UART GenServer.
+
+  You may pass options to the UART GenServer as a keyword list:
+
+    * `:name` - Register the GenServer. See GenServer.start_link/3
+    * `:port_name` - Open the specified port (e.g., "ttyS0", "COM4")
+    * Any of the options that can be passed to `open/3`
+
+  By default, the UART is started in an closed state. This is desirable in
+  situations where the port assignment is dynamic like on a laptop or desktop
+  computer. In scenarios where the UART is always available and assigned to a
+  fixed port name, it is possible to have the port automatically opened and
+  configured.
   """
   @spec start_link([term]) :: {:ok, pid} | {:error, term}
   def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, [], opts)
+    genserver_opts = Keyword.take(opts, [:name])
+    GenServer.start_link(__MODULE__, opts, genserver_opts)
   end
 
   @doc """
@@ -95,6 +108,10 @@ defmodule Nerves.UART do
 
     * `:active` - (`true` or `false`) specifies whether data is received as
        messages or by calling `read/2`. See discussion below.
+
+    * `:controlling_process - A pid, registered name or {registered_name, node}
+      that should receive messages when in active mode. Defaults to the calling
+      process.
 
     * `:speed` - (number) set the initial baudrate (e.g., 115200)
 
@@ -143,6 +160,9 @@ defmodule Nerves.UART do
   """
   @spec open(GenServer.server(), binary, [uart_option]) :: :ok | {:error, term}
   def open(pid, name, opts \\ []) do
+    # To maintain compatibility with previous versions of nerves_uart, automatically
+    # make the caller to `open` be the one that receives messages in active mode.
+    opts = Keyword.put_new(opts, :controlling_process, self())
     GenServer.call(pid, {:open, name, opts})
   end
 
@@ -290,7 +310,7 @@ defmodule Nerves.UART do
   end
 
   # gen_server callbacks
-  def init([]) do
+  def init(opts) do
     executable = :code.priv_dir(:nerves_uart) ++ '/nerves_uart'
 
     port =
@@ -302,13 +322,15 @@ defmodule Nerves.UART do
         :exit_status
       ])
 
-    state = %State{port: port}
-    {:ok, state}
+    send(self(), {:autoconfigure, opts})
+
+    {:ok, %State{port: port}}
   end
 
-  def handle_call({:open, name, opts}, {from_pid, _}, state) do
+  def handle_call({:open, name, opts}, _from, state) do
     new_framing = Keyword.get(opts, :framing, nil)
     new_rx_framing_timeout = Keyword.get(opts, :rx_framing_timeout, state.rx_framing_timeout)
+    new_controlling_process = Keyword.get(opts, :controlling_process)
     is_active = Keyword.get(opts, :active, true)
 
     response = call_port(state, :open, {name, opts})
@@ -318,7 +340,7 @@ defmodule Nerves.UART do
         %{
           state
           | name: name,
-            controlling_process: from_pid,
+            controlling_process: new_controlling_process,
             rx_framing_timeout: new_rx_framing_timeout,
             is_active: is_active
         },
@@ -392,11 +414,17 @@ defmodule Nerves.UART do
   def handle_call({:configure, opts}, _from, state) do
     new_framing = Keyword.get(opts, :framing, nil)
     new_rx_framing_timeout = Keyword.get(opts, :rx_framing_timeout, state.rx_framing_timeout)
+    new_controlling_process = Keyword.get(opts, :controlling_process, state.controlling_process)
     is_active = Keyword.get(opts, :active, state.is_active)
 
     state =
       change_framing(
-        %{state | rx_framing_timeout: new_rx_framing_timeout, is_active: is_active},
+        %{
+          state
+          | rx_framing_timeout: new_rx_framing_timeout,
+            controlling_process: new_controlling_process,
+            is_active: is_active
+        },
         new_framing
       )
 
@@ -439,6 +467,19 @@ defmodule Nerves.UART do
   def terminate(_reason, state) do
     # IO.puts("Going to terminate: #{inspect(reason)}")
     Port.close(state.port)
+  end
+
+  def handle_info({:autoconfigure, opts}, state) do
+    {:reply, response, new_state} =
+      case Keyword.get(opts, :port_name) do
+        nil -> handle_call({:configure, opts}, nil, state)
+        port_name -> handle_call({:open, port_name, opts}, nil, state)
+      end
+
+    case response do
+      :ok -> {:noreply, new_state}
+      error -> {:stop, {:autoconfiguration_failed, error}}
+    end
   end
 
   def handle_info({_, {:data, <<?n, message::binary>>}}, state) do
