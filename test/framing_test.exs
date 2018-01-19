@@ -89,27 +89,27 @@ defmodule FramingTest do
     assert {:ok, <<>>} = UART.read(uart2, 500)
   end
 
-  # Not supported yet
-  if false do
-    test "framing timeouts in passive mode", %{uart1: uart1, uart2: uart2} do
-      assert :ok = UART.open(uart1, UARTTest.port1())
+  test "framing timeouts in passive mode", %{uart1: uart1, uart2: uart2} do
+    assert :ok = UART.open(uart1, UARTTest.port1())
 
-      assert :ok =
-               UART.open(
-                 uart2,
-                 UARTTest.port2(),
-                 active: false,
-                 framing: {UART.Framing.Line, max_length: 10},
-                 rx_framing_timeout: 500
-               )
+    assert :ok =
+             UART.open(
+               uart2,
+               UARTTest.port2(),
+               active: false,
+               framing: {UART.Framing.Line, max_length: 10},
+               rx_framing_timeout: 100
+             )
 
-      # Send something that's not a line and check that it times out
-      assert :ok = UART.write(uart1, "A")
-      assert {:ok, {:partial, "A"}} = UART.read(uart2, 1000)
+    # Send something that's not a line and check that it times out
+    assert :ok = UART.write(uart1, "A")
+    # Initial read will timeout and the partial read will be queued in the uart state
+    assert {:ok, <<>>} = UART.read(uart2, 200)
+    # Call read again to fetch the queued data
+    assert {:ok, {:partial, "A"}} = UART.read(uart2, 200)
 
-      UART.close(uart1)
-      UART.close(uart2)
-    end
+    UART.close(uart1)
+    UART.close(uart2)
   end
 
   test "receive a line in active mode", %{uart1: uart1, uart2: uart2} do
