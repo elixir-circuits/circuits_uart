@@ -62,6 +62,33 @@ defmodule FramingTest do
     UART.close(uart2)
   end
 
+  test "multiple read polls do not elapse the specified read timeout", %{
+    uart1: uart1,
+    uart2: uart2
+  } do
+    assert :ok = UART.open(uart1, UARTTest.port1())
+
+    assert :ok =
+             UART.open(
+               uart2,
+               UARTTest.port2(),
+               active: false,
+               framing: {
+                 UART.Framing.Line,
+                 max_length: 4
+               }
+             )
+
+    spawn(fn ->
+      # Sleep to allow the UART.read some time to begin reading
+      :timer.sleep(100)
+      # Send something that's not a line
+      assert :ok = UART.write(uart1, "A")
+    end)
+
+    assert {:ok, <<>>} = UART.read(uart2, 500)
+  end
+
   # Not supported yet
   if false do
     test "framing timeouts in passive mode", %{uart1: uart1, uart2: uart2} do
