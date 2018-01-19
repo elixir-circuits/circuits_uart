@@ -1,4 +1,5 @@
 # Nerves.UART
+
 [![Build Status](https://travis-ci.org/nerves-project/nerves_uart.svg?branch=master)](https://travis-ci.org/nerves-project/nerves_uart)
 [![Build Status](https://ci.appveyor.com/api/projects/status/hm6s6269jtbiqxbv/branch/master?svg=true)](https://ci.appveyor.com/project/fhunleth/nerves-uart/branch/master)
 [![Hex version](https://img.shields.io/hexpm/v/nerves_uart.svg)](https://hex.pm/packages/nerves_uart)
@@ -7,12 +8,13 @@
 Nerves.UART allows you to access UARTs, serial ports, Bluetooth virtual serial
 port connections and more in Elixir. Feature highlights:
 
-  * Mac, Windows, and desktop and embedded Linux
-  * Enumerate serial ports
-  * Receive input via messages or by polling (active and passive modes)
-  * Add and remove framing on serial data - line-based framing included for use
-    with GPS, cellular, satellite and other modules
-  * Unit tests (uses the [tty0tty](https://github.com/freemed/tty0tty) virtual null modem on Travis)
+* Mac, Windows, and desktop and embedded Linux
+* Enumerate serial ports
+* Receive input via messages or by polling (active and passive modes)
+* Add and remove framing on serial data - line-based framing included for use
+  with GPS, cellular, satellite and other modules
+* Unit tests (uses the [tty0tty](https://github.com/freemed/tty0tty) virtual
+  null modem on Travis)
 
 Something doesn't work for you? Check out below and the
 [docs](https://hexdocs.pm/nerves_uart/). Chat with other users on the nerves
@@ -40,8 +42,8 @@ iex> {:ok, pid} = Nerves.UART.start_link
 {:ok, #PID<0.132.0>}
 ```
 
-The GenServer doesn't open a port automatically, so open up a serial port or UART
-now. See the results from your call to `Nerves.UART.enumerate/0` for what's
+The GenServer doesn't open a port automatically, so open up a serial port or
+UART now. See the results from your call to `Nerves.UART.enumerate/0` for what's
 available on your system.
 
 ```elixir
@@ -49,9 +51,10 @@ iex> Nerves.UART.open(pid, "COM14", speed: 115200, active: false)
 :ok
 ```
 
-This opens the serial port up at 115200 baud and turns off active mode. This means that
-you'll have to manually call `Nerves.UART.read` to receive input. In active mode, input
-from the serial port will be sent as messages. See the docs for all options.
+This opens the serial port up at 115200 baud and turns off active mode. This
+means that you'll have to manually call `Nerves.UART.read` to receive input. In
+active mode, input from the serial port will be sent as messages. See the docs
+for all options.
 
 Write something to the serial port:
 
@@ -67,9 +70,10 @@ iex> Nerves.UART.read(pid, 60000)
 {:ok, "Hi"}
 ```
 
-Input is reported as soon as it is received, so you may need multiple calls to `read/2`
-to get everything you want. If you have flow control enabled and stop calling
-`read/2`, the port will push back to the sender when its buffers fill up.
+Input is reported as soon as it is received, so you may need multiple calls to
+`read/2` to get everything you want. If you have flow control enabled and stop
+calling `read/2`, the port will push back to the sender when its buffers fill
+up.
 
 Enough with passive mode, let's switch to active mode:
 
@@ -97,19 +101,20 @@ iex> flush
 Oops. Well, when it appears again, it can be reopened. In passive mode, errors
 get reported on the calls to `Nerves.UART.read/2` and `Nerves.UART.write/3`
 
-Back to receiving data, it's a little annoying that characters arrive one by one.
-That's because our computer is really fast compared to the serial port, but if
-something slows it down, we could receive two or more characters at a time. Rather than
-reassemble the characters into lines, we can ask `nerves_uart` to do it for us:
+Back to receiving data, it's a little annoying that characters arrive one by
+one.  That's because our computer is really fast compared to the serial port,
+but if something slows it down, we could receive two or more characters at a
+time. Rather than reassemble the characters into lines, we can ask `nerves_uart`
+to do it for us:
 
 ```elixir
 iex> Nerves.UART.configure(pid, framing: {Nerves.UART.Framing.Line, separator: "\r\n"})
 :ok
 ```
 
-This tells `nerves_uart` to append a `\r\n` to each call to `write/2` and to report
-each line separately in active and passive mode. You can set this configuration
-in the call to `open/3` as well. Here's what we get now:
+This tells `nerves_uart` to append a `\r\n` to each call to `write/2` and to
+report each line separately in active and passive mode. You can set this
+configuration in the call to `open/3` as well. Here's what we get now:
 
 ```elixir
 iex> flush
@@ -117,11 +122,12 @@ iex> flush
 :ok
 ```
 
-If your serial data is framed differently, check out the `Nerves.UART.Framing` behaviour
-and implement your own.
+If your serial data is framed differently, check out the `Nerves.UART.Framing`
+behaviour and implement your own. `Nerves.UART.Framing.FourByte` is a
+particularly simple example of a framer.
 
-You can also set a timeout so that a partial line doesn't hang around in the receive
-buffer forever:
+You can also set a timeout so that a partial line doesn't hang around in the
+receive buffer forever:
 
 ```elixir
 iex> Nerves.UART.configure(pid, rx_framing_timeout: 500)
@@ -134,10 +140,9 @@ iex> flush
 {:nerves_uart, "COM14", {:partial, "A"}}
 ```
 
-
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+To install `nerves_uart`:
 
   1. Add `nerves_uart` to your list of dependencies in `mix.exs`:
 
@@ -147,28 +152,28 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
   end
   ```
 
-  2. Check that the C compiler dependencies are satisified (see below)
+  1. Check that the C compiler dependencies are satisified (see below)
 
-  3. Run `mix deps.get` and `mix compile`
+  1. Run `mix deps.get` and `mix compile`
 
 ### C compiler dependencies
 
-Since this library includes C code, `make`, `gcc`, and Erlang header and development
-libraries are required.
+Since this library includes C code, `make`, `gcc`, and Erlang header and
+development libraries are required.
 
-On Linux systems, this usually requires you to install
-the `build-essential` and `erlang-dev` packages. For example:
+On Linux systems, this usually requires you to install the `build-essential` and
+`erlang-dev` packages. For example:
 
 ```sh
 sudo apt-get install build-essential erlang-dev
 ```
 
-On Macs, run `gcc --version` or `make --version`. If they're not installed, you will
-be given instructions.
+On Macs, run `gcc --version` or `make --version`. If they're not installed, you
+will be given instructions.
 
-On Windows, if you're obtaining `nerves_uart` from `hex.pm`, you'll need
-MinGW to compile the C code. I use [Chocolatey](https://chocolatey.org/)
-and install MinGW by running the following in an administrative command prompt:
+On Windows, if you're obtaining `nerves_uart` from `hex.pm`, you'll need MinGW
+to compile the C code. I use [Chocolatey](https://chocolatey.org/) and install
+MinGW by running the following in an administrative command prompt:
 
 ```sh
 choco install mingw
@@ -176,25 +181,25 @@ choco install mingw
 
 On Nerves, you're set - just add `nerves_uart` to your `mix.exs`. Nerves
 contains everything needed by default. If you do use Nerves, though, keep in
-mind that the C code is crosscompiled for your target hardware and will
-not work on your host (the port will crash when you call `start_link` or
-`enumerate`. If you want to try out `nerves_uart` on your host
-machine, the easiest way is to either clone the source or add `nerves_uart` as a
-dependency to a regular (non-Nerves) Elixir project.
+mind that the C code is crosscompiled for your target hardware and will not work
+on your host (the port will crash when you call `start_link` or `enumerate`. If
+you want to try out `nerves_uart` on your host machine, the easiest way is to
+either clone the source or add `nerves_uart` as a dependency to a regular
+(non-Nerves) Elixir project.
 
 ## Building and running the unit tests
 
-The standard Elixir build process applies. Clone `nerves_uart` or
-download a source release and run:
+The standard Elixir build process applies. Clone `nerves_uart` or download a
+source release and run:
 
 ```sh
 mix deps.get
 mix compile
 ```
 
-The unit tests require two serial ports connected via a NULL modem
-cable to run. Define the names of the serial ports in the environment
-before running the tests. For example,
+The unit tests require two serial ports connected via a NULL modem cable to run.
+Define the names of the serial ports in the environment before running the
+tests. For example,
 
 ```sh
 export NERVES_UART_PORT1=ttyS0
@@ -269,24 +274,26 @@ FTDI-based serial ports appear to work better on both operating systesm.
 
 ### ei_copy why????
 
-You may have noticed Erlang's `erl_interface` code copy/pasted into `src/ei_copy`.
-This is *only* used on Windows to work around issues linking to the distributed
-version of `erl_interface`. That was compiled with Visual Studio. This project uses MinGW, and
-even though the C ABIs are the same between the compilers, Visual Studio adds stack
-protection calls that I couldn't figure out how to work around.
+You may have noticed Erlang's `erl_interface` code copy/pasted into
+`src/ei_copy`.  This is *only* used on Windows to work around issues linking to
+the distributed version of `erl_interface`. That was compiled with Visual
+Studio. This project uses MinGW, and even though the C ABIs are the same between
+the compilers, Visual Studio adds stack protection calls that I couldn't figure
+out how to work around.
 
 ### How does Nerves.UART communicate with the serial port?
 
-Nerves.UART uses a [Port](https://hexdocs.pm/elixir/Port.html) and C code. 
-Elixir/Erlang ports have nothing to do with the serial ports of the operating system. 
-They share the same name but are different concepts.
+Nerves.UART uses a [Port](https://hexdocs.pm/elixir/Port.html) and C code.
+Elixir/Erlang ports have nothing to do with the serial ports of the operating
+system.  They share the same name but are different concepts.
 
 ## Acknowledgments
 
-When building this library, [node-serialport](https://github.com/voodootikigod/node-serialport)
-and [QtSerialPort](http://doc.qt.io/qt-5/qserialport.html) where incredibly helpful in
-helping to define APIs and point out subtleties with platform-specific serial port code. Sadly,
-I couldn't reuse their code, but I feel indebted to the authors and maintainers of these
-libraries, since they undoubtedly saved me hours of time debugging corner cases.
-I have tried to acknowledge them in the comments where I have used strategies that I learned
-from them.
+When building this library,
+[node-serialport](https://github.com/voodootikigod/node-serialport) and
+[QtSerialPort](http://doc.qt.io/qt-5/qserialport.html) where incredibly helpful
+in helping to define APIs and point out subtleties with platform-specific serial
+port code. Sadly, I couldn't reuse their code, but I feel indebted to the
+authors and maintainers of these libraries, since they undoubtedly saved me
+hours of time debugging corner cases.  I have tried to acknowledge them in the
+comments where I have used strategies that I learned from them.

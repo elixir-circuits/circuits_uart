@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.0-dev
+
+  * Improvements
+    * Added 4-byte framer both since it is periodically useful and as a very
+      simple example of the framing feature.
+
+  * Bug fixes
+    * Fix active mode state not being updated and a message being sent in
+      passive mode on an open failure.
+
 ## v1.0.1
 
   * Improvements

@@ -259,7 +259,7 @@ static int uart_config_line(struct uart *port, const struct uart_config *config)
     //  Microsoft docs imply that these fields are only used when the device is
     //  opened, but that doesn't make sense to me, since you have to open
     //  the device to call SetCommState. Additionally, getting the RTS and DTR
-    //  states from Windows requires overlapped I/O (since we openned the handled
+    //  states from Windows requires overlapped I/O (since we opened the handled
     //  that way). Using cached results is so much easier. The case this breaks
     //  is if the user wants to know what hardware flowcontrol is doing. This
     //  seems like a debug case that is more easily satisfied with a scope.

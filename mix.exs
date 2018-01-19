@@ -1,7 +1,7 @@
 defmodule Nerves.UART.Mixfile do
   use Mix.Project
 
-  @version "1.0.1"
+  @version "1.1.0-dev"
 
   @description "Discover and use UARTs and serial ports in Elixir."
 
@@ -14,7 +14,7 @@ defmodule Nerves.UART.Mixfile do
       description: @description,
       package: package(),
       source_url: "https://github.com/nerves-project/nerves_uart",
-      docs: [extras: ["README.md"]],
+      docs: [extras: ["README.md"], main: "readme"],
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
