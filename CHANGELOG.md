@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.0-dev
+## v1.1.0
 
   * Improvements
     * Added 4-byte framer both since it is periodically useful and as a very
@@ -9,6 +9,8 @@
   * Bug fixes
     * Fix active mode state not being updated and a message being sent in
       passive mode on an open failure.
+    * Maintain the elapsed time on passive mode reads to avoid reading forever
+      when bytes keep arriving, but no messages get sent from the framer
 
 ## v1.0.1
 
