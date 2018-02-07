@@ -744,6 +744,9 @@ void uart_process_handle(struct uart *port, HANDLE *event)
                 // to EV_RXCHAR.
                 if (!(port->received_event_mask & EV_RXCHAR)) {
                     debug("spurious EV_RXCHAR");
+                    if (port->active_mode_enabled) {
+                        start_async_reads(port);
+                    }
                     return;
                 }
 
