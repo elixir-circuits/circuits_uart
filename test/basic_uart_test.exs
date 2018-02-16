@@ -4,9 +4,6 @@ defmodule BasicUARTTest do
   use ExUnit.Case
   alias Nerves.UART
 
-  @xoff <<19>>
-  @xon <<17>>
-
   setup do
     UARTTest.common_setup()
   end
@@ -196,34 +193,27 @@ defmodule BasicUARTTest do
     UART.close(uart2)
   end
 
-  test "error message on open is reported when active mode is configured explicitly", %{
+  test "open doesn't return error AND send a message when in active mode", %{
     uart1: uart1
   } do
     :ok = UART.configure(uart1, active: true)
-    {:error, :enoent} = UART.open(uart1, UARTTest.port1() <> "_does_not_exist")
-    assert_receive {:nerves_uart, _port, {:error, :ebadf}}
-  end
+    {:error, _} = UART.open(uart1, "does_not_exist")
+    refute_received {:nerves_uart, _port, _}, "No messages should be sent if open returns error"
 
-  test "error message on open is reported when active mode is configured on open", %{uart1: uart1} do
-    {:error, :enoent} = UART.open(uart1, UARTTest.port1() <> "_does_not_exist", active: true)
-    assert_receive {:nerves_uart, _port, {:error, :ebadf}}
-  end
-
-  test "error message on open is only reported to read/write call when passive mode is configured explicitly",
-       %{uart1: uart1} do
     :ok = UART.configure(uart1, active: false)
-    {:error, :enoent} = UART.open(uart1, UARTTest.port1() <> "_does_not_exist")
-
-    refute_received {:nerves_uart, _, _},
-                    "Error messages should only be reported on read/write calls in passive mode"
+    {:error, _} = UART.open(uart1, "does_not_exist", active: true)
+    refute_received {:nerves_uart, _port, _}, "No messages should be sent if open returns error"
   end
 
-  test "error message on open is only reported to read/write call when passive mode is configured on open",
-       %{uart1: uart1} do
-    {:error, :enoent} = UART.open(uart1, UARTTest.port1() <> "_does_not_exist", active: false)
+  test "open doesn't send messages in passive mode for open errors", %{
+    uart1: uart1
+  } do
+    :ok = UART.configure(uart1, active: false)
+    {:error, :enoent} = UART.open(uart1, "does_not_exist")
+    refute_received {:nerves_uart, _, _}, "No messages should be sent in passive mode"
 
-    refute_received {:nerves_uart, _, _},
-                    "Error messages should only be reported on read/write calls in passive mode"
+    {:error, :enoent} = UART.open(uart1, "does_not_exist", active: false)
+    refute_received {:nerves_uart, _, _}, "No messages should be sent in passive mode"
   end
 
   test "error writing to a closed port when using framing", %{uart1: uart1, uart2: uart2} do

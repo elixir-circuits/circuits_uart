@@ -482,6 +482,7 @@ int uart_configure(struct uart *port, const struct uart_config *config)
  */
 static void uart_close_on_error(struct uart *port, int reason)
 {
+    debug("uart_close_on_error %d, %d", port->fd, reason);
     uart_close(port);
 
     // If active mode, notify that the failure occurred.
@@ -850,6 +851,8 @@ int uart_add_poll_events(struct uart *port, struct pollfd *fdset, int *timeout)
 void uart_process(struct uart *port, const struct pollfd *fdset)
 {
     (void) fdset;
+    if (port->fd < 0)
+        return;
 
     // Handle writes
     if (port->write_data) {
