@@ -22,6 +22,11 @@
 #include "uart_enum.h"
 #include "util.h"
 
+#ifndef __WIN32__
+#include <string.h>
+#include <unistd.h>
+#endif
+
 /*
  * These tests are only enabled when DEBUG is definied. They're sometimes
  * useful when debugging the C code so that Erlang and Elixir don't

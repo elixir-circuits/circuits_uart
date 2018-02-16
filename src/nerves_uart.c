@@ -716,7 +716,11 @@ int main(int argc, char *argv[])
     log_location = stderr;
 #else
     char logfile[64];
+#ifdef __WIN32__
     sprintf(logfile, "nerves_uart-%d.log", (int) GetCurrentProcessId());
+#else
+    sprintf(logfile, "nerves_uart-%d.log", (int) getpid());
+#endif
     FILE *fp = fopen(logfile, "w+");
     log_location = fp;
 
