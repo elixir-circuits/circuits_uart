@@ -1,5 +1,22 @@
 # Changelog
 
+## v1.1.1
+
+The mix.exs file has the Elixir requirement bumped from 1.3 to 1.4. This was
+done to fix a Dialyzer warning caused by a change in arguments to
+`System.monotonic_time/1` with newer versions of Erlang and Elixir.
+Unfortunately this broke compilation under Elixir 1.3.
+
+  * Bug fixes
+    * Removed unnecessary open failure notification message. The failure gets
+      returned from the open call already and the notification was due to an
+      unfortunate path through the Linux filehandle polling code.
+    * Various Windows fixes:
+      * Fixed unhandled tx ready event seen during big transfers at 250000.
+        Thanks to Arne Ehrlich for figuring this out.
+      * Fixed bogus file handle errors when an open fails and then an attempt to
+        open again happens without a restart of the GenServer.
+
 ## v1.1.0
 
   * Improvements
