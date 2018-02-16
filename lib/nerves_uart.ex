@@ -351,7 +351,7 @@ defmodule Nerves.UART do
   end
 
   def handle_call({:read, timeout}, from, state) do
-    call_time = System.monotonic_time(:milli_seconds)
+    call_time = System.monotonic_time(:millisecond)
     # Poll the serial port
     case call_port(state, :read, timeout, port_timeout(timeout)) do
       {:ok, <<>>} ->
@@ -367,7 +367,7 @@ defmodule Nerves.UART do
 
         if messages == [] do
           # If nothing, poll some more with reduced timeout
-          elapsed = System.monotonic_time(:milli_seconds) - call_time
+          elapsed = System.monotonic_time(:millisecond) - call_time
           retry_timeout = max(timeout - elapsed, 0)
           handle_call({:read, retry_timeout}, from, new_state)
         else

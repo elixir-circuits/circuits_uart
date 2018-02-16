@@ -96,10 +96,9 @@ defmodule HWSignalsTest do
     :ok = UART.set_break(uart1, true)
     :ok = UART.set_break(uart1, false)
 
-    # :milli_seconds will be :milliseconds soon
-    start_time = System.monotonic_time(:milli_seconds)
+    start_time = System.monotonic_time(:millisecond)
     :ok = UART.send_break(uart1, 250)
-    duration = System.monotonic_time(:milli_seconds) - start_time
+    duration = System.monotonic_time(:millisecond) - start_time
     assert duration >= 250
 
     UART.close(uart1)

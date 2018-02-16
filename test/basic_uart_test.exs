@@ -308,15 +308,15 @@ defmodule BasicUARTTest do
     assert :ok = UART.open(uart1, UARTTest.port1(), active: false)
 
     # 0 duration timeout
-    start = System.monotonic_time(:milli_seconds)
+    start = System.monotonic_time(:millisecond)
     assert {:ok, <<>>} = UART.read(uart1, 0)
-    elapsed_time = System.monotonic_time(:milli_seconds) - start
+    elapsed_time = System.monotonic_time(:millisecond) - start
     assert_in_delta elapsed_time, 0, 100
 
     # 500 ms timeout
-    start = System.monotonic_time(:milli_seconds)
+    start = System.monotonic_time(:millisecond)
     assert {:ok, <<>>} = UART.read(uart1, 500)
-    elapsed_time = System.monotonic_time(:milli_seconds) - start
+    elapsed_time = System.monotonic_time(:millisecond) - start
     assert_in_delta elapsed_time, 400, 600
 
     UART.close(uart1)
