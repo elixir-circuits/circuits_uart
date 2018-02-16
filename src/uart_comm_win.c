@@ -145,7 +145,7 @@ int uart_init(struct uart **pport,
     *pport = port;
 
     memset(port, 0, sizeof(struct uart));
-    port->h = NULL;
+    port->h = INVALID_HANDLE_VALUE;
     port->active_mode_enabled = true;
     port->write_data = NULL;
     port->read_pending = false;
@@ -345,7 +345,7 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
     if (uart_init_dcb(port) < 0 ||
             uart_config_line(port, config) < 0) {
         CloseHandle(port->h);
-        port->h = NULL;
+        port->h = INVALID_HANDLE_VALUE;
         return -1;
     }
 
@@ -361,7 +361,7 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
         debug("SetCommMask failed? %d", (int) GetLastError());
         record_errno();
         CloseHandle(port->h);
-        port->h = NULL;
+        port->h = INVALID_HANDLE_VALUE;
         return -1;
     }
 
@@ -372,7 +372,7 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
 
     if (port->active_mode_enabled && start_async_reads(port) < 0) {
         CloseHandle(port->h);
-        port->h = NULL;
+        port->h = INVALID_HANDLE_VALUE;
         return -1;
     }
 
@@ -381,7 +381,7 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
 
 int uart_is_open(struct uart *port)
 {
-    return port->h != NULL;
+    return port->h != INVALID_HANDLE_VALUE;
 }
 
 int uart_configure(struct uart *port, const struct uart_config *config)
@@ -393,7 +393,7 @@ int uart_configure(struct uart *port, const struct uart_config *config)
     }
 
     // Updating closed ports is easy.
-    if (port->h == NULL)
+    if (port->h == INVALID_HANDLE_VALUE)
         return 0;
 
     // Update active mode
@@ -409,7 +409,7 @@ int uart_configure(struct uart *port, const struct uart_config *config)
 
             if (start_async_reads(port) < 0) {
                 CloseHandle(port->h);
-                port->h = NULL;
+                port->h = INVALID_HANDLE_VALUE;
                 return -1;
             }
         } else {
@@ -448,7 +448,7 @@ static void uart_close_on_error(struct uart *port, int reason)
 
 int uart_close(struct uart *port)
 {
-    if (port->h == NULL)
+    if (port->h == INVALID_HANDLE_VALUE)
         return 0;
 
     // Cancel any pending reads or writes
@@ -471,7 +471,7 @@ int uart_close(struct uart *port)
     }
 
     CloseHandle(port->h);
-    port->h = NULL;
+    port->h = INVALID_HANDLE_VALUE;
     return 0;
 }
 
