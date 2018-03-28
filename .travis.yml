@@ -4,23 +4,17 @@ language: c
 sudo: required
 dist: trusty
 
-os:
-    - linux
-    - osx
-
-compiler:
-    - gcc
-    - clang
-
 matrix:
-    exclude:
-        - os: osx
-          compiler: gcc
+    include:
         - os: linux
+          compiler: gcc
+          env: ERLANG_VERSION=20.2 ELIXIR_VERSION=1.6
+        - os: linux
+          compiler: gcc
+          env: ERLANG_VERSION=18.3 ELIXIR_VERSION=1.4
+        - os: osx
           compiler: clang
 
-env:
-  - ELIXIR_VERSION=1.5.3
 
 before_install:
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
@@ -31,10 +25,10 @@ before_install:
         cd -;
         sudo depmod;
         sudo modprobe tty0tty;
-        wget https://s3.amazonaws.com/travis-otp-releases/binaries/$(lsb_release -is | tr "A-Z" "a-z")/$(lsb_release -rs)/$(uname -m)/erlang-20.1-nonroot.tar.bz2;
-        mkdir -p ~/otp && tar -xf erlang-20.1-nonroot.tar.bz2 -C ~/otp/;
+        wget https://s3.amazonaws.com/travis-otp-releases/binaries/$(lsb_release -is | tr "A-Z" "a-z")/$(lsb_release -rs)/$(uname -m)/erlang-$ERLANG_VERSION-nonroot.tar.bz2;
+        mkdir -p ~/otp && tar -xf erlang-$ERLANG_VERSION-nonroot.tar.bz2 -C ~/otp/;
         mkdir -p ~/.kerl;
-        source $HOME/otp/20.1/activate;
+        source $HOME/otp/$ERLANG_VERSION/activate;
         wget https://github.com/elixir-lang/elixir/releases/download/v$ELIXIR_VERSION/Precompiled.zip;
         unzip -d elixir Precompiled.zip;
         sudo chmod 666 /dev/tnt*;
@@ -57,3 +51,4 @@ script:
       mix test test/uartless_test.exs;
     fi
   - mix docs
+  - if (elixir -v | grep 1.6); then mix format --check-formatted; fi
