@@ -407,10 +407,11 @@ defmodule Nerves.UART do
     new_framing = Keyword.get(opts, :framing, nil)
     new_rx_framing_timeout = Keyword.get(opts, :rx_framing_timeout, state.rx_framing_timeout)
     is_active = Keyword.get(opts, :active, state.is_active)
+    id_mode = Keyword.get(opts, :id, state.id)
 
     state =
       change_framing(
-        %{state | rx_framing_timeout: new_rx_framing_timeout, is_active: is_active},
+        %{state | rx_framing_timeout: new_rx_framing_timeout, is_active: is_active, id: id_mode},
         new_framing
       )
 
