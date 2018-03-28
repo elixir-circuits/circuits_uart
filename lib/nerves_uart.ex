@@ -36,7 +36,8 @@ defmodule Nerves.UART do
               rx_framing_timeout: 0,
               queued_messages: [],
               rx_framing_tref: nil,
-              is_active: true
+              is_active: true,
+              id: :name
   end
 
   @type uart_option ::
@@ -48,6 +49,7 @@ defmodule Nerves.UART do
           | {:flow_control, :none | :hardware | :software}
           | {:framing, module | {module, [term]}}
           | {:rx_framing_timeout, integer}
+          | {:id, :name | :pid}
 
   # Public API
   @doc """
@@ -119,6 +121,13 @@ defmodule Nerves.UART do
       frames will wait for the remainder to be received. Timed out partial
       frames are reported as `{:partial, data}`. A timeout of <= 0 means to
       wait forever.
+
+    * `:id` - (`:name` or `:pid`) specify what to return with the uart active
+    messages. with `:name` the messages are returned as `{:nreves_uart,
+    perial_port_name, data}` otherwise they are returned as `{:nerves_uart,
+    pid, data}`. The name and pid are the name of the connected UART or the pid
+    of the Nerves.UART server pid as returned by `start_link/1`. The default
+    value is `:name`.
 
   Active mode defaults to true and means that data received on the UART is
   reported in messages. The messages have the following form:
@@ -523,6 +532,11 @@ defmodule Nerves.UART do
     end
 
     {:noreply, state}
+  end
+
+  defp report_message(state = %Nerves.UART.State{id: :pid}, message) do
+    event = {:nerves_uart, self(), message}
+    send(state.controlling_process, event)
   end
 
   defp report_message(state, message) do
