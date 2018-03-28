@@ -140,6 +140,25 @@ iex> flush
 {:nerves_uart, "COM14", {:partial, "A"}}
 ```
 
+Sometimes it's easier to just operate with the `pid` of the Nerves GenServer
+rather than using the name of the port in active mode. An example of this is
+when you want to send data back to the port after receiving some data, and when
+dealing with many serial ports at once. You can do this with the `id: :pid`
+option to `open/1` or `configure/1`.
+
+```elixir
+iex> Nerves.UART.configure(pid, id: :pid)
+:ok
+
+# Assume some data was received
+
+iex> receive do
+...>   {:nerves_uart, pid, _} ->
+...>     Nerves.UART.write pid, "def"
+...> end
+:ok
+```
+
 ## Installation
 
 To install `nerves_uart`:
