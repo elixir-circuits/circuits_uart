@@ -123,8 +123,8 @@ defmodule Nerves.UART do
       wait forever.
 
     * `:id` - (`:name` or `:pid`) specify what to return with the uart active
-    messages. with `:name` the messages are returned as `{:nreves_uart,
-    perial_port_name, data}` otherwise they are returned as `{:nerves_uart,
+    messages. with `:name` the messages are returned as `{:nerves_uart,
+    serial_port_name, data}` otherwise they are returned as `{:nerves_uart,
     pid, data}`. The name and pid are the name of the connected UART or the pid
     of the Nerves.UART server pid as returned by `start_link/1`. The default
     value is `:name`.
@@ -132,11 +132,11 @@ defmodule Nerves.UART do
   Active mode defaults to true and means that data received on the UART is
   reported in messages. The messages have the following form:
 
-     `{:nerves_uart, serial_port_name, data}`
+     `{:nerves_uart, serial_port_id, data}`
 
   or
 
-     `{:nerves_uart, serial_port_name, {:error, reason}}`
+     `{:nerves_uart, serial_port_id, {:error, reason}}`
 
   When in active mode, flow control can not be used to push back on the sender
   and messages will accumulated in the mailbox should data arrive fast enough.
@@ -537,15 +537,13 @@ defmodule Nerves.UART do
     {:noreply, state}
   end
 
-  defp report_message(state = %Nerves.UART.State{id: :pid}, message) do
-    event = {:nerves_uart, self(), message}
+  defp report_message(state, message) do
+    event = {:nerves_uart, message_id(state.id, state.name), message}
     send(state.controlling_process, event)
   end
 
-  defp report_message(state, message) do
-    event = {:nerves_uart, state.name, message}
-    send(state.controlling_process, event)
-  end
+  defp message_id(:pid, _name), do: self()
+  defp message_id(:name, name), do: name
 
   defp genserver_timeout(timeout) do
     max(timeout + @genserver_timeout_slack, @genserver_timeout_slack)
