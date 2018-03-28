@@ -256,6 +256,36 @@ defmodule BasicUARTTest do
     UART.close(uart2)
   end
 
+  test "active mode receive with id: :pid", %{uart1: uart1, uart2: uart2} do
+    assert :ok = UART.open(uart1, UARTTest.port1(), active: false)
+    assert :ok = UART.open(uart2, UARTTest.port2(), active: true, id: :pid)
+    port2 = UARTTest.port2()
+
+    # First write
+    assert :ok = UART.write(uart1, "a")
+    assert_receive {:nerves_uart, ^uart2, "a"}
+
+    # Only one message should be sent
+    refute_receive {:nerves_uart, _, _}
+
+    # Configure to id: :name
+    UART.configure(uart2, id: :name)
+
+    # Try another write
+    assert :ok = UART.write(uart1, "b")
+    assert_receive {:nerves_uart, ^port2, "b"}
+
+    # Configure to id: :pid
+    UART.configure(uart2, id: :pid)
+
+    # Try another write
+    assert :ok = UART.write(uart1, "c")
+    assert_receive {:nerves_uart, ^uart2, "c"}
+
+    UART.close(uart1)
+    UART.close(uart2)
+  end
+
   test "error when calling read in active mode", %{uart1: uart1} do
     assert :ok = UART.open(uart1, UARTTest.port1(), active: true)
     assert {:error, :einval} = UART.read(uart1)
