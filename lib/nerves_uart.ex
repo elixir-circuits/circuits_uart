@@ -319,6 +319,7 @@ defmodule Nerves.UART do
     new_framing = Keyword.get(opts, :framing, nil)
     new_rx_framing_timeout = Keyword.get(opts, :rx_framing_timeout, state.rx_framing_timeout)
     is_active = Keyword.get(opts, :active, true)
+    id_mode = Keyword.get(opts, :id, :name)
 
     response = call_port(state, :open, {name, opts})
 
@@ -329,7 +330,8 @@ defmodule Nerves.UART do
           | name: name,
             controlling_process: from_pid,
             rx_framing_timeout: new_rx_framing_timeout,
-            is_active: is_active
+            is_active: is_active,
+            id: id_mode
         },
         new_framing
       )
