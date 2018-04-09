@@ -31,7 +31,7 @@ defmodule UARTlessTest do
     {:ok, pid} = UART.start_link()
     {name, opts} = UART.configuration(pid)
 
-    assert name == nil
+    assert name == :closed
     assert is_list(opts)
 
     # Check the defaults
@@ -48,6 +48,6 @@ defmodule UARTlessTest do
 
   test "find uarts" do
     {:ok, pid} = UART.start_link()
-    assert UART.find_pids() == [{pid, nil}]
+    assert UART.find_pids() == [{pid, :closed}]
   end
 end

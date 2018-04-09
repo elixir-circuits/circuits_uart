@@ -30,7 +30,7 @@ defmodule Nerves.UART do
     # is_active: active or passive mode
     defstruct port: nil,
               controlling_process: nil,
-              name: nil,
+              name: :closed,
               framing: Nerves.UART.Framing.None,
               framing_state: nil,
               rx_framing_timeout: 0,
@@ -86,7 +86,7 @@ defmodule Nerves.UART do
   NOTE: Do not rely on this function in production code. It may change if
   updates to the interface make it more convenient to use.
   """
-  @spec find_pids() :: [{binary, pid()}]
+  @spec find_pids() :: [{binary | :closed, pid()}]
   def find_pids() do
     Process.list()
     |> Enum.filter(&is_nerves_uart_process/1)
@@ -205,7 +205,7 @@ defmodule Nerves.UART do
   @doc """
   Get the configuration of the serial port.
   """
-  @spec configuration(GenServer.server()) :: {binary, [uart_option]}
+  @spec configuration(GenServer.server()) :: {binary() | :closed, [uart_option]}
   def configuration(pid) do
     GenServer.call(pid, :configuration)
   end
@@ -398,7 +398,7 @@ defmodule Nerves.UART do
 
     new_state =
       handle_framing_timer(
-        %{state | name: nil, framing_state: new_framing_state, queued_messages: []},
+        %{state | name: :closed, framing_state: new_framing_state, queued_messages: []},
         :ok
       )
 
