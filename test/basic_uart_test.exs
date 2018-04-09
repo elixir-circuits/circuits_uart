@@ -352,6 +352,31 @@ defmodule BasicUARTTest do
     UART.close(uart1)
   end
 
+  test "opened uart returns the configuration", %{uart1: uart1} do
+    :ok = UART.open(uart1, UARTTest.port1(), active: false, speed: 57600)
+    {name, opts} = UART.configuration(uart1)
+    assert name == UARTTest.port1()
+    assert Keyword.get(opts, :active) == false
+    assert Keyword.get(opts, :speed) == 57600
+    UART.close(uart1)
+  end
+
+  test "reconfiguring the uart updates the configuration", %{uart1: uart1} do
+    :ok = UART.open(uart1, UARTTest.port1(), active: false, speed: 9600)
+    {name, opts} = UART.configuration(uart1)
+    assert name == UARTTest.port1()
+    assert Keyword.get(opts, :active) == false
+    assert Keyword.get(opts, :speed) == 9600
+
+    :ok = UART.configure(uart1, active: true, speed: 115_200)
+    {name, opts} = UART.configuration(uart1)
+    assert name == UARTTest.port1()
+    assert Keyword.get(opts, :active) == true
+    assert Keyword.get(opts, :speed) == 115_200
+
+    UART.close(uart1)
+  end
+
   # Software flow control doesn't work and I'm not sure what the deal is
   if false do
     test "xoff filtered with software flow control", %{uart1: uart1, uart2: uart2} do

@@ -225,6 +225,52 @@ static void handle_configure(const char *req, int *req_index)
     }
 }
 
+static void handle_configuration(const char *req, int *req_index)
+{
+    char resp[256];
+    int resp_index = sizeof(uint16_t); // Space for payload size
+    resp[resp_index++] = response_id;
+    ei_encode_version(resp, &resp_index);
+
+    ei_encode_list_header(resp, &resp_index, 5);
+
+    ei_encode_tuple_header(resp, &resp_index, 2);
+    ei_encode_atom(resp, &resp_index, "speed");
+    ei_encode_long(resp, &resp_index, current_config.speed);
+
+    ei_encode_tuple_header(resp, &resp_index, 2);
+    ei_encode_atom(resp, &resp_index, "data_bits");
+    ei_encode_long(resp, &resp_index, current_config.data_bits);
+
+    ei_encode_tuple_header(resp, &resp_index, 2);
+    ei_encode_atom(resp, &resp_index, "stop_bits");
+    ei_encode_long(resp, &resp_index, current_config.stop_bits);
+
+    ei_encode_tuple_header(resp, &resp_index, 2);
+    ei_encode_atom(resp, &resp_index, "parity");
+    switch (current_config.parity) {
+    default:
+    case UART_PARITY_NONE: ei_encode_atom(resp, &resp_index, "none"); break;
+    case UART_PARITY_EVEN: ei_encode_atom(resp, &resp_index, "even"); break;
+    case UART_PARITY_ODD: ei_encode_atom(resp, &resp_index, "odd"); break;
+    case UART_PARITY_SPACE: ei_encode_atom(resp, &resp_index, "space"); break;
+    case UART_PARITY_MARK: ei_encode_atom(resp, &resp_index, "mark"); break;
+    }
+
+    ei_encode_tuple_header(resp, &resp_index, 2);
+    ei_encode_atom(resp, &resp_index, "flow_control");
+    switch (current_config.parity) {
+    default:
+    case UART_FLOWCONTROL_NONE: ei_encode_atom(resp, &resp_index, "none"); break;
+    case UART_FLOWCONTROL_HARDWARE: ei_encode_atom(resp, &resp_index, "hardware"); break;
+    case UART_FLOWCONTROL_SOFTWARE: ei_encode_atom(resp, &resp_index, "software"); break;
+    }
+
+    ei_encode_empty_list(resp, &resp_index);
+
+    erlcmd_send(resp, resp_index);
+}
+
 static void handle_close(const char *req, int *req_index)
 {
     (void) req;
@@ -490,6 +536,7 @@ static struct request_handler request_handlers[] = {
 { "drain", handle_drain },
 { "open", handle_open },
 { "configure", handle_configure },
+{ "configuration", handle_configuration },
 { "close", handle_close },
 { "signals", handle_signals },
 { "set_rts", handle_set_rts },

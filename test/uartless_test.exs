@@ -26,4 +26,23 @@ defmodule UARTlessTest do
     assert {:error, :ebadf} = UART.flush(pid)
     assert {:error, :ebadf} = UART.drain(pid)
   end
+
+  test "unopened uart returns a configuration" do
+    {:ok, pid} = UART.start_link()
+    {name, opts} = UART.configuration(pid)
+
+    assert name == nil
+    assert is_list(opts)
+
+    # Check the defaults
+    assert Keyword.get(opts, :active) == true
+    assert Keyword.get(opts, :speed) == 9600
+    assert Keyword.get(opts, :data_bits) == 8
+    assert Keyword.get(opts, :stop_bits) == 1
+    assert Keyword.get(opts, :parity) == :none
+    assert Keyword.get(opts, :flow_control) == :none
+    assert Keyword.get(opts, :framing) == Nerves.UART.Framing.None
+    assert Keyword.get(opts, :rx_framing_timeout) == 0
+    assert Keyword.get(opts, :id) == :name
+  end
 end

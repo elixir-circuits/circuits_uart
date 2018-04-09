@@ -174,6 +174,14 @@ defmodule Nerves.UART do
   end
 
   @doc """
+  Get the configuration of the serial port.
+  """
+  @spec configuration(GenServer.server()) :: {binary, [uart_option]}
+  def configuration(pid) do
+    GenServer.call(pid, :configuration)
+  end
+
+  @doc """
   Send a continuous stream of zero bits for a duration in milliseconds.
   By default, the zero bits are transmitted at least 0.25 seconds.
 
@@ -337,6 +345,19 @@ defmodule Nerves.UART do
       )
 
     {:reply, response, new_state}
+  end
+
+  def handle_call(:configuration, _from, state) do
+    opts =
+      call_port(state, :configuration, {}) ++
+        [
+          active: state.is_active,
+          id: state.id,
+          rx_framing_timeout: state.rx_framing_timeout,
+          framing: state.framing
+        ]
+
+    {:reply, {state.name, opts}, state}
   end
 
   def handle_call(:close, _from, state) do
