@@ -353,11 +353,11 @@ defmodule BasicUARTTest do
   end
 
   test "opened uart returns the configuration", %{uart1: uart1} do
-    :ok = UART.open(uart1, UARTTest.port1(), active: false, speed: 57600)
+    :ok = UART.open(uart1, UARTTest.port1(), active: false, speed: 57_600)
     {name, opts} = UART.configuration(uart1)
     assert name == UARTTest.port1()
     assert Keyword.get(opts, :active) == false
-    assert Keyword.get(opts, :speed) == 57600
+    assert Keyword.get(opts, :speed) == 57_600
     UART.close(uart1)
   end
 

@@ -45,4 +45,9 @@ defmodule UARTlessTest do
     assert Keyword.get(opts, :rx_framing_timeout) == 0
     assert Keyword.get(opts, :id) == :name
   end
+
+  test "find uarts" do
+    {:ok, pid} = UART.start_link()
+    assert UART.find_pids() == [{pid, nil}]
+  end
 end

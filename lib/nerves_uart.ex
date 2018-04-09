@@ -75,6 +75,35 @@ defmodule Nerves.UART do
   end
 
   @doc """
+  Find UARTs.
+
+  This is intended as a diagnostic function for finding UARTs that you may have
+  opened and forgotten about. Since a UART can only be opened once, this helps
+  you find the problematic one so that you can close it.
+
+  It returns a list of {pid, uart_name} tuples.
+
+  NOTE: Do not rely on this function in production code. It may change if
+  updates to the interface make it more convenient to use.
+  """
+  @spec find_pids() :: [{binary, pid()}]
+  def find_pids() do
+    Process.list()
+    |> Enum.filter(&is_nerves_uart_process/1)
+    |> Enum.map(&nerves_uart_info/1)
+  end
+
+  defp is_nerves_uart_process(pid) do
+    {:dictionary, dictionary} = Process.info(pid, :dictionary)
+    Keyword.get(dictionary, :"$initial_call") == {Nerves.UART, :init, 1}
+  end
+
+  defp nerves_uart_info(pid) do
+    {name, _opts} = configuration(pid)
+    {pid, name}
+  end
+
+  @doc """
   Start up a UART GenServer.
   """
   @spec start_link([term]) :: {:ok, pid} | {:error, term}
