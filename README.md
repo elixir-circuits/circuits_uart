@@ -167,7 +167,7 @@ To install `nerves_uart`:
 
   ```elixir
   def deps do
-    [{:nerves_uart, "~> 1.0.0"}]
+    [{:nerves_uart, "~> 1.0"}]
   end
   ```
 
