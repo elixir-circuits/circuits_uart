@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.2.0-dev
+
+  * Improvements
+    * Added `find_pids/0` diagnostic utility for finding lost `Nerves.UART` pids.
+      This is handy when you need to close a serial port and don't know the pid.
+    * Added `configuration/1` to get the current configuration of a UART.
+
 ## v1.1.1
 
 The mix.exs file has the Elixir requirement bumped from 1.3 to 1.4. This was
