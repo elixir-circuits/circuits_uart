@@ -8,10 +8,10 @@ matrix:
     include:
         - os: linux
           compiler: gcc
-          env: ERLANG_VERSION=20.2 ELIXIR_VERSION=1.6
+          env: ERLANG_VERSION=21.0 ELIXIR_VERSION=1.7.3-otp-21
         - os: linux
           compiler: gcc
-          env: ERLANG_VERSION=18.3 ELIXIR_VERSION=1.4
+          env: ERLANG_VERSION=21.0 ELIXIR_VERSION=1.6.6-otp-21
         - os: osx
           compiler: clang
 
@@ -29,8 +29,8 @@ before_install:
         mkdir -p ~/otp && tar -xf erlang-$ERLANG_VERSION-nonroot.tar.bz2 -C ~/otp/;
         mkdir -p ~/.kerl;
         source $HOME/otp/$ERLANG_VERSION/activate;
-        wget https://github.com/elixir-lang/elixir/releases/download/v$ELIXIR_VERSION/Precompiled.zip;
-        unzip -d elixir Precompiled.zip;
+        wget https://repo.hex.pm/builds/elixir/v$ELIXIR_VERSION.zip;
+        unzip -d elixir v$ELIXIR_VERSION.zip;
         sudo chmod 666 /dev/tnt*;
         ls -las /dev/tnt*;
       else
@@ -50,5 +50,5 @@ script:
     else
       mix test test/uartless_test.exs;
     fi
-  - mix docs
-  - if (elixir -v | grep 1.6); then mix format --check-formatted; fi
+  - if (elixir -v | grep 1.7); then mix docs; mix format --check-formatted; fi
+  - mix hex.build

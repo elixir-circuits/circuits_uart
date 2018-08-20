@@ -9,7 +9,7 @@ defmodule Nerves.UART.MixProject do
     [
       app: :nerves_uart,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.6",
       name: "Nerves.UART",
       description: @description,
       package: package(),
@@ -47,7 +47,7 @@ defmodule Nerves.UART.MixProject do
   defp deps() do
     [
       {:elixir_make, "~> 0.4", runtime: false},
-      {:ex_doc, "~> 0.11", only: :dev}
+      {:ex_doc, "~> 0.19", only: [:dev, :test], runtime: false}
     ]
   end
 
