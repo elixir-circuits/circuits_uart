@@ -77,9 +77,12 @@ static int try_read_all(const char *directory, const char *filename, char **resu
     static const size_t max_filesize = 4096;
 
     int rc = 0;
-    char path[PATH_MAX];
-    sprintf(path, "%s/%s", directory, filename);
+    char *path;
+    if (asprintf(&path, "%s/%s", directory, filename) < 0)
+        return 0;
+
     FILE *fp = fopen(path, "r");
+    free(path);
     if (fp) {
         *result = malloc(max_filesize);
         size_t amount_read = fread(*result, 1, max_filesize - 1, fp);
@@ -174,10 +177,12 @@ static char *get_driver(const char *tty_path)
  */
 static int is_real_serial8250(const char *devname)
 {
-    char devpath[256];
-    sprintf(devpath, "/dev/%s", devname);
+    char *devpath;
+    if (asprintf(&devpath, "/dev/%s", devname) < 0)
+        return 0;
 
     int fd = open(devpath, O_RDWR | O_NONBLOCK | O_NOCTTY);
+    free(devpath);
     if (fd != -1) {
         struct serial_struct serinfo;
         int rc = ioctl(fd, TIOCGSERIAL, &serinfo);
@@ -228,18 +233,23 @@ struct serial_info *find_serialports()
         return info;
 
     for (int i = 0; i < n; i++) {
-        char filepath[256];
-        sprintf(filepath, "/sys/class/tty/%s", namelist[i]->d_name);
+        char *filepath = NULL;
+        if (asprintf(&filepath, "/sys/class/tty/%s", namelist[i]->d_name) < 0)
+            break;
 
-        if (!is_real_serialport(namelist[i]->d_name, filepath))
+        if (!is_real_serialport(namelist[i]->d_name, filepath)) {
+            free(filepath);
             continue;
+        }
 
-        char symlink[256];
+        char symlink[PATH_MAX];
         ssize_t rc = readlink(filepath, symlink, sizeof(symlink));
         if (rc > 0) {
             symlink[rc] = 0;
-            char info_filepath[PATH_MAX];
-            sprintf(info_filepath, "/sys/class/tty/%s", symlink);
+            char *info_filepath = NULL;
+            if (asprintf(&info_filepath, "/sys/class/tty/%s", symlink) < 0)
+                break;
+
             struct serial_info *new_info = serial_info_alloc();
             new_info->name = strdup(namelist[i]->d_name);
             while (info_filepath[0] != '\0') {
@@ -251,9 +261,11 @@ struct serial_info *find_serialports()
                 if (pos != NULL)
                     *pos = '\0';
             }
+            free(info_filepath);
             new_info->next = info;
             info = new_info;
         }
+        free(filepath);
         free(namelist[i]);
     }
     free(namelist);
