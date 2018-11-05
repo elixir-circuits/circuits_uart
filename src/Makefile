@@ -56,9 +56,9 @@ ifeq ($(UNAME_S),Linux)
   LDFLAGS += -lrt
 endif
 
-# Look for the EI library and header files
-# For crosscompiled builds, ERL_EI_INCLUDE_DIR and ERL_EI_LIBDIR must be
-# passed into the Makefile.
+# The paths to the EI library and header files are either passed in when
+# compiled by Nerves (crosscompiled builds) or determined by mix.exs for
+# host builds.
 ifeq ($(ERL_EI_INCLUDE_DIR),)
 $(error ERL_EI_INCLUDE_DIR not set. Invoke via mix)
 endif
