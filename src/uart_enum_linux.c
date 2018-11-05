@@ -44,7 +44,7 @@
 
 static int has_string_prefix(const char *prefix, const char *s)
 {
-    int len = strlen(prefix);
+    size_t len = strlen(prefix);
     return strncmp(prefix, s, len) == 0;
 }
 
@@ -110,7 +110,7 @@ static int try_hex_read(const char *directory, const char *filename, int *result
     char *str;
     int rc = try_read_first_line(directory, filename, &str);
     if (rc) {
-        *result = strtol(str, NULL, 16);
+        *result = (int) strtol(str, NULL, 16);
         free(str);
     }
     return rc;
@@ -126,10 +126,10 @@ static int get_serialport_info(const char *sys_devices_path, struct serial_info 
 
     if (info->manufacturer && info->vid == 0) {
         // Try to get the vid from the manufacturer field.
-        info->vid = strtol(info->manufacturer, NULL, 16);
+        info->vid = (int) strtol(info->manufacturer, NULL, 16);
     }
     if (info->description && info->pid == 0) {
-        info->pid = strtol(info->description, NULL, 16);
+        info->pid = (int) strtol(info->description, NULL, 16);
     }
     return rc;
 }
