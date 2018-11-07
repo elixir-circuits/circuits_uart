@@ -26,7 +26,8 @@ enum uart_parity {
     UART_PARITY_EVEN,
     UART_PARITY_ODD,
     UART_PARITY_SPACE,
-    UART_PARITY_MARK
+    UART_PARITY_MARK,
+    UART_PARITY_IGNORE
 };
 
 enum uart_flow_control {

@@ -146,6 +146,7 @@ static int parse_option_list(const char *req, int *req_index, struct uart_config
             else if (strcmp(parity, "odd") == 0) config->parity = UART_PARITY_ODD;
             else if (strcmp(parity, "space") == 0) config->parity = UART_PARITY_SPACE;
             else if (strcmp(parity, "mark") == 0) config->parity = UART_PARITY_MARK;
+            else if (strcmp(parity, "ignore") == 0) config->parity = UART_PARITY_IGNORE;
         } else if (strcmp(key, "flow_control") == 0) {
             char flow_control[16];
             if (ei_decode_atom(req, req_index, flow_control) < 0) {
@@ -255,6 +256,7 @@ static void handle_configuration(const char *req, int *req_index)
     case UART_PARITY_ODD: ei_encode_atom(resp, &resp_index, "odd"); break;
     case UART_PARITY_SPACE: ei_encode_atom(resp, &resp_index, "space"); break;
     case UART_PARITY_MARK: ei_encode_atom(resp, &resp_index, "mark"); break;
+    case UART_PARITY_IGNORE: ei_encode_atom(resp, &resp_index, "ignore"); break;
     }
 
     ei_encode_tuple_header(resp, &resp_index, 2);

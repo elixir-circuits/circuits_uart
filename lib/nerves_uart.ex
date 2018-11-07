@@ -45,7 +45,7 @@ defmodule Nerves.UART do
           | {:speed, non_neg_integer}
           | {:data_bits, 5..8}
           | {:stop_bits, 1..2}
-          | {:parity, :none | :even | :odd | :space | :mark}
+          | {:parity, :none | :even | :odd | :space | :mark | :ignore}
           | {:flow_control, :none | :hardware | :software}
           | {:framing, module | {module, [term]}}
           | {:rx_framing_timeout, integer}
@@ -137,6 +137,7 @@ defmodule Nerves.UART do
       parity. Usually this is `:none`. Other values:
       * `:space` means that the parity bit is always 0
       * `:mark` means that the parity bit is always 1
+      * `:ignore` means that the parity bit is ignored (Linux/OSX only)
 
     * `:flow_control` - (`:none`, `:hardware`, or `:software`) set the flow control
       strategy.
