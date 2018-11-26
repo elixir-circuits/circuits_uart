@@ -1,5 +1,5 @@
-defmodule Nerves.UART.Framing.Line do
-  @behaviour Nerves.UART.Framing
+defmodule Circuits.UART.Framing.Line do
+  @behaviour Circuits.UART.Framing
 
   @moduledoc """
   Each message is one line. This framer appends and removes newline sequences

@@ -36,10 +36,10 @@ FILE *log_location;
 #include <err.h>
 #else
 // If err.h doesn't exist, define substitutes.
-#define err(STATUS, MSG, ...) do { fprintf(LOG_LOCATION, "nerves_uart: " MSG "\n", ## __VA_ARGS__); fflush(LOG_LOCATION); exit(STATUS); } while (0)
-#define errx(STATUS, MSG, ...) do { fprintf(LOG_LOCATION, "nerves_uart: " MSG "\n", ## __VA_ARGS__); fflush(LOG_LOCATION); exit(STATUS); } while (0)
-#define warn(MSG, ...) do { fprintf(LOG_LOCATION, "nerves_uart: " MSG "\n", ## __VA_ARGS__); fflush(LOG_LOCATION); } while (0)
-#define warnx(MSG, ...) do { fprintf(LOG_LOCATION, "nerves_uart: " MSG "\n", ## __VA_ARGS__); fflush(LOG_LOCATION); } while (0)
+#define err(STATUS, MSG, ...) do { fprintf(LOG_LOCATION, "circuits_uart: " MSG "\n", ## __VA_ARGS__); fflush(LOG_LOCATION); exit(STATUS); } while (0)
+#define errx(STATUS, MSG, ...) do { fprintf(LOG_LOCATION, "circuits_uart: " MSG "\n", ## __VA_ARGS__); fflush(LOG_LOCATION); exit(STATUS); } while (0)
+#define warn(MSG, ...) do { fprintf(LOG_LOCATION, "circuits_uart: " MSG "\n", ## __VA_ARGS__); fflush(LOG_LOCATION); } while (0)
+#define warnx(MSG, ...) do { fprintf(LOG_LOCATION, "circuits_uart: " MSG "\n", ## __VA_ARGS__); fflush(LOG_LOCATION); } while (0)
 #endif
 
 #define ONE_YEAR_MILLIS (1000ULL * 60 * 60 * 24 * 365)

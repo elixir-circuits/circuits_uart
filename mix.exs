@@ -1,4 +1,4 @@
-defmodule Nerves.UART.MixProject do
+defmodule Circuits.UART.MixProject do
   use Mix.Project
 
   @version "1.2.1"
@@ -7,13 +7,13 @@ defmodule Nerves.UART.MixProject do
 
   def project() do
     [
-      app: :nerves_uart,
+      app: :circuits_uart,
       version: @version,
       elixir: "~> 1.6",
-      name: "Nerves.UART",
+      name: "Circuits.UART",
       description: @description,
       package: package(),
-      source_url: "https://github.com/nerves-project/nerves_uart",
+      source_url: "https://github.com/elixir-circuits/circuits_uart",
       docs: [extras: ["README.md"], main: "readme"],
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -66,7 +66,7 @@ defmodule Nerves.UART.MixProject do
       ],
       maintainers: ["Frank Hunleth"],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/nerves-project/nerves_uart"}
+      links: %{"GitHub" => "https://github.com/elixir-circuits/circuits_uart"}
     ]
   end
 

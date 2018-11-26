@@ -2,7 +2,7 @@ Code.require_file("uart_test.exs", __DIR__)
 
 defmodule BasicUARTTest do
   use ExUnit.Case
-  alias Nerves.UART
+  alias Circuits.UART
 
   setup do
     UARTTest.common_setup()
@@ -198,11 +198,11 @@ defmodule BasicUARTTest do
   } do
     :ok = UART.configure(uart1, active: true)
     {:error, _} = UART.open(uart1, "does_not_exist")
-    refute_received {:nerves_uart, _port, _}, "No messages should be sent if open returns error"
+    refute_received {:circuits_uart, _port, _}, "No messages should be sent if open returns error"
 
     :ok = UART.configure(uart1, active: false)
     {:error, _} = UART.open(uart1, "does_not_exist", active: true)
-    refute_received {:nerves_uart, _port, _}, "No messages should be sent if open returns error"
+    refute_received {:circuits_uart, _port, _}, "No messages should be sent if open returns error"
   end
 
   test "open doesn't send messages in passive mode for open errors", %{
@@ -210,10 +210,10 @@ defmodule BasicUARTTest do
   } do
     :ok = UART.configure(uart1, active: false)
     {:error, :enoent} = UART.open(uart1, "does_not_exist")
-    refute_received {:nerves_uart, _, _}, "No messages should be sent in passive mode"
+    refute_received {:circuits_uart, _, _}, "No messages should be sent in passive mode"
 
     {:error, :enoent} = UART.open(uart1, "does_not_exist", active: false)
-    refute_received {:nerves_uart, _, _}, "No messages should be sent in passive mode"
+    refute_received {:circuits_uart, _, _}, "No messages should be sent in passive mode"
   end
 
   test "error writing to a closed port when using framing", %{uart1: uart1, uart2: uart2} do
@@ -243,14 +243,14 @@ defmodule BasicUARTTest do
 
     # First write
     assert :ok = UART.write(uart1, "a")
-    assert_receive {:nerves_uart, ^port2, "a"}
+    assert_receive {:circuits_uart, ^port2, "a"}
 
     # Only one message should be sent
-    refute_receive {:nerves_uart, _, _}
+    refute_receive {:circuits_uart, _, _}
 
     # Try another write
     assert :ok = UART.write(uart1, "b")
-    assert_receive {:nerves_uart, ^port2, "b"}
+    assert_receive {:circuits_uart, ^port2, "b"}
 
     UART.close(uart1)
     UART.close(uart2)
@@ -263,24 +263,24 @@ defmodule BasicUARTTest do
 
     # First write
     assert :ok = UART.write(uart1, "a")
-    assert_receive {:nerves_uart, ^uart2, "a"}
+    assert_receive {:circuits_uart, ^uart2, "a"}
 
     # Only one message should be sent
-    refute_receive {:nerves_uart, _, _}
+    refute_receive {:circuits_uart, _, _}
 
     # Configure to id: :name
     UART.configure(uart2, id: :name)
 
     # Try another write
     assert :ok = UART.write(uart1, "b")
-    assert_receive {:nerves_uart, ^port2, "b"}
+    assert_receive {:circuits_uart, ^port2, "b"}
 
     # Configure to id: :pid
     UART.configure(uart2, id: :pid)
 
     # Try another write
     assert :ok = UART.write(uart1, "c")
-    assert_receive {:nerves_uart, ^uart2, "c"}
+    assert_receive {:circuits_uart, ^uart2, "c"}
 
     UART.close(uart1)
     UART.close(uart2)
@@ -302,18 +302,18 @@ defmodule BasicUARTTest do
 
     assert :ok = UART.configure(uart2, active: true)
     assert :ok = UART.write(uart1, "b")
-    assert_receive {:nerves_uart, ^port2, "b"}
+    assert_receive {:circuits_uart, ^port2, "b"}
 
     assert :ok = UART.configure(uart2, active: false)
     assert :ok = UART.write(uart1, "c")
     assert {:ok, "c"} = UART.read(uart2, 100)
-    refute_receive {:nerves_uart, _, _}
+    refute_receive {:circuits_uart, _, _}
 
     assert :ok = UART.configure(uart2, active: true)
     assert :ok = UART.write(uart1, "d")
-    assert_receive {:nerves_uart, ^port2, "d"}
+    assert_receive {:circuits_uart, ^port2, "d"}
 
-    refute_receive {:nerves_uart, _, _}
+    refute_receive {:circuits_uart, _, _}
 
     UART.close(uart1)
     UART.close(uart2)
@@ -328,7 +328,7 @@ defmodule BasicUARTTest do
       port1 = UARTTest.port1()
 
       assert {:error, :einval} = UART.write(uart1, "a")
-      assert_receive {:nerves_uart, ^port1, {:error, :einval}}
+      assert_receive {:circuits_uart, ^port1, {:error, :einval}}
 
       UART.close(uart1)
     end

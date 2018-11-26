@@ -26,4 +26,4 @@ erl_crash.dump
 /priv
 
 # Ignore debug logs
-nerves_uart.log
+circuits_uart.log

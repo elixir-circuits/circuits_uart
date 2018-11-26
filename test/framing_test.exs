@@ -2,7 +2,7 @@ Code.require_file("uart_test.exs", __DIR__)
 
 defmodule FramingTest do
   use ExUnit.Case
-  alias Nerves.UART
+  alias Circuits.UART
 
   @moduledoc """
   These tests are high level framing tests. See `framing_*_test.exs`
@@ -130,7 +130,7 @@ defmodule FramingTest do
 
     # Send something that's not a line and check that we don't receive it
     assert :ok = UART.write(uart1, "A")
-    refute_receive {:nerves_uart, _, _}
+    refute_receive {:circuits_uart, _, _}
 
     # Terminate the line and check that receive gets it
     assert :ok = UART.write(uart1, "\n")
@@ -143,17 +143,17 @@ defmodule FramingTest do
     #                      3. Erlang ports remove their framing
     #    Argument not to trim: 1. most framing is easy to trim anyway
     #                          2. easier to debug?
-    assert_receive {:nerves_uart, ^port2, "A"}
+    assert_receive {:circuits_uart, ^port2, "A"}
 
     # Send two lines
     assert :ok = UART.write(uart1, "B\nC\n")
-    assert_receive {:nerves_uart, ^port2, "B"}
-    assert_receive {:nerves_uart, ^port2, "C"}
+    assert_receive {:circuits_uart, ^port2, "B"}
+    assert_receive {:circuits_uart, ^port2, "C"}
 
     # Handle a line that's too long
     assert :ok = UART.write(uart1, "DEFGHIJK\n")
-    assert_receive {:nerves_uart, ^port2, {:partial, "DEFG"}}
-    assert_receive {:nerves_uart, ^port2, "HIJK"}
+    assert_receive {:circuits_uart, ^port2, {:partial, "DEFG"}}
+    assert_receive {:circuits_uart, ^port2, "HIJK"}
 
     UART.close(uart1)
     UART.close(uart2)
@@ -175,7 +175,7 @@ defmodule FramingTest do
 
     # Send something that's not a line and check that it times out
     assert :ok = UART.write(uart1, "A")
-    assert_receive {:nerves_uart, ^port2, {:partial, "A"}}, 1000
+    assert_receive {:circuits_uart, ^port2, {:partial, "A"}}, 1000
 
     UART.close(uart1)
     UART.close(uart2)
@@ -190,7 +190,7 @@ defmodule FramingTest do
       port1 = UARTTest.port1()
 
       assert {:error, :einval} = UART.write(uart1, "a")
-      assert_receive {:nerves_uart, ^port1, {:error, :einval}}
+      assert_receive {:circuits_uart, ^port1, {:error, :einval}}
 
       UART.close(uart1)
     end

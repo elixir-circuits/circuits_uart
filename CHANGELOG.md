@@ -10,9 +10,9 @@
 
 * Improvements
   * Added `id: pid` option. In active mode, this causes the receive
-    notification messages to contain the pid of the Nerves.UART GenServer that
+    notification messages to contain the pid of the Circuits.UART GenServer that
     sends them. Thanks to Tallak Tveide for this improvement.
-  * Added `find_pids/0` diagnostic utility for finding lost `Nerves.UART` pids.
+  * Added `find_pids/0` diagnostic utility for finding lost `Circuits.UART` pids.
     This is handy when you need to close a serial port and don't know the pid.
   * Added `configuration/1` to get the current configuration of a UART.
 

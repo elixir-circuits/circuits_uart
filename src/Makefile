@@ -15,8 +15,8 @@ CFLAGS += -std=c99 -D_GNU_SOURCE
 
 ###################
 # If you're having trouble with the serial port, commenting in the following line
-# may give some more hints. By default, log messages are appended to nerves_uart.log.
-# See src/nerves_uart.c to change this. Be sure to rebuild everything by invoking
+# may give some more hints. By default, log messages are appended to circuits_uart.log.
+# See src/circuits_uart.c to change this. Be sure to rebuild everything by invoking
 # "mix clean" and then "mix compile", so that the flag takes effect.
 #CFLAGS += -DDEBUG
 
@@ -83,7 +83,7 @@ OBJ=$(SRC:.c=.o)
 
 .PHONY: all clean
 
-all: priv priv/nerves_uart$(EXEEXT)
+all: priv priv/circuits_uart$(EXEEXT)
 
 %.o: %.c
 	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
@@ -91,8 +91,8 @@ all: priv priv/nerves_uart$(EXEEXT)
 priv:
 	mkdir priv
 
-priv/nerves_uart$(EXEEXT): $(OBJ)
+priv/circuits_uart$(EXEEXT): $(OBJ)
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
 
 clean:
-	rm -f priv/nerves_uart$(EXEEXT) src/*.o src/ei_copy/*.o
+	rm -f priv/circuits_uart$(EXEEXT) src/*.o src/ei_copy/*.o

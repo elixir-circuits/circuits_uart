@@ -136,7 +136,7 @@ void erlcmd_init(struct erlcmd *handler,
 
     char pipe_name[64];
     sprintf(pipe_name,
-             "\\\\.\\Pipe\\nerves-uart.%08x",
+             "\\\\.\\Pipe\\circuits-uart.%08x",
              (unsigned int) GetCurrentProcessId());
 
     handler->stdin_read_pipe = CreateNamedPipeA(

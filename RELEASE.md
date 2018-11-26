@@ -21,10 +21,10 @@
   11. Wait for the CI builds to complete successfully. They should work
       assuming that no code changes were made between the last build and the tag,
       but wait to be safe.
-  12. [SKIP FOR NOW] Copy the nerves_uart.exe artifact created by the Appveyor CI build to `prebuilt/nerves_uart.exe`
+  12. [SKIP FOR NOW] Copy the circuits_uart.exe artifact created by the Appveyor CI build to `prebuilt/circuits_uart.exe`
   13. Run `mix hex.publish`
-  14. Update the deps on a sample project that uses nerves_uart to make sure that it
-      downloads and builds the new nerves_uart.
+  14. Update the deps on a sample project that uses circuits_uart to make sure that it
+      downloads and builds the new circuits_uart.
   15. Copy the latest CHANGELOG.md entry to the GitHub releases description.
       Publish the release on GitHub.
   16. Start the next dev cycle. Start a new section in `CHANGELOG.md` and

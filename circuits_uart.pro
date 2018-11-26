@@ -8,7 +8,7 @@ QT       -= core
 
 QT       -= gui
 
-TARGET = nerves_uart
+TARGET = circuits_uart
 CONFIG   += console
 CONFIG   -= app_bundle
 
@@ -17,7 +17,7 @@ TEMPLATE = app
 
 SOURCES += \
     src/erlcmd.c \
-    src/nerves_uart.c \
+    src/circuits_uart.c \
     src/uart_enum_linux.c \
     src/uart_enum_win.c \
     src/uart_enum.c \
@@ -35,11 +35,11 @@ HEADERS += \
     src/uart_comm.h
 
 DISTFILES += \
-    lib/nerves_uart.ex \
+    lib/circuits_uart.ex \
     mix.exs \
     Makefile \
     README.md \
-    test/nerves_uart_test.exs \
+    test/circuits_uart_test.exs \
     .travis.yml \
     appveyor.yml \
     test/hw_signals_test.exs \

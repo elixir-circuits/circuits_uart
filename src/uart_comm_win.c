@@ -24,7 +24,7 @@
 /*
  * Serial I/O on Windows Notes
  *
- * The goal for nerves_uart is to be able to poll the serial ports
+ * The goal for circuits_uart is to be able to poll the serial ports
  * using WaitForMultipleObjects. This means that overlapped I/O or
  * other asynchronous I/O needs to be used.
  *

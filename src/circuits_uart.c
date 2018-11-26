@@ -766,9 +766,9 @@ int main(int argc, char *argv[])
 #else
     char logfile[64];
 #ifdef __WIN32__
-    sprintf(logfile, "nerves_uart-%d.log", (int) GetCurrentProcessId());
+    sprintf(logfile, "circuits_uart-%d.log", (int) GetCurrentProcessId());
 #else
-    sprintf(logfile, "nerves_uart-%d.log", (int) getpid());
+    sprintf(logfile, "circuits_uart-%d.log", (int) getpid());
 #endif
     FILE *fp = fopen(logfile, "w+");
     log_location = fp;

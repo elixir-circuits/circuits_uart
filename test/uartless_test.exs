@@ -1,6 +1,6 @@
 defmodule UARTlessTest do
   use ExUnit.Case
-  alias Nerves.UART
+  alias Circuits.UART
 
   # These tests all run with or without a serial port
 
@@ -41,7 +41,7 @@ defmodule UARTlessTest do
     assert Keyword.get(opts, :stop_bits) == 1
     assert Keyword.get(opts, :parity) == :none
     assert Keyword.get(opts, :flow_control) == :none
-    assert Keyword.get(opts, :framing) == Nerves.UART.Framing.None
+    assert Keyword.get(opts, :framing) == Circuits.UART.Framing.None
     assert Keyword.get(opts, :rx_framing_timeout) == 0
     assert Keyword.get(opts, :id) == :name
   end

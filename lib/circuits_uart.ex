@@ -1,4 +1,4 @@
-defmodule Nerves.UART do
+defmodule Circuits.UART do
   use GenServer
 
   # Many calls take timeouts for how long to wait for reading and writing
@@ -31,7 +31,7 @@ defmodule Nerves.UART do
     defstruct port: nil,
               controlling_process: nil,
               name: :closed,
-              framing: Nerves.UART.Framing.None,
+              framing: Circuits.UART.Framing.None,
               framing_state: nil,
               rx_framing_timeout: 0,
               queued_messages: [],
@@ -71,7 +71,7 @@ defmodule Nerves.UART do
   """
   @spec enumerate() :: map
   def enumerate() do
-    Nerves.UART.Enumerator.enumerate()
+    Circuits.UART.Enumerator.enumerate()
   end
 
   @doc """
@@ -89,16 +89,16 @@ defmodule Nerves.UART do
   @spec find_pids() :: [{binary | :closed, pid()}]
   def find_pids() do
     Process.list()
-    |> Enum.filter(&is_nerves_uart_process/1)
-    |> Enum.map(&nerves_uart_info/1)
+    |> Enum.filter(&is_circuits_uart_process/1)
+    |> Enum.map(&circuits_uart_info/1)
   end
 
-  defp is_nerves_uart_process(pid) do
+  defp is_circuits_uart_process(pid) do
     {:dictionary, dictionary} = Process.info(pid, :dictionary)
-    Keyword.get(dictionary, :"$initial_call") == {Nerves.UART, :init, 1}
+    Keyword.get(dictionary, :"$initial_call") == {Circuits.UART, :init, 1}
   end
 
-  defp nerves_uart_info(pid) do
+  defp circuits_uart_info(pid) do
     {name, _opts} = configuration(pid)
     {pid, name}
   end
@@ -143,9 +143,9 @@ defmodule Nerves.UART do
       strategy.
 
     * `:framing` - (`module` or `{module, args}`) set the framing for data.
-      The `module` must implement the `Nerves.UART.Framing` behaviour. See
-      `Nerves.UART.Framing.None`, `Nerves.UART.Framing.Line`, and
-      `Nerves.UART.Framing.FourByte`. The default is `Nerves.UART.Framing.None`.
+      The `module` must implement the `Circuits.UART.Framing` behaviour. See
+      `Circuits.UART.Framing.None`, `Circuits.UART.Framing.Line`, and
+      `Circuits.UART.Framing.FourByte`. The default is `Circuits.UART.Framing.None`.
 
     * `:rx_framing_timeout` - (milliseconds) this specifies how long incomplete
       frames will wait for the remainder to be received. Timed out partial
@@ -153,20 +153,20 @@ defmodule Nerves.UART do
       wait forever.
 
     * `:id` - (`:name` or `:pid`) specify what to return with the uart active
-    messages. with `:name` the messages are returned as `{:nerves_uart,
-    serial_port_name, data}` otherwise they are returned as `{:nerves_uart,
+    messages. with `:name` the messages are returned as `{:circuits_uart,
+    serial_port_name, data}` otherwise they are returned as `{:circuits_uart,
     pid, data}`. The name and pid are the name of the connected UART or the pid
-    of the Nerves.UART server pid as returned by `start_link/1`. The default
+    of the Circuits.UART server pid as returned by `start_link/1`. The default
     value is `:name`.
 
   Active mode defaults to true and means that data received on the UART is
   reported in messages. The messages have the following form:
 
-     `{:nerves_uart, serial_port_id, data}`
+     `{:circuits_uart, serial_port_id, data}`
 
   or
 
-     `{:nerves_uart, serial_port_id, {:error, reason}}`
+     `{:circuits_uart, serial_port_id, {:error, reason}}`
 
   When in active mode, flow control can not be used to push back on the sender
   and messages will accumulated in the mailbox should data arrive fast enough.
@@ -338,7 +338,7 @@ defmodule Nerves.UART do
 
   # gen_server callbacks
   def init([]) do
-    executable = :code.priv_dir(:nerves_uart) ++ '/nerves_uart'
+    executable = :code.priv_dir(:circuits_uart) ++ '/circuits_uart'
 
     port =
       Port.open({:spawn_executable, executable}, [
@@ -589,7 +589,7 @@ defmodule Nerves.UART do
   end
 
   defp report_message(state, message) do
-    event = {:nerves_uart, message_id(state.id, state.name), message}
+    event = {:circuits_uart, message_id(state.id, state.name), message}
     send(state.controlling_process, event)
   end
 

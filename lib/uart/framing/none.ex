@@ -1,5 +1,5 @@
-defmodule Nerves.UART.Framing.None do
-  @behaviour Nerves.UART.Framing
+defmodule Circuits.UART.Framing.None do
+  @behaviour Circuits.UART.Framing
 
   @moduledoc """
   Don't apply or removing any framing.

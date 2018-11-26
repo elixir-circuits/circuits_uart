@@ -1,11 +1,10 @@
-# Nerves.UART
+# Circuits.UART
 
-[![Build Status](https://travis-ci.org/nerves-project/nerves_uart.svg?branch=master)](https://travis-ci.org/nerves-project/nerves_uart)
-[![Build Status](https://ci.appveyor.com/api/projects/status/hm6s6269jtbiqxbv/branch/master?svg=true)](https://ci.appveyor.com/project/fhunleth/nerves-uart/branch/master)
-[![Hex version](https://img.shields.io/hexpm/v/nerves_uart.svg)](https://hex.pm/packages/nerves_uart)
-[![Ebert](https://ebertapp.io/github/nerves-project/nerves_uart.svg)](https://ebertapp.io/github/nerves-project/nerves_uart)
+[![Build Status](https://travis-ci.org/elixir-circuits/circuits_uart.svg?branch=master)](https://travis-ci.org/elixir-circuits/circuits_uart)
+[![Build Status](https://ci.appveyor.com/api/projects/status/hm6s6269jtbiqxbv/branch/master?svg=true)](https://ci.appveyor.com/project/elixir-circuits/circuits_uart/branch/master)
+[![Hex version](https://img.shields.io/hexpm/v/circuits_uart.svg)](https://hex.pm/packages/circuits_uart)
 
-Nerves.UART allows you to access UARTs, serial ports, Bluetooth virtual serial
+Circuits.UART allows you to access UARTs, serial ports, Bluetooth virtual serial
 port connections and more in Elixir. Feature highlights:
 
 * Mac, Windows, and desktop and embedded Linux
@@ -17,7 +16,7 @@ port connections and more in Elixir. Feature highlights:
   null modem on Travis)
 
 Something doesn't work for you? Check out below and the
-[docs](https://hexdocs.pm/nerves_uart/). Chat with other users on the nerves
+[docs](https://hexdocs.pm/circuits_uart/). Chat with other users on the nerves
 channel on the [elixir-lang slack](https://elixir-slackin.herokuapp.com/), or
 file an issue or PR.
 
@@ -26,7 +25,7 @@ file an issue or PR.
 Discover what serial ports are attached:
 
 ```elixir
-iex> Nerves.UART.enumerate
+iex> Circuits.UART.enumerate
 %{"COM14" => %{description: "USB Serial Port", manufacturer: "FTDI", product_id: 24577,
     vendor_id: 1027},
   "COM5" => %{description: "Prolific USB-to-Serial Comm Port",
@@ -38,35 +37,35 @@ iex> Nerves.UART.enumerate
 Start the UART GenServer:
 
 ```elixir
-iex> {:ok, pid} = Nerves.UART.start_link
+iex> {:ok, pid} = Circuits.UART.start_link
 {:ok, #PID<0.132.0>}
 ```
 
 The GenServer doesn't open a port automatically, so open up a serial port or
-UART now. See the results from your call to `Nerves.UART.enumerate/0` for what's
+UART now. See the results from your call to `Circuits.UART.enumerate/0` for what's
 available on your system.
 
 ```elixir
-iex> Nerves.UART.open(pid, "COM14", speed: 115200, active: false)
+iex> Circuits.UART.open(pid, "COM14", speed: 115200, active: false)
 :ok
 ```
 
 This opens the serial port up at 115200 baud and turns off active mode. This
-means that you'll have to manually call `Nerves.UART.read` to receive input. In
+means that you'll have to manually call `Circuits.UART.read` to receive input. In
 active mode, input from the serial port will be sent as messages. See the docs
 for all options.
 
 Write something to the serial port:
 
 ```elixir
-iex> Nerves.UART.write(pid, "Hello there\r\n")
+iex> Circuits.UART.write(pid, "Hello there\r\n")
 :ok
 ```
 
 See if anyone responds in the next 60 seconds:
 
 ```elixir
-iex> Nerves.UART.read(pid, 60000)
+iex> Circuits.UART.read(pid, 60000)
 {:ok, "Hi"}
 ```
 
@@ -78,15 +77,15 @@ up.
 Enough with passive mode, let's switch to active mode:
 
 ```elixir
-iex> Nerves.UART.configure(pid, active: true)
+iex> Circuits.UART.configure(pid, active: true)
 :ok
 
 iex> flush
-{:nerves_uart, "COM14", "a"}
-{:nerves_uart, "COM14", "b"}
-{:nerves_uart, "COM14", "c"}
-{:nerves_uart, "COM14", "\r"}
-{:nerves_uart, "COM14", "\n"}
+{:circuits_uart, "COM14", "a"}
+{:circuits_uart, "COM14", "b"}
+{:circuits_uart, "COM14", "c"}
+{:circuits_uart, "COM14", "\r"}
+{:circuits_uart, "COM14", "\n"}
 :ok
 ```
 
@@ -95,49 +94,49 @@ happens:
 
 ```elixir
 iex> flush
-{:nerves_uart, "COM14", {:error, :eio}}
+{:circuits_uart, "COM14", {:error, :eio}}
 ```
 
 Oops. Well, when it appears again, it can be reopened. In passive mode, errors
-get reported on the calls to `Nerves.UART.read/2` and `Nerves.UART.write/3`
+get reported on the calls to `Circuits.UART.read/2` and `Circuits.UART.write/3`
 
 Back to receiving data, it's a little annoying that characters arrive one by
 one.  That's because our computer is really fast compared to the serial port,
 but if something slows it down, we could receive two or more characters at a
-time. Rather than reassemble the characters into lines, we can ask `nerves_uart`
+time. Rather than reassemble the characters into lines, we can ask `circuits_uart`
 to do it for us:
 
 ```elixir
-iex> Nerves.UART.configure(pid, framing: {Nerves.UART.Framing.Line, separator: "\r\n"})
+iex> Circuits.UART.configure(pid, framing: {Circuits.UART.Framing.Line, separator: "\r\n"})
 :ok
 ```
 
-This tells `nerves_uart` to append a `\r\n` to each call to `write/2` and to
+This tells `circuits_uart` to append a `\r\n` to each call to `write/2` and to
 report each line separately in active and passive mode. You can set this
 configuration in the call to `open/3` as well. Here's what we get now:
 
 ```elixir
 iex> flush
-{:nerves_uart, "COM14", "abc"}   # Note that the "\r\n" is trimmed
+{:circuits_uart, "COM14", "abc"}   # Note that the "\r\n" is trimmed
 :ok
 ```
 
-If your serial data is framed differently, check out the `Nerves.UART.Framing`
-behaviour and implement your own. `Nerves.UART.Framing.FourByte` is a
+If your serial data is framed differently, check out the `Circuits.UART.Framing`
+behaviour and implement your own. `Circuits.UART.Framing.FourByte` is a
 particularly simple example of a framer.
 
 You can also set a timeout so that a partial line doesn't hang around in the
 receive buffer forever:
 
 ```elixir
-iex> Nerves.UART.configure(pid, rx_framing_timeout: 500)
+iex> Circuits.UART.configure(pid, rx_framing_timeout: 500)
 :ok
 
 # Assume that the sender sent the letter "A" without sending anything else
 # for 500 ms.
 
 iex> flush
-{:nerves_uart, "COM14", {:partial, "A"}}
+{:circuits_uart, "COM14", {:partial, "A"}}
 ```
 
 Sometimes it's easier to operate with the `pid` of the UART GenServer rather
@@ -147,27 +146,27 @@ one serial port at a time. You can do this with the `id: :pid` option to
 `open/1` or `configure/1`.
 
 ```elixir
-iex> Nerves.UART.configure(pid, id: :pid)
+iex> Circuits.UART.configure(pid, id: :pid)
 :ok
 
 # Assume some data was received
 
 iex> receive do
-...>   {:nerves_uart, pid, _} ->
-...>     Nerves.UART.write(pid, "ack")
+...>   {:circuits_uart, pid, _} ->
+...>     Circuits.UART.write(pid, "ack")
 ...> end
 :ok
 ```
 
 ## Installation
 
-To install `nerves_uart`:
+To install `circuits_uart`:
 
-  1. Add `nerves_uart` to your list of dependencies in `mix.exs`:
+  1. Add `circuits_uart` to your list of dependencies in `mix.exs`:
 
   ```elixir
   def deps do
-    [{:nerves_uart, "~> 1.2"}]
+    [{:circuits_uart, "~> 1.2"}]
   end
   ```
 
@@ -190,7 +189,7 @@ sudo apt-get install build-essential erlang-dev
 On Macs, run `gcc --version` or `make --version`. If they're not installed, you
 will be given instructions.
 
-On Windows, if you're obtaining `nerves_uart` from `hex.pm`, you'll need MinGW
+On Windows, if you're obtaining `circuits_uart` from `hex.pm`, you'll need MinGW
 to compile the C code. I use [Chocolatey](https://chocolatey.org/) and install
 MinGW by running the following in an administrative command prompt:
 
@@ -198,17 +197,17 @@ MinGW by running the following in an administrative command prompt:
 choco install mingw
 ```
 
-On Nerves, you're set - just add `nerves_uart` to your `mix.exs`. Nerves
+On Nerves, you're set - just add `circuits_uart` to your `mix.exs`. Nerves
 contains everything needed by default. If you do use Nerves, though, keep in
 mind that the C code is crosscompiled for your target hardware and will not work
 on your host (the port will crash when you call `start_link` or `enumerate`. If
-you want to try out `nerves_uart` on your host machine, the easiest way is to
-either clone the source or add `nerves_uart` as a dependency to a regular
+you want to try out `circuits_uart` on your host machine, the easiest way is to
+either clone the source or add `circuits_uart` as a dependency to a regular
 (non-Nerves) Elixir project.
 
 ## Building and running the unit tests
 
-The standard Elixir build process applies. Clone `nerves_uart` or download a
+The standard Elixir build process applies. Clone `circuits_uart` or download a
 source release and run:
 
 ```sh
@@ -221,8 +220,8 @@ Define the names of the serial ports in the environment before running the
 tests. For example,
 
 ```sh
-export NERVES_UART_PORT1=ttyS0
-export NERVES_UART_PORT2=ttyS1
+export CIRCUITS_UART_PORT1=ttyS0
+export CIRCUITS_UART_PORT2=ttyS1
 ```
 
 If you're on Windows or Linux, you don't need real serial ports. For linux,
@@ -238,8 +237,8 @@ sudo depmod
 sudo modprobe tty0tty
 sudo chmod 666 /dev/tnt*
 
-export NERVES_UART_PORT1=tnt0
-export NERVES_UART_PORT2=tnt1
+export CIRCUITS_UART_PORT1=tnt0
+export CIRCUITS_UART_PORT2=tnt1
 ```
 
 On Windows, download and install
@@ -277,7 +276,7 @@ out and back in again, and you should be able to access the serial port.
 If you're having trouble and suspect the C code, edit the `Makefile` to enable
 debug logging. See the `Makefile` for instructions on how to do this. Debug
 logging is appended to a file by default, but can be sent to `stderr` or another
-location by editing `src/nerves_uart.c`.
+location by editing `src/circuits_uart.c`.
 
 If you're on Linux, the `tty0tty` emulated null modem removes the flakiness of
 real serial port drivers if that's the problem. The serial port monitor
@@ -300,9 +299,9 @@ Studio. This project uses MinGW, and even though the C ABIs are the same between
 the compilers, Visual Studio adds stack protection calls that I couldn't figure
 out how to work around.
 
-### How does Nerves.UART communicate with the serial port?
+### How does Circuits.UART communicate with the serial port?
 
-Nerves.UART uses a [Port](https://hexdocs.pm/elixir/Port.html) and C code.
+Circuits.UART uses a [Port](https://hexdocs.pm/elixir/Port.html) and C code.
 Elixir/Erlang ports have nothing to do with the serial ports of the operating
 system.  They share the same name but are different concepts.
 

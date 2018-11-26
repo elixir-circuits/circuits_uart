@@ -1,11 +1,11 @@
-defmodule Nerves.UART.Framing do
+defmodule Circuits.UART.Framing do
   @moduledoc """
   A behaviour for implementing framers for data received over a UART.
   """
 
   @doc """
   Initialize the state of the framer based on options passed to
-  `Nerves.UART.open/3`.
+  `Circuits.UART.open/3`.
 
   This function should return the initial state for the framer or
   an error.
@@ -48,7 +48,7 @@ defmodule Nerves.UART.Framing do
   @callback frame_timeout(state :: term) :: {:ok, [term], new_state} when new_state: term
 
   @doc """
-  This is called when the user invokes `Nerves.UART.flush/2`. Any partially
+  This is called when the user invokes `Circuits.UART.flush/2`. Any partially
   received frames should be dropped.
   """
   @callback flush(direction :: :receive | :transmit | :both, state :: term) :: new_state

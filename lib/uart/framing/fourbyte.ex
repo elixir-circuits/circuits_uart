@@ -1,5 +1,5 @@
-defmodule Nerves.UART.Framing.FourByte do
-  @behaviour Nerves.UART.Framing
+defmodule Circuits.UART.Framing.FourByte do
+  @behaviour Circuits.UART.Framing
 
   @moduledoc """
   Each message is 4 bytes. This framer doesn't do anything for the transmit

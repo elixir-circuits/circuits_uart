@@ -1,8 +1,8 @@
-defmodule Nerves.UART.Enumerator do
+defmodule Circuits.UART.Enumerator do
   @moduledoc false
 
   def enumerate() do
-    executable = :code.priv_dir(:nerves_uart) ++ '/nerves_uart'
+    executable = :code.priv_dir(:circuits_uart) ++ '/circuits_uart'
 
     port =
       Port.open({:spawn_executable, executable}, [

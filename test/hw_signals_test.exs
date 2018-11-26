@@ -2,7 +2,7 @@ Code.require_file("uart_test.exs", __DIR__)
 
 defmodule HWSignalsTest do
   use ExUnit.Case
-  alias Nerves.UART
+  alias Circuits.UART
 
   setup do
     UARTTest.common_setup()

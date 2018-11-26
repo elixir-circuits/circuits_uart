@@ -12,4 +12,4 @@ build_script:
   - mix test test/uartless_test.exs
 
 artifacts:
-  - path: priv/nerves_uart.exe
+  - path: priv/circuits_uart.exe

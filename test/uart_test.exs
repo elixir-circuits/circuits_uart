@@ -1,6 +1,6 @@
 defmodule UARTTest do
   use ExUnit.Case
-  alias Nerves.UART
+  alias Circuits.UART
 
   @moduledoc """
   This module provides common setup code for unit tests that require real
@@ -8,8 +8,8 @@ defmodule UARTTest do
 
   Define the following environment variables for your environment:
 
-    NERVES_UART_PORT1 - e.g., COM1 or ttyS0
-    NERVES_UART_PORT2
+    CIRCUITS_UART_PORT1 - e.g., COM1 or ttyS0
+    CIRCUITS_UART_PORT2
 
   The unit tests expect those ports to exist, be different ports,
   and be connected to each other through a null modem cable.
@@ -19,16 +19,16 @@ defmodule UARTTest do
   """
 
   def port1() do
-    System.get_env("NERVES_UART_PORT1")
+    System.get_env("CIRCUITS_UART_PORT1")
   end
 
   def port2() do
-    System.get_env("NERVES_UART_PORT2")
+    System.get_env("CIRCUITS_UART_PORT2")
   end
 
   def common_setup() do
     if is_nil(port1()) || is_nil(port2()) do
-      header = "Please define NERVES_UART_PORT1 and NERVES_UART_PORT2 in your
+      header = "Please define CIRCUITS_UART_PORT1 and CIRCUITS_UART_PORT2 in your
   environment (e.g. to ttyS0 or COM1) and connect them via a null
   modem cable.\n\n"
 
