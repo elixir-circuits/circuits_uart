@@ -1,7 +1,7 @@
 # Circuits.UART
 
 [![Build Status](https://travis-ci.org/elixir-circuits/circuits_uart.svg?branch=master)](https://travis-ci.org/elixir-circuits/circuits_uart)
-[![Build Status](https://ci.appveyor.com/api/projects/status/hm6s6269jtbiqxbv/branch/master?svg=true)](https://ci.appveyor.com/project/elixir-circuits/circuits_uart/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/bav50v763eprxy18?svg=true)](https://ci.appveyor.com/project/fhunleth/circuits-uart)
 [![Hex version](https://img.shields.io/hexpm/v/circuits_uart.svg)](https://hex.pm/packages/circuits_uart)
 
 `Circuits.UART` allows you to use UARTs, serial ports, Bluetooth virtual serial
