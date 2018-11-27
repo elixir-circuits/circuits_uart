@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.3.0
+
+Rebrand to `Circuits.UART`. No features or bugs were fixed in this version. To
+upgrade, you will need to rename all occurences of `nerves_uart` to
+`circuits_uart` and `Nerves.UART` to `Circuits.UART`.
+
 ## v1.2.1
 
 * Bug fixes

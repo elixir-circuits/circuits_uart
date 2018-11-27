@@ -4,16 +4,20 @@
 [![Build Status](https://ci.appveyor.com/api/projects/status/hm6s6269jtbiqxbv/branch/master?svg=true)](https://ci.appveyor.com/project/elixir-circuits/circuits_uart/branch/master)
 [![Hex version](https://img.shields.io/hexpm/v/circuits_uart.svg)](https://hex.pm/packages/circuits_uart)
 
-Circuits.UART allows you to access UARTs, serial ports, Bluetooth virtual serial
-port connections and more in Elixir. Feature highlights:
+`Circuits.UART` allows you to use UARTs, serial ports, Bluetooth virtual serial
+port connections and more in Elixir. Some highlights:
 
-* Mac, Windows, and desktop and embedded Linux
+* Mac, Windows, Linux, and Nerves
 * Enumerate serial ports
 * Receive input via messages or by polling (active and passive modes)
 * Add and remove framing on serial data - line-based framing included for use
   with GPS, cellular, satellite and other modules
 * Unit tests (uses the [tty0tty](https://github.com/freemed/tty0tty) virtual
   null modem on Travis)
+
+Looking for `Nerves.UART`? `Circuits.UART` is the new name. Everything else is
+the same. Update your project by replacing all references to `nerves_uart` and
+`Nerves.UART` to `circuits_uart` and `Circuits.UART` and you should be good.
 
 Something doesn't work for you? Check out below and the
 [docs](https://hexdocs.pm/circuits_uart/). Chat with other users on the nerves
