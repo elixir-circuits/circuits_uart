@@ -20,9 +20,8 @@ the same. Update your project by replacing all references to `nerves_uart` and
 `Nerves.UART` to `circuits_uart` and `Circuits.UART` and you should be good.
 
 Something doesn't work for you? Check out below and the
-[docs](https://hexdocs.pm/circuits_uart/). Chat with other users on the nerves
-channel on the [elixir-lang slack](https://elixir-slackin.herokuapp.com/), or
-file an issue or PR.
+[docs](https://hexdocs.pm/circuits_uart/). Post a question on the [Elixir
+Forum](https://elixirforum.com/) or file an issue or PR.
 
 ## Example use
 
