@@ -529,7 +529,13 @@ void uart_write(struct uart *port, const uint8_t *data, size_t len, int timeout)
     ssize_t written;
     do {
         written = write(port->fd, data, len);
-        debug("uart_write: wrote %d/%d, errno=%d (%s) data=%p, fd=%d", (int) written, (int) len, errno, strerror(errno), data, port->fd);
+        debug("uart_write: wrote %d/%d, errno=%d (%s) data=%p, fd=%d",
+                (int) written,
+                (int) len,
+                written < 0 ? errno : 0, /* errno only set on error */
+                strerror(written < 0 ? errno : 0),
+                data,
+                port->fd);
     } while (written < 0 && errno == EINTR);
 
     if (written < 0) {
