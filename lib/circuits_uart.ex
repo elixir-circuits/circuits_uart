@@ -247,21 +247,9 @@ defmodule Circuits.UART do
 
     * `:ebadf` - the UART is closed
   """
-  @spec write(GenServer.server(), binary | [byte], non_neg_integer()) :: :ok | {:error, term}
-  def write(pid, data, timeout) when is_binary(data) do
+  @spec write(GenServer.server(), iodata(), non_neg_integer()) :: :ok | {:error, term}
+  def write(pid, data, timeout \\ 5000) do
     GenServer.call(pid, {:write, data, timeout}, genserver_timeout(timeout))
-  end
-
-  def write(pid, data, timeout) when is_list(data) do
-    write(pid, :erlang.iolist_to_binary(data), timeout)
-  end
-
-  @doc """
-  Write data to the opened UART with the default timeout.
-  """
-  @spec write(GenServer.server(), binary | [byte]) :: :ok | {:error, term}
-  def write(pid, data) do
-    write(pid, data, 5000)
   end
 
   @doc """
@@ -445,9 +433,11 @@ defmodule Circuits.UART do
     end
   end
 
-  def handle_call({:write, value, timeout}, _from, state) do
+  def handle_call({:write, data, timeout}, _from, state) do
+    bin_data = IO.iodata_to_binary(data)
+
     {:ok, framed_data, new_framing_state} =
-      apply(state.framing, :add_framing, [value, state.framing_state])
+      apply(state.framing, :add_framing, [bin_data, state.framing_state])
 
     response = call_port(state, :write, {framed_data, timeout}, port_timeout(timeout))
     new_state = %{state | framing_state: new_framing_state}
