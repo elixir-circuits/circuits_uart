@@ -768,7 +768,7 @@ int main(int argc, char *argv[])
 #ifdef __WIN32__
     sprintf(logfile, "circuits_uart-%d.log", (int) GetCurrentProcessId());
 #else
-    sprintf(logfile, "circuits_uart-%d.log", (int) getpid());
+    sprintf(logfile, "/tmp/circuits_uart-%d.log", (int) getpid());
 #endif
     FILE *fp = fopen(logfile, "w+");
     log_location = fp;
