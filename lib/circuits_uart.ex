@@ -5,12 +5,12 @@ defmodule Circuits.UART do
   # serial ports. This is the additional time added to the GenServer message passing
   # timeout so that the interprocess messaging timers don't hit before the
   # timeouts on the actual operations.
-  @genserver_timeout_slack 100
+  @genserver_timeout_slack 500
 
   # There's a timeout when interacting with the port as well. If the port
   # doesn't respond by timeout + @port_timeout_slack, then there's something
   # wrong with it.
-  @port_timeout_slack 50
+  @port_timeout_slack 400
 
   @moduledoc """
   Find and use UARTs, serial ports, and more.
@@ -247,7 +247,7 @@ defmodule Circuits.UART do
 
     * `:ebadf` - the UART is closed
   """
-  @spec write(GenServer.server(), binary | [byte], integer) :: :ok | {:error, term}
+  @spec write(GenServer.server(), binary | [byte], non_neg_integer()) :: :ok | {:error, term}
   def write(pid, data, timeout) when is_binary(data) do
     GenServer.call(pid, {:write, data, timeout}, genserver_timeout(timeout))
   end
@@ -276,7 +276,7 @@ defmodule Circuits.UART do
     * `:ebadf` - the UART is closed
     * `:einval` - the UART is in active mode
   """
-  @spec read(GenServer.server(), integer) :: {:ok, binary} | {:error, term}
+  @spec read(GenServer.server(), non_neg_integer()) :: {:ok, binary} | {:error, term}
   def read(pid, timeout \\ 5000) do
     GenServer.call(pid, {:read, timeout}, genserver_timeout(timeout))
   end
@@ -596,12 +596,12 @@ defmodule Circuits.UART do
   defp message_id(:pid, _name), do: self()
   defp message_id(:name, name), do: name
 
-  defp genserver_timeout(timeout) do
-    max(timeout + @genserver_timeout_slack, @genserver_timeout_slack)
+  defp genserver_timeout(timeout) when timeout >= 0 do
+    timeout + @genserver_timeout_slack
   end
 
-  defp port_timeout(timeout) do
-    max(timeout + @port_timeout_slack, @port_timeout_slack)
+  defp port_timeout(timeout) when timeout >= 0 do
+    timeout + @port_timeout_slack
   end
 
   # Stop the framing timer if active and a frame completed
