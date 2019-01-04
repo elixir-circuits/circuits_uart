@@ -326,7 +326,7 @@ defmodule Circuits.UART do
 
   # gen_server callbacks
   def init([]) do
-    executable = :code.priv_dir(:circuits_uart) ++ '/circuits_uart'
+    executable = Application.app_dir(:circuits_uart, ["priv", "circuits_uart"]) |> to_charlist()
 
     port =
       Port.open({:spawn_executable, executable}, [
