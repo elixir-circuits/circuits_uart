@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.3.1
+
+* Bug fixes
+  * Lengthen timeouts on messages sent to ports. This provides more slack time
+    on heavily loaded uniprocessor devices that were missing timeouts by ~100 ms
+    periodically.
+  * Move C object files and the port executable to under the `_build` directory.
+    This makes it easier to switch between host/target builds especially when
+    using Elixir 1.8's mix target feature.
+
+* Improvements
+  * Handle iodata on `Circuits.UART.write` in addition to binaries and
+    charlists.
+
 ## v1.3.0
 
 Rebrand to `Circuits.UART`. No features or bugs were fixed in this version. To
