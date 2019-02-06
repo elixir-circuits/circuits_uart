@@ -19,11 +19,12 @@ erl_crash.dump
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
-# Ignore object files
-*.o
+# Ignore package tarball (built via "mix hex.build").
+circuits_uart-*.tar
 
-# Ignore our port executable
+# Ignore C object files and executables
 /priv
+*.o
 
 # Ignore debug logs
 circuits_uart.log
