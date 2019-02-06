@@ -169,7 +169,7 @@ To install `circuits_uart`:
 
   ```elixir
   def deps do
-    [{:circuits_uart, "~> 1.2"}]
+    [{:circuits_uart, "~> 1.3"}]
   end
   ```
 
