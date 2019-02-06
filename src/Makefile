@@ -1,15 +1,27 @@
-# Variables to override
+# Makefile for building the NIF
+#
+# Makefile targets:
+#
+# all/install   build and install the NIF
+# clean         clean build products and intermediates
+#
+# Variables to override:
+#
+# BUILD         where to store intermediate files (defaults to src directory)
+# PREFIX        path to the installation direction (defaults to ./priv)
 #
 # CC            C compiler
 # CROSSCOMPILE	crosscompiler prefix, if any
 # CFLAGS	compiler flags for compiling all C files
-# LDFLAGS	linker flags for linking all binaries
 # ERL_CFLAGS	additional compiler flags for files using Erlang header files
+# ERL_EI_INCLUDE_DIR include path to ei.h (Required for crosscompile)
+# ERL_EI_LIBDIR path to libei.a (Required for crosscompile)
+# LDFLAGS	linker flags for linking all binaries
 # ERL_LDFLAGS	additional linker flags for projects referencing Erlang libraries
-# ERL_EI_INCLUDE_DIR path to Erlang interface header files
-# ERL_EI_LIBDIR path to libei.a
 
-LDFLAGS +=
+PREFIX ?= priv
+BUILD ?= src
+
 CFLAGS ?= -O2 -Wall -Wextra -Wno-unused-parameter
 CFLAGS += -std=c99 -D_GNU_SOURCE
 
@@ -79,20 +91,29 @@ endif
 
 endif
 
-OBJ=$(SRC:.c=.o)
+HEADERS =$(wildcard src/*.h)
+OBJ=$(SRC:src/%.c=$(BUILD)/%.o)
+PORTEXE=$(PREFIX)/circuits_uart$(EXEEXT)
 
-.PHONY: all clean
+all: install
 
-all: priv priv/circuits_uart$(EXEEXT)
+install: $(PREFIX) $(BUILD) $(PORTEXE)
 
-%.o: %.c
+$(OBJ): $(HEADERS) src/Makefile
+
+$(BUILD)/%.o: src/%.c
 	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
 
-priv:
-	mkdir priv
-
-priv/circuits_uart$(EXEEXT): $(OBJ)
+$(PORTEXE): $(OBJ)
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
 
+$(PREFIX):
+	mkdir -p $@
+
+$(BUILD):
+	mkdir -p $@/ei_copy
+
 clean:
-	rm -f priv/circuits_uart$(EXEEXT) src/*.o src/ei_copy/*.o
+	rm -f $(PORTEXE) $(BUILD)/*.o $(BUILD)/ei_copy/*.o
+
+.PHONY: all clean install

@@ -27,6 +27,20 @@ defmodule Circuits.UART.MixProject do
   end
 
   defp make_env() do
+    base =
+      Mix.Project.compile_path()
+      |> Path.join("..")
+      |> Path.expand()
+
+    %{
+      "MIX_ENV" => to_string(Mix.env()),
+      "PREFIX" => Path.join(base, "priv"),
+      "BUILD" => Path.join(base, "obj")
+    }
+    |> Map.merge(ei_env())
+  end
+
+  defp ei_env() do
     case System.get_env("ERL_EI_INCLUDE_DIR") do
       nil ->
         %{
