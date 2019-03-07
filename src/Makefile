@@ -19,8 +19,8 @@
 # LDFLAGS	linker flags for linking all binaries
 # ERL_LDFLAGS	additional linker flags for projects referencing Erlang libraries
 
-PREFIX ?= priv
-BUILD ?= src
+PREFIX ?= $(MIX_COMPILE_PATH)/../priv
+BUILD ?= $(MIX_COMPILE_PATH)/../obj
 
 CFLAGS ?= -O2 -Wall -Wextra -Wno-unused-parameter
 CFLAGS += -std=c99 -D_GNU_SOURCE
