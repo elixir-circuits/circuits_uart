@@ -18,39 +18,11 @@ defmodule Circuits.UART.MixProject do
       make_executable: make_executable(),
       make_makefile: "src/Makefile",
       make_error_message: make_error_message(),
-      make_env: &make_env/0,
       docs: [extras: ["README.md"], main: "readme"],
       start_permanent: Mix.env() == :prod,
       build_embedded: true,
       deps: deps()
     ]
-  end
-
-  defp make_env() do
-    base =
-      Mix.Project.compile_path()
-      |> Path.join("..")
-      |> Path.expand()
-
-    %{
-      "MIX_ENV" => to_string(Mix.env()),
-      "PREFIX" => Path.join(base, "priv"),
-      "BUILD" => Path.join(base, "obj")
-    }
-    |> Map.merge(ei_env())
-  end
-
-  defp ei_env() do
-    case System.get_env("ERL_EI_INCLUDE_DIR") do
-      nil ->
-        %{
-          "ERL_EI_INCLUDE_DIR" => "#{:code.root_dir()}/usr/include",
-          "ERL_EI_LIBDIR" => "#{:code.root_dir()}/usr/lib"
-        }
-
-      _ ->
-        %{}
-    end
   end
 
   def application, do: []
@@ -79,7 +51,7 @@ defmodule Circuits.UART.MixProject do
 
   defp deps do
     [
-      {:elixir_make, "~> 0.4", runtime: false},
+      {:elixir_make, "~> 0.5", runtime: false},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:dialyxir, "1.0.0-rc.4", only: :dev, runtime: false}
     ]
