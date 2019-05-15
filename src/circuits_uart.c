@@ -261,7 +261,7 @@ static void handle_configuration(const char *req, int *req_index)
 
     ei_encode_tuple_header(resp, &resp_index, 2);
     ei_encode_atom(resp, &resp_index, "flow_control");
-    switch (current_config.parity) {
+    switch (current_config.flow_control) {
     default:
     case UART_FLOWCONTROL_NONE: ei_encode_atom(resp, &resp_index, "none"); break;
     case UART_FLOWCONTROL_HARDWARE: ei_encode_atom(resp, &resp_index, "hardware"); break;
