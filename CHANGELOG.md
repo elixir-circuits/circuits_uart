@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.3.2
+
+* Bug fixes
+  * Fix incorrect switch in C that caused flow control enum to be incorrect.
+    Thanks to Lee Bannard
+
 ## v1.3.1
 
 * Bug fixes
