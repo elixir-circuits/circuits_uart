@@ -56,5 +56,4 @@ script:
     else
       mix test test/uartless_test.exs;
     fi
-  - if (elixir -v | grep 1.7); then mix docs; mix format --check-formatted; fi
-  - mix hex.build
+  - if (elixir -v | grep 1.8); then mix docs; mix format --check-formatted; mix hex.build; fi
