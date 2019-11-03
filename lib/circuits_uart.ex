@@ -323,6 +323,15 @@ defmodule Circuits.UART do
   def set_rts(pid, value) when is_boolean(value) do
     GenServer.call(pid, {:set_rts, value})
   end
+  
+  @doc """
+  Change the controlling process that
+  receives events from an active uart.
+  """
+  @spec controlling_process(GenServer.server(), pid) :: :ok | {:error, term}
+  def controlling_process(pid, controlling_process) when is_pid(controlling_process) do
+    GenServer.call(pid, {:controlling_process, controlling_process})
+  end
 
   # gen_server callbacks
   def init([]) do
@@ -490,6 +499,11 @@ defmodule Circuits.UART do
   def handle_call({:set_break, value}, _from, state) do
     response = call_port(state, :set_break, value)
     {:reply, response, state}
+  end
+  
+  def handle_call({:controlling_process, pid}, _from, state) do
+    new_state = %{state | controlling_process: pid}
+    {:reply, :ok, new_state}
   end
 
   def terminate(_reason, state) do
