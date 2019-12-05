@@ -51,7 +51,7 @@ defmodule Circuits.UART.MixProject do
 
   defp deps do
     [
-      {:elixir_make, "~> 0.5", runtime: false},
+      {:elixir_make, "~> 0.6", runtime: false},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: :dev, runtime: false}
     ]
