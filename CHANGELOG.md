@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.0
+
+* New Feature
+  * Add `Circuits.UART.controlling_process/2`. This assigns a new controlling
+    process Pid to a uart in similar to OTP functions like `:gen_udp.controlling_process/2`. Thanks to Robin Hilliard for adding this.
+
 ## v1.3.2
 
 * Bug fixes
