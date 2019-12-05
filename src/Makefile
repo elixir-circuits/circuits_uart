@@ -58,6 +58,8 @@ CFLAGS += -DUNICODE
 
 EXEEXT=.exe
 
+RM=del
+
 else
 # Non-Windows
 
@@ -97,7 +99,7 @@ PORTEXE=$(PREFIX)/circuits_uart$(EXEEXT)
 
 all: install
 
-install: $(PREFIX) $(BUILD) $(PORTEXE)
+install: $(PREFIX) $(BUILD) $(BUILD)/ei_copy $(PORTEXE)
 
 $(OBJ): $(HEADERS) src/Makefile
 
@@ -107,13 +109,18 @@ $(BUILD)/%.o: src/%.c
 $(PORTEXE): $(OBJ)
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
 
-$(PREFIX):
-	mkdir -p $@
-
-$(BUILD):
-	mkdir -p $@/ei_copy
+ifeq ($(OS),Windows_NT)
+$(PREFIX) $(BUILD) $(BUILD)/ei_copy:
+	mkdir $(subst /,\\,$@)
 
 clean:
-	rm -f $(PORTEXE) $(BUILD)/*.o $(BUILD)/ei_copy/*.o
+	-$(RM) $(subst /,\,$(PORTEXE) $(OBJ))
+else
+$(PREFIX) $(BUILD) $(BUILD)/ei_copy:
+	mkdir -p $@
+
+clean:
+	$(RM) $(PORTEXE) $(OBJ)
+endif
 
 .PHONY: all clean install
