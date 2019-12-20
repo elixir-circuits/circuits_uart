@@ -1,7 +1,7 @@
 defmodule Circuits.UART.MixProject do
   use Mix.Project
 
-  @version "1.4.0"
+  @version "1.4.1"
 
   def project do
     [
