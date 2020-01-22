@@ -11,9 +11,8 @@ defmodule Circuits.UART.Framing.Line do
      cause unbounded buffer expansion. When the max length is passed, a
      `{:partial, data}` is reported. The application can decide what to do with
      this.
-  2. The separation character varies depending on the target device. Some
-     devices require "\\r\\n" sequences, so be sure to specify this. Currently
-     only one or two character separators are supported.
+  2. The separation character varies depending on the target device. See
+     "Separator" section to see how to specify this.
   3. It may be desirable to set a `:rx_framer_timeout` to prevent
      characters received in error from collecting during idle times. When the
      receive timer expires, `{:partial, data}` is reported.
@@ -21,6 +20,18 @@ defmodule Circuits.UART.Framing.Line do
      sequences. If the device only sends ASCII, high characters (128-255)
      should work as well. [Note: please report if using extended
      characters.]
+
+  ## Separator
+
+  Some devices require `"\\r\\n"` sequences. If you are using one of these
+  devices, a LTE modem for example, you can specify the separator like so:
+
+  ```elixir
+  Circuits.UART.open(uart, tty_name, framing: {Line, separator: "\\r\\n"})
+  ```
+
+  By default the separator is `"\\n"`. Currently only one or two character
+  separators are supported.
   """
 
   defmodule State do
