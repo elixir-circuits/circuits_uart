@@ -263,7 +263,7 @@ delay to each test to work around this. It likely can be much shorter.
 On MacOS, download and install [socat](http://www.dest-unreach.org/socat/). You can install it via Homebrew. Once you have it installed and ready to go, run the following command. You will need to change `<USERNAME>` to your current system username
 
 ```sh
-sudo socat -d -d -d -d -lf /tmp/socat pty,link=/dev/dummy1,raw,echo=0,user=<USERNAME>,group=staff,link=/dev/dummy2,raw,echo=0,user=<USERNAME>,group=staff
+sudo socat -d -d -d -d -lf /tmp/socat pty,link=/dev/dummy1,raw,echo=0,user=<USERNAME>,group=staff link=/dev/dummy2,raw,echo=0,user=<USERNAME>,group=staff
 ```
 
 Once that opens, in a separate terminal emulator, set the Circuits ENVars, and go about your testing
