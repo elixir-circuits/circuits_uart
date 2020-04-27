@@ -430,4 +430,9 @@ defmodule BasicUARTTest do
   test "changing config on open port" do
     # Implement me.
   end
+
+  test "opening port with custom speed", %{uart1: uart1} do
+    assert :ok = UART.open(uart1, UARTTest.port1(), active: false, speed: 192_000)
+    UART.close(uart1)
+  end
 end

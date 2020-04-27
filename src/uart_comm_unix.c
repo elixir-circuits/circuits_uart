@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <termios.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -33,7 +32,13 @@
 
 #ifdef __linux__
 #include <linux/serial.h>
+#define termios asmtermios
+#include <asm/termbits.h>
+#undef  termios
+#include <asm/ioctls.h>
 #endif
+
+#include <termios.h>
 
 #ifdef __APPLE__
 #include <IOKit/serial/ioss.h>
@@ -180,18 +185,18 @@ static int to_databits_constant(int bits)
 static int set_custom_speed(int fd, int speed)
 {
 #if defined(__linux__)
-    struct serial_struct serinfo;
+    struct termios2 serinfo;
     memset(&serinfo, 0, sizeof(serinfo));
-    if (ioctl(fd, TIOCGSERIAL, &serinfo) < 0)
+    if (ioctl(fd, TCGETS2, &serinfo) < 0)
         return -1;
 
-    serinfo.flags &= ~ASYNC_SPD_MASK;
-    serinfo.flags |= ASYNC_SPD_CUST;
-    serinfo.custom_divisor = (serinfo.baud_base + (speed / 2)) / speed;
-    if (serinfo.custom_divisor < 1)
-        serinfo.custom_divisor = 1;
+    serinfo.c_cflag &= ~CBAUD;
+    serinfo.c_cflag |= BOTHER;
+    serinfo.c_ispeed = speed;
+    serinfo.c_ospeed = speed;
 
-    return ioctl(fd, TIOCSSERIAL, &serinfo);
+    return ioctl(fd, TCSETS2, &serinfo);
+
 #elif defined(__APPLE__)
     // Custom baud rates supported on Tiger and beyond
     // NOTE: Apple appears to be picky. Once setting this, calling
