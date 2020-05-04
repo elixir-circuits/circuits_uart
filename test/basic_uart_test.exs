@@ -8,6 +8,24 @@ defmodule BasicUARTTest do
     UARTTest.common_setup()
   end
 
+  defp test_send_and_receive(uart1, uart2, options) do
+    all_options = [{:active, false} | options]
+
+    assert :ok = UART.open(uart1, UARTTest.port1(), all_options)
+    assert :ok = UART.open(uart2, UARTTest.port2(), all_options)
+
+    # uart1 -> uart2
+    assert :ok = UART.write(uart1, "A")
+    assert {:ok, "A"} = UART.read(uart2)
+
+    # uart2 -> uart1
+    assert :ok = UART.write(uart2, "B")
+    assert {:ok, "B"} = UART.read(uart1)
+
+    UART.close(uart1)
+    UART.close(uart2)
+  end
+
   test "serial ports exist" do
     ports = UART.enumerate()
     assert is_map(ports)
@@ -33,19 +51,7 @@ defmodule BasicUARTTest do
   end
 
   test "write and read", %{uart1: uart1, uart2: uart2} do
-    assert :ok = UART.open(uart1, UARTTest.port1(), active: false)
-    assert :ok = UART.open(uart2, UARTTest.port2(), active: false)
-
-    # uart1 -> uart2
-    assert :ok = UART.write(uart1, "A")
-    assert {:ok, "A"} = UART.read(uart2)
-
-    # uart2 -> uart1
-    assert :ok = UART.write(uart2, "B")
-    assert {:ok, "B"} = UART.read(uart1)
-
-    UART.close(uart1)
-    UART.close(uart2)
+    test_send_and_receive(uart1, uart2, [])
   end
 
   test "write iodata", %{uart1: uart1, uart2: uart2} do
@@ -434,5 +440,27 @@ defmodule BasicUARTTest do
   test "opening port with custom speed", %{uart1: uart1} do
     assert :ok = UART.open(uart1, UARTTest.port1(), active: false, speed: 192_000)
     UART.close(uart1)
+  end
+
+  test "write and read at standard speeds", %{uart1: uart1, uart2: uart2} do
+    standard_speeds = [9600, 19200, 38400, 57600, 115_200]
+
+    for speed <- standard_speeds do
+      test_send_and_receive(uart1, uart2, speed: speed)
+    end
+  end
+
+  test "write and read at custom speeds", %{uart1: uart1, uart2: uart2} do
+    # 31250 - MIDI
+    # 64000, 192_000, 200_000 - Random speeds seen in the field
+    #
+    # NOTE: This test is highly dependent on the UARTs under test being able
+    #       to support these baud rates, so it may not be a Circuits.UART
+    #       issue if it fails.
+    custom_speeds = [31250, 64000, 192_000, 200_000]
+
+    for speed <- custom_speeds do
+      test_send_and_receive(uart1, uart2, speed: speed)
+    end
   end
 end
