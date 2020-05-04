@@ -8,7 +8,7 @@ matrix:
     include:
         - os: linux
           compiler: gcc
-          env: ERLANG_VERSION=22.3 ELIXIR_VERSION=1.10.2-otp-22
+          env: ERLANG_VERSION=22.3 ELIXIR_VERSION=1.10.2-otp-22 EXTRA_CHECKS=true
         - os: linux
           compiler: gcc
           env: ERLANG_VERSION=22.2.8 ELIXIR_VERSION=1.9.4-otp-22
@@ -59,4 +59,8 @@ script:
     else
       mix test test/uartless_test.exs;
     fi
-  - if (elixir -v | grep 1.8); then mix docs; mix format --check-formatted; mix hex.build; fi
+  - if [ "$EXTRA_CHECKS" = "true" ]; then
+      mix docs &&
+      mix format --check-formatted &&
+      mix hex.build;
+    fi
