@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.4.2
+
+* Bug fix
+  * Updated non-standard UART speed configuration to use the newer termios2 API
+    on Linux. This fixes a custom speed issue that was seen when using the older
+    API. Thanks to Tom Boland for reporting the issue and providing a fix.
+
 ## v1.4.1
 
 * Bug fix
