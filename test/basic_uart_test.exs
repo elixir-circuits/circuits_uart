@@ -420,7 +420,7 @@ defmodule BasicUARTTest do
       end
     end
   end
-  
+
   test "call controlling_process", %{uart1: uart1} do
     assert :ok = UART.open(uart1, UARTTest.port1(), active: false)
     assert :ok = UART.controlling_process(uart1, self())
