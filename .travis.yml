@@ -8,6 +8,9 @@ matrix:
     include:
         - os: linux
           compiler: gcc
+          env: ERLANG_VERSION=23.0.1 ELIXIR_VERSION=1.10.3-otp-23 EXTRA_CHECKS=true
+        - os: linux
+          compiler: gcc
           env: ERLANG_VERSION=22.3 ELIXIR_VERSION=1.10.2-otp-22 EXTRA_CHECKS=true
         - os: linux
           compiler: gcc
