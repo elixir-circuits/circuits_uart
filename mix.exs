@@ -2,26 +2,31 @@ defmodule Circuits.UART.MixProject do
   use Mix.Project
 
   @version "1.4.2"
+  @source_url "https://github.com/elixir-circuits/circuits_uart"
 
   def project do
     [
       app: :circuits_uart,
       version: @version,
       elixir: "~> 1.6",
-      name: "Circuits.UART",
       description: description(),
       package: package(),
-      source_url: "https://github.com/elixir-circuits/circuits_uart",
+      source_url: @source_url,
       compilers: [:elixir_make | Mix.compilers()],
       make_targets: ["all"],
       make_clean: ["clean"],
       make_executable: make_executable(),
       make_makefile: "src/Makefile",
       make_error_message: make_error_message(),
-      docs: [extras: ["README.md"], main: "readme"],
+      docs: docs(),
       start_permanent: Mix.env() == :prod,
       build_embedded: true,
-      deps: deps()
+      deps: deps(),
+      preferred_cli_env: %{
+        docs: :docs,
+        "hex.publish": :docs,
+        "hex.build": :docs
+      }
     ]
   end
 
@@ -45,15 +50,24 @@ defmodule Circuits.UART.MixProject do
         "CHANGELOG.md"
       ],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/elixir-circuits/circuits_uart"}
+      links: %{"GitHub" => @source_url}
     }
   end
 
   defp deps do
     [
       {:elixir_make, "~> 0.6", runtime: false},
-      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.22", only: :docs, runtime: false},
       {:dialyxir, "~> 1.0.0", only: :dev, runtime: false}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: ["README.md", "CHANGELOG.md"],
+      main: "readme",
+      source_ref: "v#{@version}",
+      source_url: @source_url
     ]
   end
 
