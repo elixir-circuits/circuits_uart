@@ -257,7 +257,7 @@ defmodule Circuits.UART do
   after timing out.
 
   Returns `{:ok, binary}`, where `binary` is a binary data object that contains the
-  read data, or `{:error, reason}` if an error occurs.
+  read data, `{:error, reason}` if an error occurs, or `{:ok, <<>>}` after timing out.
 
   Typical error reasons:
 
