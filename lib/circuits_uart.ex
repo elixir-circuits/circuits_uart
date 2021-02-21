@@ -247,7 +247,7 @@ defmodule Circuits.UART do
 
     * `:ebadf` - the UART is closed
   """
-  @spec write(GenServer.server(), iodata(), non_neg_integer()) :: :ok | {:error, term}
+  @spec write(GenServer.server(), any(), non_neg_integer()) :: :ok | {:error, term}
   def write(pid, data, timeout \\ 5000) do
     GenServer.call(pid, {:write, data, timeout}, genserver_timeout(timeout))
   end
@@ -443,10 +443,8 @@ defmodule Circuits.UART do
   end
 
   def handle_call({:write, data, timeout}, _from, state) do
-    bin_data = IO.iodata_to_binary(data)
-
     {:ok, framed_data, new_framing_state} =
-      apply(state.framing, :add_framing, [bin_data, state.framing_state])
+      apply(state.framing, :add_framing, [data, state.framing_state])
 
     response = call_port(state, :write, {framed_data, timeout}, port_timeout(timeout))
     new_state = %{state | framing_state: new_framing_state}
