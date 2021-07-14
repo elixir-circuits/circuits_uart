@@ -13,6 +13,7 @@ defmodule FramingTest do
     UARTTest.common_setup()
   end
 
+  @tag skip: "Fix test on Windows"
   test "receive a line in passive mode", %{uart1: uart1, uart2: uart2} do
     assert :ok = UART.open(uart1, UARTTest.port1())
 

@@ -40,8 +40,6 @@ DISTFILES += \
     Makefile \
     README.md \
     test/circuits_uart_test.exs \
-    .travis.yml \
-    appveyor.yml \
     test/hw_signals_test.exs \
     test/test_helper.exs \
     test/uart_test.exs \

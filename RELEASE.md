@@ -1,7 +1,6 @@
 # Release checklist
 
-  1. Verify that the regression tests pass for tty0tty on Linux (verified by Travis,
-     so this should definitely work)
+  1. Verify that the regression tests pass (verified by GitHub Actions).
   2. Verify that the regression tests pass for 2 usb->serial ports connected via
      a NULL modem on Linux and Windows.
   3. Verify that the regression tests pass for 2 usb->serial ports connected via
@@ -21,7 +20,7 @@
   11. Wait for the CI builds to complete successfully. They should work
       assuming that no code changes were made between the last build and the tag,
       but wait to be safe.
-  12. [SKIP FOR NOW] Copy the circuits_uart.exe artifact created by the Appveyor CI build to `prebuilt/circuits_uart.exe`
+  12. [SKIP FOR NOW] Copy the circuits_uart.exe artifact created by the CI build to `prebuilt/circuits_uart.exe`
   13. Run `mix hex.publish`
   14. Update the deps on a sample project that uses circuits_uart to make sure that it
       downloads and builds the new circuits_uart.
