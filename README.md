@@ -2,8 +2,8 @@
 
 [![Hex version](https://img.shields.io/hexpm/v/circuits_uart.svg)](https://hex.pm/packages/circuits_uart)
 [![API docs](https://img.shields.io/hexpm/v/circuits_uart.svg?label=hexdocs "API docs")](https://hexdocs.pm/circuits_uart/Circuits.UART.html)
-[![Build status](https://travis-ci.org/elixir-circuits/circuits_uart.svg?branch=master)](https://travis-ci.org/elixir-circuits/circuits_uart)
-[![Build status](https://ci.appveyor.com/api/projects/status/6056beyvk4ssor5x?svg=true)](https://ci.appveyor.com/project/fhunleth/circuits-uart)
+[![build](https://github.com/elixir-circuits/circuits_uart/actions/workflows/build.yml/badge.svg)](https://github.com/elixir-circuits/circuits_uart/actions/workflows/build.yml)
+
 
 `Circuits.UART` allows you to use UARTs, serial ports, Bluetooth virtual serial
 port connections and more in Elixir. Some highlights:
