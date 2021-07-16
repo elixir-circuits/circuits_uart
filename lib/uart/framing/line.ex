@@ -13,7 +13,7 @@ defmodule Circuits.UART.Framing.Line do
      this.
   2. The separation character varies depending on the target device. See
      "Separator" section to see how to specify this.
-  3. It may be desirable to set a `:rx_framer_timeout` to prevent
+  3. It may be desirable to set a `:rx_framing_timeout` to prevent
      characters received in error from collecting during idle times. When the
      receive timer expires, `{:partial, data}` is reported.
   4. Line separators must be ASCII characters (0-127) or be valid UTF-8
@@ -27,7 +27,7 @@ defmodule Circuits.UART.Framing.Line do
   devices, a LTE modem for example, you can specify the separator like so:
 
   ```elixir
-  Circuits.UART.open(uart, tty_name, framing: {Line, separator: "\\r\\n"})
+  Circuits.UART.open(uart, tty_name, framing: {Circuits.UART.Framing.Line, separator: "\\r\\n"})
   ```
 
   By default the separator is `"\\n"`. Currently only one or two character
