@@ -105,9 +105,11 @@ install: $(PREFIX) $(BUILD) $(BUILD)/ei_copy $(PORTEXE)
 $(OBJ): $(HEADERS) src/Makefile
 
 $(BUILD)/%.o: src/%.c
+	@echo " CC $(notdir $@)"
 	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
 
 $(PORTEXE): $(OBJ)
+	@echo " LD $(notdir $@)"
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
 
 ifeq ($(OS),Windows_NT)
@@ -125,3 +127,6 @@ clean:
 endif
 
 .PHONY: all clean install
+
+# Don't echo commands unless the caller exports "V=1"
+${V}.SILENT:
