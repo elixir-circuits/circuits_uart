@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.4.3
+
+This release doesn't contain any new features. Most of the changes relate to
+updating dependencies and CI to make the project more pleasant to maintain.
+
+* Improvements
+  * Minor documentation fixes and build message cleanup.
+
 ## v1.4.2
 
 * Bug fix
