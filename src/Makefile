@@ -7,8 +7,7 @@
 #
 # Variables to override:
 #
-# BUILD         where to store intermediate files (defaults to src directory)
-# PREFIX        path to the installation direction (defaults to ./priv)
+# MIX_APP_PATH  path to the build directory
 #
 # CC            C compiler
 # CROSSCOMPILE	crosscompiler prefix, if any
@@ -18,7 +17,6 @@
 # ERL_EI_LIBDIR path to libei.a (Required for crosscompile)
 # LDFLAGS	linker flags for linking all binaries
 # ERL_LDFLAGS	additional linker flags for projects referencing Erlang libraries
-# MIX_APP_PATH  path to the build directory
 
 PREFIX = $(MIX_APP_PATH)/priv
 BUILD  = $(MIX_APP_PATH)/obj
