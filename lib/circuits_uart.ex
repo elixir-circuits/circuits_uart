@@ -93,6 +93,14 @@ defmodule Circuits.UART do
     |> Enum.map(&circuits_uart_info/1)
   end
 
+  @spec find_pid(binary) :: pid() | nil
+  def find_pid(port_name) do
+    case find_pids() do
+      [{pid, ^port_name}] -> pid
+      _ -> nil
+    end
+  end
+
   defp is_circuits_uart_process(pid) do
     {:dictionary, dictionary} = Process.info(pid, :dictionary)
     Keyword.get(dictionary, :"$initial_call") == {Circuits.UART, :init, 1}
