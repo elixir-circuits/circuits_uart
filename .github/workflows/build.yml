@@ -38,8 +38,10 @@ jobs:
       - name: Install tty0tty
         if: runner.os == 'Linux' && steps.tty0tty-cache.outputs.cache-hit != 'true'
         run: |
-          git clone https://github.com/freemed/tty0tty.git;
+          git clone https://github.com/freemed/tty0tty.git
           cd tty0tty/module
+          # Use latest when on Linux 5.14+
+          git checkout 9f2d06e89a9ba18f3193169a5d84789986ace2ab
 
       - name: Set up tty0tty
         if: runner.os == 'Linux'
