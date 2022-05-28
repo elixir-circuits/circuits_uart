@@ -46,7 +46,7 @@ static kern_return_t FindModems(io_iterator_t *matchingServices)
                              CFSTR(kIOSerialBSDAllTypes));
     }
 
-    kernResult = IOServiceGetMatchingServices(kIOMasterPortDefault, classesToMatch, matchingServices);
+    kernResult = IOServiceGetMatchingServices(kIOMainPortDefault, classesToMatch, matchingServices);
 
     return kernResult;
 }
@@ -112,7 +112,6 @@ struct serial_info *find_serialports()
 
     io_service_t modemService;
     kernResult = KERN_FAILURE;
-    Boolean modemFound = false;
 
     // Initialize the returned path
     *bsdPath = '\0';
@@ -140,7 +139,6 @@ struct serial_info *find_serialports()
                 new_info->next = info;
                 info = new_info;
 
-                modemFound = true;
                 kernResult = KERN_SUCCESS;
 
                 io_service_t device = GetUsbDevice(modemService);
