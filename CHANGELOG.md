@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.4
+
+* Improvements
+  * Fix MacOS deprecation warning. Thanks to @tonnenpinguin for the fix.
+
 ## v1.4.3
 
 This release doesn't contain any new features. Most of the changes relate to
