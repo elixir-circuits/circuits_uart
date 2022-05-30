@@ -94,8 +94,13 @@ defmodule Circuits.UART do
   end
 
   defp is_circuits_uart_process(pid) do
-    {:dictionary, dictionary} = Process.info(pid, :dictionary)
-    Keyword.get(dictionary, :"$initial_call") == {Circuits.UART, :init, 1}
+    case Process.info(pid, :dictionary) do
+      {:dictionary, dictionary} ->
+        Keyword.get(dictionary, :"$initial_call") == {Circuits.UART, :init, 1}
+
+      _ ->
+        false
+    end
   end
 
   defp circuits_uart_info(pid) do
