@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.5
+
+* Bug fix
+  * Gracefully handle Process.info/2 returning nil (:heart: @tonnenpinguin)
+
 ## v1.4.4
 
 * Improvements
