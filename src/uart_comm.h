@@ -50,6 +50,20 @@ struct uart_config
     int stop_bits;  // 1 or 2
     enum uart_parity parity;
     enum uart_flow_control flow_control;
+
+    // RS485 config (Linux only)
+    // These flags only need to be set if the user provides values
+    // so this is a modified logic where:
+    //   -1 == not set
+    //   0 == false
+    //   1 == true (or number)
+    int rs485_enabled;
+    int rs485_rts_on_send;
+    int rs485_rts_after_send;
+    int rs485_rx_during_tx;
+    int rs485_terminate_bus;
+    long rs485_delay_rts_before_send;
+    long rs485_delay_rts_after_send;
 };
 
 struct uart_signals
@@ -102,7 +116,7 @@ int uart_is_open(struct uart *port);
  * @param config the initial configuration
  * @return 0 on success, <0 on error
  */
-int uart_open(struct uart *port, const char *name, const struct uart_config *config);
+int uart_open(struct uart *port, const char *name, struct uart_config *config);
 
 /**
  * @brief Close and free up the resources for a UART
@@ -151,7 +165,7 @@ void uart_read(struct uart *port, int timeout);
  * @param config the new configuration
  * @return <0 on error
  */
-int uart_configure(struct uart *port, const struct uart_config *config);
+int uart_configure(struct uart *port, struct uart_config *config);
 
 /**
  * @brief Block until all data is written out the port

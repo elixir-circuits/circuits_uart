@@ -360,6 +360,71 @@ static int uart_config_flowcontrol(int fd, const struct uart_config *config)
     return tcsetattr(fd, TCSANOW, &options);
 }
 
+/**
+ * @brief Configure the RS485 settings on the port
+ *
+ * @param fd
+ * @param config
+ * @return <0 on error
+ */
+static int uart_config_rs485(int fd, struct uart_config *config)
+{
+#if defined(__linux__)
+    struct serial_rs485 rs485;
+    if (ioctl(fd, TIOCGRS485, &rs485) < 0) {
+        record_errno();
+        return -1;
+    }
+
+    // Only apply settings if user is changing enabled flag or it is already
+    // enabled by the driver.
+    if (config->rs485_enabled > -1 || (rs485.flags & SER_RS485_ENABLED)) {
+        // If these values aren't set by the user, then use the read in RS485 settings
+        if (config->rs485_enabled == -1)
+            config->rs485_enabled = (rs485.flags & SER_RS485_ENABLED);
+        else
+            rs485.flags = config->rs485_enabled ? (rs485.flags | SER_RS485_ENABLED) : (rs485.flags & ~SER_RS485_ENABLED);
+
+        if (config->rs485_rts_on_send == -1)
+            config->rs485_rts_on_send = rs485.flags & SER_RS485_RTS_ON_SEND;
+        else
+            rs485.flags = config->rs485_rts_on_send ? (rs485.flags | SER_RS485_RTS_ON_SEND) : (rs485.flags & ~SER_RS485_RTS_ON_SEND);
+
+        if (config->rs485_rts_after_send == -1)
+            config->rs485_rts_after_send = rs485.flags & SER_RS485_RTS_AFTER_SEND;
+        else
+            rs485.flags = config->rs485_rts_after_send ? (rs485.flags | SER_RS485_RTS_AFTER_SEND) : (rs485.flags & ~SER_RS485_RTS_AFTER_SEND);
+
+        if (config->rs485_rx_during_tx == -1)
+            config->rs485_rx_during_tx = rs485.flags & SER_RS485_RX_DURING_TX;
+        else
+            rs485.flags = config->rs485_rx_during_tx ? (rs485.flags | SER_RS485_RX_DURING_TX) : (rs485.flags & ~SER_RS485_RX_DURING_TX);
+
+        if (config->rs485_terminate_bus == -1)
+            config->rs485_terminate_bus = rs485.flags & SER_RS485_TERMINATE_BUS;
+        else
+            rs485.flags = config->rs485_terminate_bus ? (rs485.flags | SER_RS485_TERMINATE_BUS) : (rs485.flags & ~SER_RS485_TERMINATE_BUS);
+
+        if (config->rs485_delay_rts_before_send == -1)
+            config->rs485_delay_rts_before_send = rs485.delay_rts_before_send;
+        else
+            rs485.delay_rts_before_send = config->rs485_delay_rts_before_send;
+
+        if (config->rs485_delay_rts_after_send == -1)
+            config->rs485_delay_rts_after_send = rs485.delay_rts_after_send;
+        else
+            rs485.delay_rts_after_send = config->rs485_delay_rts_after_send;
+
+        if (ioctl(fd, TIOCSRS485, &rs485) < 0) {
+            record_errno();
+            return -1;
+        }
+    }
+#endif
+
+    return 0;
+}
+
 static char *name_to_device_file(const char *name)
 {
     // If passed "ttyS0", return "/dev/ttyS0".
@@ -396,7 +461,7 @@ int uart_init(struct uart **pport,
     return 0;
 }
 
-int uart_open(struct uart *port, const char *name, const struct uart_config *config)
+int uart_open(struct uart *port, const char *name, struct uart_config *config)
 {
     char *uart_path = name_to_device_file(name);
     if (!uart_path) {
@@ -436,6 +501,11 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
         goto handle_error;
     }
 
+    if (uart_config_rs485(port->fd, config) < 0) {
+        debug("uart_config_rs485 failed");
+        goto handle_error;
+    }
+
     // Clear garbage data from RX/TX queues
     tcflush(port->fd, TCIOFLUSH);
 
@@ -455,7 +525,7 @@ int uart_is_open(struct uart *port)
     return port->fd != -1;
 }
 
-int uart_configure(struct uart *port, const struct uart_config *config)
+int uart_configure(struct uart *port, struct uart_config *config)
 {
     // Update active mode
     if (config->active != port->active_mode_enabled) {
@@ -477,6 +547,12 @@ int uart_configure(struct uart *port, const struct uart_config *config)
 
     if (uart_config_flowcontrol(port->fd, config) < 0) {
         debug("uart_config_flowcontrol failed");
+        record_errno();
+        return -1;
+    }
+
+    if (uart_config_rs485(port->fd, config) < 0) {
+        debug("uart_config_rs485 failed");
         record_errno();
         return -1;
     }

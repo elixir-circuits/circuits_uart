@@ -156,6 +156,55 @@ static int parse_option_list(const char *req, int *req_index, struct uart_config
             if (strcmp(flow_control, "none") == 0) config->flow_control = UART_FLOWCONTROL_NONE;
             else if (strcmp(flow_control, "hardware") == 0) config->flow_control = UART_FLOWCONTROL_HARDWARE;
             else if (strcmp(flow_control, "software") == 0) config->flow_control = UART_FLOWCONTROL_SOFTWARE;
+        } else if (strcmp(key, "rs485_enabled") == 0) {
+            int val;
+            if (ei_decode_boolean(req, req_index, &val) < 0) {
+                debug("rs485_enabled should be a boolean");
+                return -1;
+            }
+            config->rs485_enabled = val;
+        } else if (strcmp(key, "rs485_rts_on_send") == 0) {
+            int val;
+            if (ei_decode_boolean(req, req_index, &val) < 0) {
+                debug("rs485_rts_on_send should be a boolean");
+                return -1;
+            }
+            config->rs485_rts_on_send = val;
+        } else if (strcmp(key, "rs485_rts_after_send") == 0) {
+            int val;
+            if (ei_decode_boolean(req, req_index, &val) < 0) {
+                debug("rs485_rts_after_send should be a boolean");
+                return -1;
+            }
+            config->rs485_rts_after_send = val;
+        } else if (strcmp(key, "rs485_rx_during_tx") == 0) {
+            int val;
+            if (ei_decode_boolean(req, req_index, &val) < 0) {
+                debug("rs485_rx_during_tx should be a boolean");
+                return -1;
+            }
+            config->rs485_rx_during_tx = val;
+        } else if (strcmp(key, "rs485_terminate_bus") == 0) {
+            int val;
+            if (ei_decode_boolean(req, req_index, &val) < 0) {
+                debug("rs485_terminate_bus should be a boolean");
+                return -1;
+            }
+            config->rs485_terminate_bus = val;
+        } else if (strcmp(key, "rs485_delay_rts_before_send") == 0) {
+            long val;
+            if (ei_decode_long(req, req_index, &val) < 0) {
+                debug("rs485_delay_rts_before_send should be a long");
+                return -1;
+            }
+            config->rs485_delay_rts_before_send = val;
+        } else if (strcmp(key, "rs485_delay_rts_after_send") == 0) {
+            long val;
+            if (ei_decode_long(req, req_index, &val) < 0) {
+                debug("rs485_delay_rts_after_send should be a long");
+                return -1;
+            }
+            config->rs485_delay_rts_after_send = val;
         } else {
             // unknown term
             ei_skip_term(req, req_index);
@@ -233,7 +282,40 @@ static void handle_configuration(const char *req, int *req_index)
     resp[resp_index++] = response_id;
     ei_encode_version(resp, &resp_index);
 
-    ei_encode_list_header(resp, &resp_index, 5);
+    // Add RS485 configuration if it is set
+    if (current_config.rs485_enabled > -1) {
+        ei_encode_list_header(resp, &resp_index, 12);
+
+        ei_encode_tuple_header(resp, &resp_index, 2);
+        ei_encode_atom(resp, &resp_index, "rs485_enabled");
+        ei_encode_boolean(resp, &resp_index, current_config.rs485_enabled);
+
+        ei_encode_tuple_header(resp, &resp_index, 2);
+        ei_encode_atom(resp, &resp_index, "rs485_rts_on_send");
+        ei_encode_boolean(resp, &resp_index, current_config.rs485_rts_on_send);
+
+        ei_encode_tuple_header(resp, &resp_index, 2);
+        ei_encode_atom(resp, &resp_index, "rs485_rts_after_send");
+        ei_encode_boolean(resp, &resp_index, current_config.rs485_rts_after_send);
+
+        ei_encode_tuple_header(resp, &resp_index, 2);
+        ei_encode_atom(resp, &resp_index, "rs485_rx_during_tx");
+        ei_encode_boolean(resp, &resp_index, current_config.rs485_rx_during_tx);
+
+        ei_encode_tuple_header(resp, &resp_index, 2);
+        ei_encode_atom(resp, &resp_index, "rs485_terminate_bus");
+        ei_encode_boolean(resp, &resp_index, current_config.rs485_terminate_bus);
+
+        ei_encode_tuple_header(resp, &resp_index, 2);
+        ei_encode_atom(resp, &resp_index, "rs485_delay_rts_before_send");
+        ei_encode_long(resp, &resp_index, current_config.rs485_delay_rts_before_send);
+
+        ei_encode_tuple_header(resp, &resp_index, 2);
+        ei_encode_atom(resp, &resp_index, "rs485_delay_rts_after_send");
+        ei_encode_long(resp, &resp_index, current_config.rs485_delay_rts_after_send);
+    } else {
+        ei_encode_list_header(resp, &resp_index, 5);
+    }
 
     ei_encode_tuple_header(resp, &resp_index, 2);
     ei_encode_atom(resp, &resp_index, "speed");
