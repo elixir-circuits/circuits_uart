@@ -360,6 +360,51 @@ static int uart_config_flowcontrol(int fd, const struct uart_config *config)
     return tcsetattr(fd, TCSANOW, &options);
 }
 
+int uart_get_rs485_config(struct uart *port, struct uart_config *config)
+{
+#if defined(__linux__)
+    struct serial_rs485 rs485;
+
+    if (ioctl(port->fd, TIOCGRS485, &rs485) < 0) {
+        // This may fail with ENOTTY if the port doesn't support RS485. If thats
+        // the case, then we only care about a failure when a user is trying
+        // to set things. Otherwise, we assume RS485 may not even be expected and
+        // can safely be ignored
+        if (!config->rs485_user_configured) return 0;
+
+        record_errno();
+        return -1;
+    }
+
+    config->rs485_enabled = (rs485.flags & SER_RS485_ENABLED);
+    config->rs485_rts_on_send = (rs485.flags & SER_RS485_RTS_ON_SEND);
+    config->rs485_rts_after_send = (rs485.flags & SER_RS485_RTS_AFTER_SEND);
+    config->rs485_rx_during_tx = (rs485.flags & SER_RS485_RX_DURING_TX);
+    config->rs485_terminate_bus = (rs485.flags & SER_RS485_TERMINATE_BUS);
+
+    rs485.delay_rts_before_send = config->rs485_delay_rts_before_send >= 0 ? config->rs485_delay_rts_before_send : rs485.delay_rts_before_send;
+    rs485.delay_rts_after_send = config->rs485_delay_rts_after_send >= 0 ? config->rs485_delay_rts_after_send : rs485.delay_rts_after_send;
+#endif
+
+    return 0;
+}
+
+/**
+ * @brief Update the tristate flag of RS485 configution
+ *
+ * @param flags
+ * @param current_val
+ * @param rs485 setting mask
+ */
+static void update_tristate_flags(long *flags, int val, long mask)
+{
+    switch (val){
+    case 0: *flags |= mask; break;
+    case 1: *flags &= ~mask; break;
+    default: break;
+    }
+}
+
 /**
  * @brief Configure the RS485 settings on the port
  *
@@ -367,58 +412,34 @@ static int uart_config_flowcontrol(int fd, const struct uart_config *config)
  * @param config
  * @return <0 on error
  */
-static int uart_config_rs485(int fd, struct uart_config *config)
+static int uart_config_rs485(int fd, const struct uart_config *config)
 {
 #if defined(__linux__)
     struct serial_rs485 rs485;
+
     if (ioctl(fd, TIOCGRS485, &rs485) < 0) {
+        // This may fail with ENOTTY if the port doesn't support RS485. If thats
+        // the case, then we only care about a failure when a user is trying
+        // to set things. Otherwise, we assume RS485 may not even be expected and
+        // can safely be ignored
+        if (!config->rs485_user_configured) return 0;
+
         record_errno();
         return -1;
     }
 
-    // Only apply settings if user is changing enabled flag or it is already
-    // enabled by the driver.
-    if (config->rs485_enabled > -1 || (rs485.flags & SER_RS485_ENABLED)) {
-        // If these values aren't set by the user, then use the read in RS485 settings
-        if (config->rs485_enabled == -1)
-            config->rs485_enabled = (rs485.flags & SER_RS485_ENABLED);
-        else
-            rs485.flags = config->rs485_enabled ? (rs485.flags | SER_RS485_ENABLED) : (rs485.flags & ~SER_RS485_ENABLED);
+    update_tristate_flags(&rs485.flags, config->rs485_enabled, SER_RS485_ENABLED);
+    update_tristate_flags(&rs485.flags, config->rs485_rts_on_send, SER_RS485_RTS_ON_SEND);
+    update_tristate_flags(&rs485.flags, config->rs485_rts_after_send, SER_RS485_RTS_AFTER_SEND);
+    update_tristate_flags(&rs485.flags, config->rs485_rx_during_tx, SER_RS485_RX_DURING_TX);
+    update_tristate_flags(&rs485.flags, config->rs485_terminate_bus, SER_RS485_TERMINATE_BUS);
 
-        if (config->rs485_rts_on_send == -1)
-            config->rs485_rts_on_send = rs485.flags & SER_RS485_RTS_ON_SEND;
-        else
-            rs485.flags = config->rs485_rts_on_send ? (rs485.flags | SER_RS485_RTS_ON_SEND) : (rs485.flags & ~SER_RS485_RTS_ON_SEND);
+    rs485.delay_rts_before_send = config->rs485_delay_rts_before_send >= 0 ? config->rs485_delay_rts_before_send : rs485.delay_rts_before_send;
+    rs485.delay_rts_after_send = config->rs485_delay_rts_after_send >= 0 ? config->rs485_delay_rts_after_send : rs485.delay_rts_after_send;
 
-        if (config->rs485_rts_after_send == -1)
-            config->rs485_rts_after_send = rs485.flags & SER_RS485_RTS_AFTER_SEND;
-        else
-            rs485.flags = config->rs485_rts_after_send ? (rs485.flags | SER_RS485_RTS_AFTER_SEND) : (rs485.flags & ~SER_RS485_RTS_AFTER_SEND);
-
-        if (config->rs485_rx_during_tx == -1)
-            config->rs485_rx_during_tx = rs485.flags & SER_RS485_RX_DURING_TX;
-        else
-            rs485.flags = config->rs485_rx_during_tx ? (rs485.flags | SER_RS485_RX_DURING_TX) : (rs485.flags & ~SER_RS485_RX_DURING_TX);
-
-        if (config->rs485_terminate_bus == -1)
-            config->rs485_terminate_bus = rs485.flags & SER_RS485_TERMINATE_BUS;
-        else
-            rs485.flags = config->rs485_terminate_bus ? (rs485.flags | SER_RS485_TERMINATE_BUS) : (rs485.flags & ~SER_RS485_TERMINATE_BUS);
-
-        if (config->rs485_delay_rts_before_send == -1)
-            config->rs485_delay_rts_before_send = rs485.delay_rts_before_send;
-        else
-            rs485.delay_rts_before_send = config->rs485_delay_rts_before_send;
-
-        if (config->rs485_delay_rts_after_send == -1)
-            config->rs485_delay_rts_after_send = rs485.delay_rts_after_send;
-        else
-            rs485.delay_rts_after_send = config->rs485_delay_rts_after_send;
-
-        if (ioctl(fd, TIOCSRS485, &rs485) < 0) {
-            record_errno();
-            return -1;
-        }
+    if (ioctl(fd, TIOCSRS485, &rs485) < 0) {
+        record_errno();
+        return -1;
     }
 #endif
 
@@ -461,7 +482,7 @@ int uart_init(struct uart **pport,
     return 0;
 }
 
-int uart_open(struct uart *port, const char *name, struct uart_config *config)
+int uart_open(struct uart *port, const char *name, const struct uart_config *config)
 {
     char *uart_path = name_to_device_file(name);
     if (!uart_path) {
@@ -525,7 +546,7 @@ int uart_is_open(struct uart *port)
     return port->fd != -1;
 }
 
-int uart_configure(struct uart *port, struct uart_config *config)
+int uart_configure(struct uart *port, const struct uart_config *config)
 {
     // Update active mode
     if (config->active != port->active_mode_enabled) {

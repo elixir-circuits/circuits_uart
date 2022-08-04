@@ -34,6 +34,7 @@ void uart_default_config(struct uart_config *config)
     config->flow_control = UART_FLOWCONTROL_NONE;
 
     // RS485 unset by default
+    config->rs485_user_configured = false;
     config->rs485_enabled = -1;
     config->rs485_rts_on_send = -1;
     config->rs485_rts_after_send = -1;

@@ -316,7 +316,7 @@ static int start_async_reads(struct uart *port) {
     return 0;
 }
 
-int uart_open(struct uart *port, const char *name, struct uart_config *config)
+int uart_open(struct uart *port, const char *name, const struct uart_config *config)
 {
     // If the port is open, close it and re-open it.
     uart_close(port);
@@ -384,7 +384,7 @@ int uart_is_open(struct uart *port)
     return port->h != INVALID_HANDLE_VALUE;
 }
 
-int uart_configure(struct uart *port, struct uart_config *config)
+int uart_configure(struct uart *port, const struct uart_config *config)
 {
     bool active_mode_changed = false;
     if (config->active != port->active_mode_enabled) {
@@ -841,4 +841,9 @@ void uart_process_timeout(struct uart *port)
     }
 }
 
+int uart_get_rs485_config(struct uart *port, struct uart_config *config)
+{
+    // Unsupported on Windows
+    return 0;
+}
 #endif
