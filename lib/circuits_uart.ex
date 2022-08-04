@@ -50,6 +50,13 @@ defmodule Circuits.UART do
           | {:framing, module | {module, [term]}}
           | {:rx_framing_timeout, integer}
           | {:id, :name | :pid}
+          | {:rs485_enabled, boolean()}
+          | {:rs485_rts_on_send, boolean()}
+          | {:rs485_rts_after_send, boolean()}
+          | {:rs485_rx_during_tx, boolean()}
+          | {:rs485_terminate_bus, boolean()}
+          | {:rs485_delay_rts_before_send, pos_integer()}
+          | {:rs485_delay_rts_after_send, pos_integer()}
 
   # Public API
   @doc """
@@ -163,6 +170,22 @@ defmodule Circuits.UART do
     pid, data}`. The name and pid are the name of the connected UART or the pid
     of the Circuits.UART server pid as returned by `start_link/1`. The default
     value is `:name`.
+
+  The following options are supported on Linux only:
+
+    * `:rs485_enabled` - (`true` or `false`) enable RS485 mode.
+
+    * `:rs485_rts_on_send` - (`true` or `false`) enable RTS on send.
+
+    * `:rs485_rts_after_send` - (`true` or `false`) enable RTS after send.
+
+    * `:rs485_rx_during_tx` - (`true` or `false`) enable RX during TX (loopback).
+
+    * `:rs485_terminate_bus` - (`true` or `false`) enable bus termination.
+
+    * `:rs485_delay_rts_before_send` - (milliseconds) delay RTS before send.
+
+    * `:rs485_delay_rts_after_send` - (milliseconds) delay RTS after send.
 
   Active mode defaults to true and means that data received on the UART is
   reported in messages. The messages have the following form:

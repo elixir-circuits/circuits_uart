@@ -32,4 +32,14 @@ void uart_default_config(struct uart_config *config)
     config->stop_bits = 1;
     config->parity = UART_PARITY_NONE;
     config->flow_control = UART_FLOWCONTROL_NONE;
+
+    // RS485 unset by default
+    config->rs485_user_configured = false;
+    config->rs485_enabled = -1;
+    config->rs485_rts_on_send = -1;
+    config->rs485_rts_after_send = -1;
+    config->rs485_rx_during_tx = -1;
+    config->rs485_terminate_bus = -1;
+    config->rs485_delay_rts_before_send = -1;
+    config->rs485_delay_rts_after_send = -1;
 }

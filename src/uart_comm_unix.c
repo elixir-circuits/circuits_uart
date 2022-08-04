@@ -360,6 +360,91 @@ static int uart_config_flowcontrol(int fd, const struct uart_config *config)
     return tcsetattr(fd, TCSANOW, &options);
 }
 
+int uart_get_rs485_config(struct uart *port, struct uart_config *config)
+{
+#if defined(__linux__)
+    struct serial_rs485 rs485;
+
+    if (ioctl(port->fd, TIOCGRS485, &rs485) < 0) {
+        // This may fail with ENOTTY if the port doesn't support RS485. If thats
+        // the case, then we only care about a failure when a user is trying
+        // to set things. Otherwise, we assume RS485 may not even be expected and
+        // can safely be ignored
+        if (!config->rs485_user_configured) return 0;
+
+        record_errno();
+        return -1;
+    }
+
+    config->rs485_enabled = (rs485.flags & SER_RS485_ENABLED) != 0;
+    config->rs485_rts_on_send = (rs485.flags & SER_RS485_RTS_ON_SEND) != 0;
+    config->rs485_rts_after_send = (rs485.flags & SER_RS485_RTS_AFTER_SEND) != 0;
+    config->rs485_rx_during_tx = (rs485.flags & SER_RS485_RX_DURING_TX) != 0;
+    config->rs485_terminate_bus = (rs485.flags & SER_RS485_TERMINATE_BUS) != 0;
+
+    config->rs485_delay_rts_before_send = rs485.delay_rts_before_send;
+    config->rs485_delay_rts_after_send = rs485.delay_rts_after_send;
+#endif
+
+    return 0;
+}
+
+/**
+ * @brief Update a flag based on the value of a tristate boolean.
+ *
+ * @param flags a point to the where the flags are
+ * @param flag_bit the bit to set or clear
+ * @param tristate_val the tristate boolean (<0 is unset, 0 is false, >0 is true)
+ */
+static void update_flags(uint32_t *flags, uint32_t flag_bit, int tristate_val)
+{
+    if (tristate_val == 0)
+        *flags &= ~flag_bit;
+    else if (tristate_val > 0)
+        *flags |= flag_bit;
+}
+
+/**
+ * @brief Configure the RS485 settings on the port
+ *
+ * @param fd
+ * @param config
+ * @return <0 on error
+ */
+static int uart_config_rs485(int fd, const struct uart_config *config)
+{
+#if defined(__linux__)
+    struct serial_rs485 rs485;
+
+    if (ioctl(fd, TIOCGRS485, &rs485) < 0) {
+        // This may fail with ENOTTY if the port doesn't support RS485. If that's
+        // the case, then we only care about a failure when a user is trying
+        // to set things. Otherwise, we assume RS485 may not even be expected and
+        // can safely be ignored
+        if (!config->rs485_user_configured) return 0;
+
+        record_errno();
+        return -1;
+    }
+
+    update_flags(&rs485.flags, SER_RS485_ENABLED, config->rs485_enabled);
+    update_flags(&rs485.flags, SER_RS485_RTS_ON_SEND, config->rs485_rts_on_send);
+    update_flags(&rs485.flags, SER_RS485_RTS_AFTER_SEND, config->rs485_rts_after_send);
+    update_flags(&rs485.flags, SER_RS485_RX_DURING_TX, config->rs485_rx_during_tx);
+    update_flags(&rs485.flags, SER_RS485_TERMINATE_BUS, config->rs485_terminate_bus);
+
+    rs485.delay_rts_before_send = config->rs485_delay_rts_before_send >= 0 ? config->rs485_delay_rts_before_send : rs485.delay_rts_before_send;
+    rs485.delay_rts_after_send = config->rs485_delay_rts_after_send >= 0 ? config->rs485_delay_rts_after_send : rs485.delay_rts_after_send;
+
+    if (ioctl(fd, TIOCSRS485, &rs485) < 0) {
+        record_errno();
+        return -1;
+    }
+#endif
+
+    return 0;
+}
+
 static char *name_to_device_file(const char *name)
 {
     // If passed "ttyS0", return "/dev/ttyS0".
@@ -436,6 +521,11 @@ int uart_open(struct uart *port, const char *name, const struct uart_config *con
         goto handle_error;
     }
 
+    if (uart_config_rs485(port->fd, config) < 0) {
+        debug("uart_config_rs485 failed");
+        goto handle_error;
+    }
+
     // Clear garbage data from RX/TX queues
     tcflush(port->fd, TCIOFLUSH);
 
@@ -477,6 +567,12 @@ int uart_configure(struct uart *port, const struct uart_config *config)
 
     if (uart_config_flowcontrol(port->fd, config) < 0) {
         debug("uart_config_flowcontrol failed");
+        record_errno();
+        return -1;
+    }
+
+    if (uart_config_rs485(port->fd, config) < 0) {
+        debug("uart_config_rs485 failed");
         record_errno();
         return -1;
     }

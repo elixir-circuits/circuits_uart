@@ -50,6 +50,21 @@ struct uart_config
     int stop_bits;  // 1 or 2
     enum uart_parity parity;
     enum uart_flow_control flow_control;
+    bool rs485_user_configured;
+
+    // RS485 config (Linux only)
+    // These flags only need to be set if the user provides values
+    // so this is a modified logic where:
+    //   -1 == not set
+    //   0 == false
+    //   1 == true (or number)
+    int rs485_enabled;
+    int rs485_rts_on_send;
+    int rs485_rts_after_send;
+    int rs485_rx_during_tx;
+    int rs485_terminate_bus;
+    long rs485_delay_rts_before_send;
+    long rs485_delay_rts_after_send;
 };
 
 struct uart_signals
@@ -213,6 +228,15 @@ int uart_set_break(struct uart *port, bool val);
  * @return 0 on success
  */
 int uart_get_signals(struct uart *port, struct uart_signals *sig);
+
+/**
+ * @brief Read in the RS485 config
+ *
+ * @param port the uart struct
+ * @param config the uart configuration
+ * @return 0 on success
+ */
+int uart_get_rs485_config(struct uart *port, struct uart_config *config);
 
 #if defined(__linux__) || defined(__APPLE__)
 struct pollfd;
