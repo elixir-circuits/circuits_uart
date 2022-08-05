@@ -376,11 +376,11 @@ int uart_get_rs485_config(struct uart *port, struct uart_config *config)
         return -1;
     }
 
-    config->rs485_enabled = (rs485.flags & SER_RS485_ENABLED);
-    config->rs485_rts_on_send = (rs485.flags & SER_RS485_RTS_ON_SEND);
-    config->rs485_rts_after_send = (rs485.flags & SER_RS485_RTS_AFTER_SEND);
-    config->rs485_rx_during_tx = (rs485.flags & SER_RS485_RX_DURING_TX);
-    config->rs485_terminate_bus = (rs485.flags & SER_RS485_TERMINATE_BUS);
+    config->rs485_enabled = (rs485.flags & SER_RS485_ENABLED) != 0;
+    config->rs485_rts_on_send = (rs485.flags & SER_RS485_RTS_ON_SEND) != 0;
+    config->rs485_rts_after_send = (rs485.flags & SER_RS485_RTS_AFTER_SEND) != 0;
+    config->rs485_rx_during_tx = (rs485.flags & SER_RS485_RX_DURING_TX) != 0;
+    config->rs485_terminate_bus = (rs485.flags & SER_RS485_TERMINATE_BUS) != 0;
 
     rs485.delay_rts_before_send = config->rs485_delay_rts_before_send >= 0 ? config->rs485_delay_rts_before_send : rs485.delay_rts_before_send;
     rs485.delay_rts_after_send = config->rs485_delay_rts_after_send >= 0 ? config->rs485_delay_rts_after_send : rs485.delay_rts_after_send;
@@ -390,19 +390,18 @@ int uart_get_rs485_config(struct uart *port, struct uart_config *config)
 }
 
 /**
- * @brief Update the tristate flag of RS485 configution
+ * @brief Update a flag based on the value of a tristate boolean.
  *
- * @param flags
- * @param current_val
- * @param rs485 setting mask
+ * @param flags a point to the where the flags are
+ * @param flag_bit the bit to set or clear
+ * @param tristate_val the tristate boolean (<0 is unset, 0 is false, >0 is true)
  */
-static void update_tristate_flags(long *flags, int val, long mask)
+static void update_flags(uint32_t *flags, uint32_t flag_bit, int tristate_val)
 {
-    switch (val){
-    case 0: *flags |= mask; break;
-    case 1: *flags &= ~mask; break;
-    default: break;
-    }
+    if (tristate_val == 0)
+        *flags &= ~flag_bit;
+    else if (tristate_val > 0)
+        *flags |= flag_bit;
 }
 
 /**
@@ -418,7 +417,7 @@ static int uart_config_rs485(int fd, const struct uart_config *config)
     struct serial_rs485 rs485;
 
     if (ioctl(fd, TIOCGRS485, &rs485) < 0) {
-        // This may fail with ENOTTY if the port doesn't support RS485. If thats
+        // This may fail with ENOTTY if the port doesn't support RS485. If that's
         // the case, then we only care about a failure when a user is trying
         // to set things. Otherwise, we assume RS485 may not even be expected and
         // can safely be ignored
@@ -428,11 +427,11 @@ static int uart_config_rs485(int fd, const struct uart_config *config)
         return -1;
     }
 
-    update_tristate_flags(&rs485.flags, config->rs485_enabled, SER_RS485_ENABLED);
-    update_tristate_flags(&rs485.flags, config->rs485_rts_on_send, SER_RS485_RTS_ON_SEND);
-    update_tristate_flags(&rs485.flags, config->rs485_rts_after_send, SER_RS485_RTS_AFTER_SEND);
-    update_tristate_flags(&rs485.flags, config->rs485_rx_during_tx, SER_RS485_RX_DURING_TX);
-    update_tristate_flags(&rs485.flags, config->rs485_terminate_bus, SER_RS485_TERMINATE_BUS);
+    update_flags(&rs485.flags, SER_RS485_ENABLED, config->rs485_enabled);
+    update_flags(&rs485.flags, SER_RS485_RTS_ON_SEND, config->rs485_rts_on_send);
+    update_flags(&rs485.flags, SER_RS485_RTS_AFTER_SEND, config->rs485_rts_after_send);
+    update_flags(&rs485.flags, SER_RS485_RX_DURING_TX, config->rs485_rx_during_tx);
+    update_flags(&rs485.flags, SER_RS485_TERMINATE_BUS, config->rs485_terminate_bus);
 
     rs485.delay_rts_before_send = config->rs485_delay_rts_before_send >= 0 ? config->rs485_delay_rts_before_send : rs485.delay_rts_before_send;
     rs485.delay_rts_after_send = config->rs485_delay_rts_after_send >= 0 ? config->rs485_delay_rts_after_send : rs485.delay_rts_after_send;

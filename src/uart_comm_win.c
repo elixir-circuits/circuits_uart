@@ -844,6 +844,8 @@ void uart_process_timeout(struct uart *port)
 int uart_get_rs485_config(struct uart *port, struct uart_config *config)
 {
     // Unsupported on Windows
+    (void) port;
+    (void) config;
     return 0;
 }
 #endif
