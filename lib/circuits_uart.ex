@@ -117,8 +117,12 @@ defmodule Circuits.UART do
 
   @doc """
   Start up a UART GenServer.
+
+  You usually don't need to pass options here unless you'd like to register a
+  name for the GenServer.  See `open/3` for opening all of the configuration
+  options.
   """
-  @spec start_link([term]) :: {:ok, pid} | {:error, term}
+  @spec start_link(GenServer.options()) :: GenServer.on_start()
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, [], opts)
   end

@@ -21,6 +21,7 @@ defmodule Circuits.UART.MixProject do
       docs: docs(),
       start_permanent: Mix.env() == :prod,
       build_embedded: true,
+      dialyzer: dialyzer(),
       deps: deps(),
       preferred_cli_env: %{
         docs: :docs,
@@ -59,6 +60,13 @@ defmodule Circuits.UART.MixProject do
       {:elixir_make, "~> 0.6", runtime: false},
       {:ex_doc, "~> 0.22", only: :docs, runtime: false},
       {:dialyxir, "~> 1.2", only: :dev, runtime: false}
+    ]
+  end
+
+  defp dialyzer() do
+    [
+      flags: [:missing_return, :extra_return, :unmatched_returns, :error_handling, :underspecs],
+      list_unused_filters: true
     ]
   end
 
