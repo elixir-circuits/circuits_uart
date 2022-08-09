@@ -1,5 +1,10 @@
 defmodule Circuits.UART do
+  @moduledoc """
+  Find and use UARTs, serial ports, and more.
+  """
   use GenServer
+
+  alias Circuits.UART.Enumerator
 
   # Many calls take timeouts for how long to wait for reading and writing
   # serial ports. This is the additional time added to the GenServer message passing
@@ -11,10 +16,6 @@ defmodule Circuits.UART do
   # doesn't respond by timeout + @port_timeout_slack, then there's something
   # wrong with it.
   @port_timeout_slack 400
-
-  @moduledoc """
-  Find and use UARTs, serial ports, and more.
-  """
 
   defmodule State do
     @moduledoc false
@@ -59,27 +60,26 @@ defmodule Circuits.UART do
           | {:rs485_delay_rts_after_send, pos_integer()}
 
   # Public API
+
   @doc """
   Return a map of available ports with information about each one. The map
   looks like this:
   ```
-     %{ "ttyS0" -> %{vendor_id: 1234, product_id: 1,
-                     manufacturer: "Acme Corporation", serial_number: "000001"},
-        "ttyUSB0" -> ${vendor_id: 1234, product_id: 2} }
+   %{ "ttyS0" -> %{vendor_id: 1234, product_id: 1,
+                   manufacturer: "Acme Corporation", serial_number: "000001"},
+      "ttyUSB0" -> ${vendor_id: 1234, product_id: 2} }
   ```
   Depending on the port and the operating system, not all fields may be
   returned. Informational fields are:
 
-    * `:vendor_id` - The 16-bit USB vendor ID of the device providing the port. Vendor ID to name lists are managed through usb.org
-    * `:product_id` - The 16-bit vendor supplied product ID
-    * `:manufacturer` - The manufacturer of the port
-    * `:description` - A description or product name
-    * `:serial_number` - The device's serial number if it has one
+  * `:vendor_id` - The 16-bit USB vendor ID of the device providing the port. Vendor ID to name lists are managed through usb.org
+  * `:product_id` - The 16-bit vendor supplied product ID
+  * `:manufacturer` - The manufacturer of the port
+  * `:description` - A description or product name
+  * `:serial_number` - The device's serial number if it has one
   """
-  @spec enumerate() :: map
-  def enumerate() do
-    Circuits.UART.Enumerator.enumerate()
-  end
+  @spec enumerate() :: map()
+  defdelegate enumerate(), to: Enumerator
 
   @doc """
   Find UARTs.
@@ -424,7 +424,7 @@ defmodule Circuits.UART do
     response = call_port(state, :close, nil)
 
     # Clean up the Elixir side
-    new_framing_state = apply(state.framing, :flush, [:both, state.framing_state])
+    new_framing_state = state.framing.flush(:both, state.framing_state)
 
     new_state =
       handle_framing_timer(
@@ -452,7 +452,7 @@ defmodule Circuits.UART do
       {:ok, buffer} ->
         # More data
         {rc, messages, new_framing_state} =
-          apply(state.framing, :remove_framing, [buffer, state.framing_state])
+          state.framing.remove_framing(buffer, state.framing_state)
 
         new_state = handle_framing_timer(%{state | framing_state: new_framing_state}, rc)
 
@@ -478,7 +478,7 @@ defmodule Circuits.UART do
     bin_data = IO.iodata_to_binary(data)
 
     {:ok, framed_data, new_framing_state} =
-      apply(state.framing, :add_framing, [bin_data, state.framing_state])
+      state.framing.add_framing(bin_data, state.framing_state)
 
     response = call_port(state, :write, {framed_data, timeout}, port_timeout(timeout))
     new_state = %{state | framing_state: new_framing_state}
@@ -507,7 +507,7 @@ defmodule Circuits.UART do
   end
 
   def handle_call({:flush, direction}, _from, state) do
-    fstate = apply(state.framing, :flush, [direction, state.framing_state])
+    fstate = state.framing.flush(direction, state.framing_state)
     new_state = %{state | framing_state: fstate}
     response = call_port(new_state, :flush, direction)
     {:reply, response, new_state}
@@ -544,8 +544,7 @@ defmodule Circuits.UART do
   end
 
   def handle_info(:rx_framing_timed_out, state) do
-    {:ok, messages, new_framing_state} =
-      apply(state.framing, :frame_timeout, [state.framing_state])
+    {:ok, messages, new_framing_state} = state.framing.frame_timeout(state.framing_state)
 
     new_state =
       notify_timedout_messages(
@@ -577,7 +576,7 @@ defmodule Circuits.UART do
   end
 
   defp change_framing(state, {framing_mod, framing_args}) do
-    {:ok, framing_state} = apply(framing_mod, :init, [framing_args])
+    {:ok, framing_state} = framing_mod.init(framing_args)
     %{state | framing: framing_mod, framing_state: framing_state}
   end
 
@@ -598,8 +597,7 @@ defmodule Circuits.UART do
 
   defp handle_port({:notif, data}, state) when is_binary(data) do
     # IO.puts "Received data on port #{state.name}"
-    {rc, messages, new_framing_state} =
-      apply(state.framing, :remove_framing, [data, state.framing_state])
+    {rc, messages, new_framing_state} = state.framing.remove_framing(data, state.framing_state)
 
     new_state = handle_framing_timer(%{state | framing_state: new_framing_state}, rc)
 
