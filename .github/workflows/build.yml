@@ -125,3 +125,5 @@ jobs:
       - run: mix format --check-formatted
       - run: mix deps.unlock --check-unused
       - run: mix hex.build
+      - run: mix credo -a
+      - run: mix dialyzer
