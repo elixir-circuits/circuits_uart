@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.0
+
+* Updates
+  * Added RS485 configuration options. These only work on Linux. Thanks to
+    @jjcarstens for this feature.
+
 ## v1.4.5
 
 * Bug fix
