@@ -64,11 +64,13 @@ defmodule Circuits.UART do
   @doc """
   Return a map of available ports with information about each one. The map
   looks like this:
+
+  ```elixir
+   %{"ttyS0" -> %{vendor_id: 1234, product_id: 1,
+                  manufacturer: "Acme Corporation", serial_number: "000001"},
+     "ttyUSB0" -> ${vendor_id: 1234, product_id: 2}}
   ```
-   %{ "ttyS0" -> %{vendor_id: 1234, product_id: 1,
-                   manufacturer: "Acme Corporation", serial_number: "000001"},
-      "ttyUSB0" -> ${vendor_id: 1234, product_id: 2} }
-  ```
+
   Depending on the port and the operating system, not all fields may be
   returned. Informational fields are:
 
@@ -140,35 +142,35 @@ defmodule Circuits.UART do
 
   The following options are available:
 
-    * `:active` - (`true` or `false`) specifies whether data is received as
-       messages or by calling `read/2`. See discussion below.
+  * `:active` - (`true` or `false`) specifies whether data is received as
+     messages or by calling `read/2`. See discussion below.
 
-    * `:speed` - (number) set the initial baudrate (e.g., 115200)
+  * `:speed` - (number) set the initial baudrate (e.g., 115200)
 
-    * `:data_bits` - (5, 6, 7, 8) set the number of data bits (usually 8)
+  * `:data_bits` - (5, 6, 7, 8) set the number of data bits (usually 8)
 
-    * `:stop_bits` - (1, 2) set the number of stop bits (usually 1)
+  * `:stop_bits` - (1, 2) set the number of stop bits (usually 1)
 
-    * `:parity` - (`:none`, `:even`, `:odd`, `:space`, or `:mark`) set the
-      parity. Usually this is `:none`. Other values:
-      * `:space` means that the parity bit is always 0
-      * `:mark` means that the parity bit is always 1
-      * `:ignore` means that the parity bit is ignored (Linux/OSX only)
+  * `:parity` - (`:none`, `:even`, `:odd`, `:space`, or `:mark`) set the
+    parity. Usually this is `:none`. Other values:
+    * `:space` means that the parity bit is always 0
+    * `:mark` means that the parity bit is always 1
+    * `:ignore` means that the parity bit is ignored (Linux/OSX only)
 
-    * `:flow_control` - (`:none`, `:hardware`, or `:software`) set the flow control
-      strategy.
+  * `:flow_control` - (`:none`, `:hardware`, or `:software`) set the flow control
+    strategy.
 
-    * `:framing` - (`module` or `{module, args}`) set the framing for data.
-      The `module` must implement the `Circuits.UART.Framing` behaviour. See
-      `Circuits.UART.Framing.None`, `Circuits.UART.Framing.Line`, and
-      `Circuits.UART.Framing.FourByte`. The default is `Circuits.UART.Framing.None`.
+  * `:framing` - (`module` or `{module, args}`) set the framing for data.
+    The `module` must implement the `Circuits.UART.Framing` behaviour. See
+    `Circuits.UART.Framing.None`, `Circuits.UART.Framing.Line`, and
+    `Circuits.UART.Framing.FourByte`. The default is `Circuits.UART.Framing.None`.
 
-    * `:rx_framing_timeout` - (milliseconds) this specifies how long incomplete
-      frames will wait for the remainder to be received. Timed out partial
-      frames are reported as `{:partial, data}`. A timeout of <= 0 means to
-      wait forever.
+  * `:rx_framing_timeout` - (milliseconds) this specifies how long incomplete
+    frames will wait for the remainder to be received. Timed out partial
+    frames are reported as `{:partial, data}`. A timeout of <= 0 means to
+    wait forever.
 
-    * `:id` - (`:name` or `:pid`) specify what to return with the uart active
+  * `:id` - (`:name` or `:pid`) specify what to return with the uart active
     messages. with `:name` the messages are returned as `{:circuits_uart,
     serial_port_name, data}` otherwise they are returned as `{:circuits_uart,
     pid, data}`. The name and pid are the name of the connected UART or the pid
@@ -177,28 +179,26 @@ defmodule Circuits.UART do
 
   The following options are supported on Linux only:
 
-    * `:rs485_enabled` - (`true` or `false`) enable RS485 mode.
-
-    * `:rs485_rts_on_send` - (`true` or `false`) enable RTS on send.
-
-    * `:rs485_rts_after_send` - (`true` or `false`) enable RTS after send.
-
-    * `:rs485_rx_during_tx` - (`true` or `false`) enable RX during TX (loopback).
-
-    * `:rs485_terminate_bus` - (`true` or `false`) enable bus termination.
-
-    * `:rs485_delay_rts_before_send` - (milliseconds) delay RTS before send.
-
-    * `:rs485_delay_rts_after_send` - (milliseconds) delay RTS after send.
+  * `:rs485_enabled` - (`true` or `false`) enable RS485 mode.
+  * `:rs485_rts_on_send` - (`true` or `false`) enable RTS on send.
+  * `:rs485_rts_after_send` - (`true` or `false`) enable RTS after send.
+  * `:rs485_rx_during_tx` - (`true` or `false`) enable RX during TX (loopback).
+  * `:rs485_terminate_bus` - (`true` or `false`) enable bus termination.
+  * `:rs485_delay_rts_before_send` - (milliseconds) delay RTS before send.
+  * `:rs485_delay_rts_after_send` - (milliseconds) delay RTS after send.
 
   Active mode defaults to true and means that data received on the UART is
   reported in messages. The messages have the following form:
 
-     `{:circuits_uart, serial_port_id, data}`
+  ```elixir
+  {:circuits_uart, serial_port_id, data}
+  ```
 
   or
 
-     `{:circuits_uart, serial_port_id, {:error, reason}}`
+  ```elixir
+  {:circuits_uart, serial_port_id, {:error, reason}}
+  ```
 
   When in active mode, flow control can not be used to push back on the sender
   and messages will accumulated in the mailbox should data arrive fast enough.
@@ -208,11 +208,11 @@ defmodule Circuits.UART do
   On success, `open/3` returns `:ok`. On error, `{:error, reason}` is returned.
   The following are some reasons:
 
-    * `:enoent`  - the specified port couldn't be found
-    * `:eagain`  - the port is already open
-    * `:eacces`  - permission was denied when opening the port
+  * `:enoent`  - the specified port couldn't be found
+  * `:eagain`  - the port is already open
+  * `:eacces`  - permission was denied when opening the port
   """
-  @spec open(GenServer.server(), binary, [uart_option]) :: :ok | {:error, term}
+  @spec open(GenServer.server(), binary, [uart_option]) :: :ok | {:error, File.posix()}
   def open(pid, name, opts \\ []) do
     GenServer.call(pid, {:open, name, opts})
   end
@@ -221,7 +221,7 @@ defmodule Circuits.UART do
   Close the serial port. The GenServer continues to run so that a port can
   be opened again.
   """
-  @spec close(GenServer.server()) :: :ok | {:error, term}
+  @spec close(GenServer.server()) :: :ok | {:error, File.posix()}
   def close(pid) do
     GenServer.call(pid, :close)
   end
@@ -230,7 +230,7 @@ defmodule Circuits.UART do
   Change the serial port configuration after `open/3` has been called. See
   `open/3` for the valid options.
   """
-  @spec configure(GenServer.server(), [uart_option]) :: :ok | {:error, term}
+  @spec configure(GenServer.server(), [uart_option]) :: :ok | {:error, File.posix()}
   def configure(pid, opts) do
     GenServer.call(pid, {:configure, opts})
   end
@@ -250,7 +250,7 @@ defmodule Circuits.UART do
   This is a convenience function for calling `set_break/2` to enable
   the break signal, wait, and then turn it off.
   """
-  @spec send_break(GenServer.server(), integer) :: :ok | {:error, term}
+  @spec send_break(GenServer.server(), integer) :: :ok | {:error, File.posix()}
   def send_break(pid, duration \\ 250) do
     :ok = set_break(pid, true)
     :timer.sleep(duration)
@@ -260,7 +260,7 @@ defmodule Circuits.UART do
   @doc """
   Start or stop sending a break signal.
   """
-  @spec set_break(GenServer.server(), boolean) :: :ok | {:error, term}
+  @spec set_break(GenServer.server(), boolean) :: :ok | {:error, File.posix()}
   def set_break(pid, value) when is_boolean(value) do
     GenServer.call(pid, {:set_break, value})
   end
@@ -277,9 +277,9 @@ defmodule Circuits.UART do
 
   Typical error reasons:
 
-    * `:ebadf` - the UART is closed
+  * `:ebadf` - the UART is closed
   """
-  @spec write(GenServer.server(), iodata(), non_neg_integer()) :: :ok | {:error, term}
+  @spec write(GenServer.server(), iodata(), non_neg_integer()) :: :ok | {:error, File.posix()}
   def write(pid, data, timeout \\ 5000) do
     GenServer.call(pid, {:write, data, timeout}, genserver_timeout(timeout))
   end
@@ -293,10 +293,10 @@ defmodule Circuits.UART do
 
   Typical error reasons:
 
-    * `:ebadf` - the UART is closed
-    * `:einval` - the UART is in active mode
+  * `:ebadf` - the UART is closed
+  * `:einval` - the UART is in active mode
   """
-  @spec read(GenServer.server(), non_neg_integer()) :: {:ok, binary} | {:error, term}
+  @spec read(GenServer.server(), non_neg_integer()) :: {:ok, binary} | {:error, File.posix()}
   def read(pid, timeout \\ 5000) do
     GenServer.call(pid, {:read, timeout}, genserver_timeout(timeout))
   end
@@ -306,7 +306,7 @@ defmodule Circuits.UART do
   [tcdrain(3)](http://linux.die.net/man/3/tcdrain) for low level details on
   Linux or OSX. This is not implemented on Windows.
   """
-  @spec drain(GenServer.server()) :: :ok | {:error, term}
+  @spec drain(GenServer.server()) :: :ok | {:error, File.posix()}
   def drain(pid) do
     GenServer.call(pid, :drain)
   end
@@ -317,7 +317,7 @@ defmodule Circuits.UART do
   See [tcflush(3)](http://linux.die.net/man/3/tcflush) for low level details on
   Linux or OSX. This calls `PurgeComm` on Windows.
   """
-  @spec flush(GenServer.server()) :: :ok | {:error, term}
+  @spec flush(GenServer.server()) :: :ok | {:error, File.posix()}
   def flush(pid, direction \\ :both) do
     GenServer.call(pid, {:flush, direction})
   end
@@ -326,16 +326,16 @@ defmodule Circuits.UART do
   Returns a map of signal names and their current state (true or false).
   Signals include:
 
-    * `:dsr` - Data Set Ready
-    * `:dtr` - Data Terminal Ready
-    * `:rts` - Request To Send
-    * `:st`  - Secondary Transmitted Data
-    * `:sr`  - Secondary Received Data
-    * `:cts` - Clear To Send
-    * `:cd`  - Data Carrier Detect
-    * `:rng` - Ring Indicator
+  * `:dsr` - Data Set Ready
+  * `:dtr` - Data Terminal Ready
+  * `:rts` - Request To Send
+  * `:st`  - Secondary Transmitted Data
+  * `:sr`  - Secondary Received Data
+  * `:cts` - Clear To Send
+  * `:cd`  - Data Carrier Detect
+  * `:rng` - Ring Indicator
   """
-  @spec signals(GenServer.server()) :: map | {:error, term}
+  @spec signals(GenServer.server()) :: map | {:error, File.posix()}
   def signals(pid) do
     GenServer.call(pid, :signals)
   end
@@ -343,7 +343,7 @@ defmodule Circuits.UART do
   @doc """
   Set or clear the Data Terminal Ready signal.
   """
-  @spec set_dtr(GenServer.server(), boolean) :: :ok | {:error, term}
+  @spec set_dtr(GenServer.server(), boolean) :: :ok | {:error, File.posix()}
   def set_dtr(pid, value) when is_boolean(value) do
     GenServer.call(pid, {:set_dtr, value})
   end
@@ -351,7 +351,7 @@ defmodule Circuits.UART do
   @doc """
   Set or clear the Request To Send signal.
   """
-  @spec set_rts(GenServer.server(), boolean) :: :ok | {:error, term}
+  @spec set_rts(GenServer.server(), boolean) :: :ok | {:error, File.posix()}
   def set_rts(pid, value) when is_boolean(value) do
     GenServer.call(pid, {:set_rts, value})
   end
@@ -360,7 +360,7 @@ defmodule Circuits.UART do
   Change the controlling process that
   receives events from an active uart.
   """
-  @spec controlling_process(GenServer.server(), pid) :: :ok | {:error, term}
+  @spec controlling_process(GenServer.server(), pid) :: :ok | {:error, File.posix()}
   def controlling_process(pid, controlling_process) when is_pid(controlling_process) do
     GenServer.call(pid, {:controlling_process, controlling_process})
   end
