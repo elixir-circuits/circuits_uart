@@ -190,8 +190,10 @@ defmodule FramingTest do
       assert :ok = UART.open(uart1, UARTTest.port1(), active: true, framing: UART.Framing.Line)
       port1 = UARTTest.port1()
 
-      assert {:error, :einval} = UART.write(uart1, "a")
-      assert_receive {:circuits_uart, ^port1, {:error, :einval}}
+      assert {:error, errno} = UART.write(uart1, "a", 0)
+      assert errno in [:einval, :eagain]
+
+      assert_receive {:circuits_uart, ^port1, {:error, _einval_or_eagain}}
 
       UART.close(uart1)
     end
