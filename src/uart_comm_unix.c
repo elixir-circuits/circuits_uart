@@ -389,6 +389,7 @@ int uart_get_rs485_config(struct uart *port, struct uart_config *config)
     return 0;
 }
 
+#if defined(__linux__)
 /**
  * @brief Update a flag based on the value of a tristate boolean.
  *
@@ -403,6 +404,7 @@ static void update_flags(uint32_t *flags, uint32_t flag_bit, int tristate_val)
     else if (tristate_val > 0)
         *flags |= flag_bit;
 }
+#endif
 
 /**
  * @brief Configure the RS485 settings on the port
