@@ -20,7 +20,6 @@ defmodule Circuits.UART.MixProject do
       make_error_message: make_error_message(),
       docs: docs(),
       start_permanent: Mix.env() == :prod,
-      build_embedded: true,
       dialyzer: dialyzer(),
       deps: deps(),
       preferred_cli_env: %{
