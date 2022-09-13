@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.5.1
+
+* Fixes
+  * Don't even try using the RS485 ioctls if not set by the user. This fixes an
+    issue on Allwinner devices, but probably others, where getting RS485
+    settings works, but setting them, even if unchanged always fails. Thanks to
+    @jjcarstens for the fix.
+
 ## v1.5.0
 
 * Updates
