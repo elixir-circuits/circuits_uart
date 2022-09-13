@@ -8,6 +8,7 @@ jobs:
     strategy:
       matrix:
         beam:
+          - { otp: '25', elixir: '1.14' }
           - { otp: '25', elixir: '1.13' }
           - { otp: '24', elixir: '1.12' }
           - { otp: '23', elixir: '1.11' }
@@ -18,7 +19,7 @@ jobs:
             runner: ubuntu-latest
         include:
           - os: { name: Windows, runner: windows-latest }
-            beam: { otp: '25', elixir: '1.13' }
+            beam: { otp: '25', elixir: '1.14' }
     steps:
       - uses: actions/checkout@v2
 
@@ -110,7 +111,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: 25
-          elixir-version: 1.13
+          elixir-version: 1.14
 
       - name: Retrieve Mix Dependencies Cache
         uses: actions/cache@v1
