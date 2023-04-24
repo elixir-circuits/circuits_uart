@@ -68,7 +68,7 @@ defmodule Circuits.UART do
   ```elixir
    %{"ttyS0" -> %{vendor_id: 1234, product_id: 1,
                   manufacturer: "Acme Corporation", serial_number: "000001"},
-     "ttyUSB0" -> ${vendor_id: 1234, product_id: 2}}
+     "ttyUSB0" -> %{vendor_id: 1234, product_id: 2}}
   ```
 
   Depending on the port and the operating system, not all fields may be
