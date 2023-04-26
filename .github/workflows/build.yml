@@ -16,7 +16,7 @@ jobs:
           - { otp: '22', elixir: '1.9' }
         os:
           - name: Linux
-            runner: ubuntu-latest
+            runner: ubuntu20
         include:
           - os: { name: Windows, runner: windows-latest }
             beam: { otp: '25', elixir: '1.14' }
