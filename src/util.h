@@ -22,11 +22,10 @@
 #include <stdint.h>
 
 //#define DEBUG
-
 #ifdef DEBUG
-FILE *log_location;
+extern FILE *log_location;
 #define LOG_LOCATION log_location
-#define debug(...) do { fprintf(log_location, "%llu: ", current_time()); fprintf(log_location, __VA_ARGS__); fprintf(log_location, "\r\n"); fflush(log_location); } while(0)
+#define debug(...) do { fprintf(LOG_LOCATION, "%llu: ", current_time()); fprintf(LOG_LOCATION, __VA_ARGS__); fprintf(LOG_LOCATION, "\r\n"); fflush(LOG_LOCATION); } while(0)
 #else
 #define LOG_LOCATION stderr
 #define debug(...)
