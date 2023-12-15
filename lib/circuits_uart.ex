@@ -296,7 +296,8 @@ defmodule Circuits.UART do
   * `:ebadf` - the UART is closed
   * `:einval` - the UART is in active mode
   """
-  @spec read(GenServer.server(), non_neg_integer()) :: {:ok, binary} | {:error, File.posix()}
+  @spec read(GenServer.server(), non_neg_integer()) ::
+          {:ok, binary} | {:ok, {:partial, binary}} | {:error, File.posix()}
   def read(pid, timeout \\ 5000) do
     GenServer.call(pid, {:read, timeout}, genserver_timeout(timeout))
   end
