@@ -28,7 +28,7 @@ jobs:
 
       - name: Retrieve tty0tty Cache
         if: runner.os == 'Linux'
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         id: tty0tty-cache
         with:
           path: tty0tty
@@ -51,7 +51,7 @@ jobs:
 
       - name: Retrieve com0com Cache
         if: runner.os == 'Windows'
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         id: com0com-cache
         with:
           path: com0com
@@ -79,7 +79,7 @@ jobs:
           ./setupc.exe --silent install - -
 
       - name: Retrieve Mix Dependencies Cache
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         id: mix-cache
         with:
           path: deps
@@ -112,7 +112,7 @@ jobs:
           elixir-version: 1.15
 
       - name: Retrieve Mix Dependencies Cache
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         id: mix-cache
         with:
           path: deps
