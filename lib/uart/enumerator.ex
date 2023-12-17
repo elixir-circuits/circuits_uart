@@ -2,7 +2,7 @@ defmodule Circuits.UART.Enumerator do
   @moduledoc false
 
   def enumerate() do
-    executable = :code.priv_dir(:circuits_uart) ++ '/circuits_uart'
+    executable = :code.priv_dir(:circuits_uart) ++ ~c"/circuits_uart"
 
     port =
       Port.open({:spawn_executable, executable}, [

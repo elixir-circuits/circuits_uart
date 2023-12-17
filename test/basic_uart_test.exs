@@ -58,10 +58,10 @@ defmodule BasicUARTTest do
     assert :ok = UART.open(uart1, UARTTest.port1(), active: false)
     assert :ok = UART.open(uart2, UARTTest.port2(), active: false)
 
-    assert :ok = UART.write(uart1, 'B')
+    assert :ok = UART.write(uart1, ~c"B")
     assert {:ok, "B"} = UART.read(uart2)
 
-    assert :ok = UART.write(uart1, ['AB', ?C, 'D', "EFG"])
+    assert :ok = UART.write(uart1, [~c"AB", ?C, ~c"D", "EFG"])
 
     # Wait for everything to be received in one call
     :timer.sleep(100)
