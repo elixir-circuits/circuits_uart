@@ -1,7 +1,7 @@
 defmodule Circuits.UART.MixProject do
   use Mix.Project
 
-  @version "1.5.1"
+  @version "1.5.2"
   @source_url "https://github.com/elixir-circuits/circuits_uart"
 
   def project do

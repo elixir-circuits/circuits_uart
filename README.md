@@ -170,7 +170,7 @@ To install `circuits_uart`:
 
   ```elixir
   def deps do
-    [{:circuits_uart, "~> 1.3"}]
+    [{:circuits_uart, "~> 1.5"}]
   end
   ```
 
@@ -327,7 +327,7 @@ system.  They share the same name but are different concepts.
 ### I see weird things happening on my UART using nerves
 
 By default nerves is configured so Linux and the Elixir console is redirected
-to the serial0 interface. As a result, while using this interface, the buffer might 
+to the serial0 interface. As a result, while using this interface, the buffer might
 be full of debug logs from your application, which could cause the port to timeout
 when you are writing to it, or attempting to drain it `:port_timed_out`.
 
@@ -336,7 +336,7 @@ To disable this "pollution" you will have to edit:
 - `cmdline.txt` and comment `console=serial0,115200`
 
 To learn how to edit those files in your nerves setup you can check the advanced
-configuration documentation of nerves: 
+configuration documentation of nerves:
 https://hexdocs.pm/nerves/advanced-configuration.html#overwriting-files-in-the-root-filesystem
 
 ## Acknowledgments

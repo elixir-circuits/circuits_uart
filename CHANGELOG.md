@@ -1,5 +1,16 @@
 # Changelog
 
+*I'm looking for help maintaining Circuits.UART. While it generally can be made
+to do what people want, there are some significant improvements that are
+possible that would be really nice to have. I just haven't had a project to
+justify them and don't have time. Please consider reaching out if you have time
+and interest.*
+
+## v1.5.2
+
+* Fixes
+  * Fix `Circuits.UART.read/2` spec. Thanks to @codestorm1.
+
 ## v1.5.1
 
 * Fixes
