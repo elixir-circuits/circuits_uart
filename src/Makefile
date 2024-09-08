@@ -80,8 +80,8 @@ $(error ERL_EI_LIBDIR not set. Invoke via mix)
 endif
 
 # Set Erlang-specific compile and linker flags
-ERL_CFLAGS ?= -I$(ERL_EI_INCLUDE_DIR)
-ERL_LDFLAGS ?= -L$(ERL_EI_LIBDIR) -lei
+ERL_CFLAGS ?= -I"$(ERL_EI_INCLUDE_DIR)"
+ERL_LDFLAGS ?= -L"$(ERL_EI_LIBDIR)" -lei
 
 # If compiling on OSX and not crosscompiling, include CoreFoundation and IOKit
 ifeq ($(CROSSCOMPILE),)
