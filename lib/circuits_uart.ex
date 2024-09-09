@@ -98,11 +98,11 @@ defmodule Circuits.UART do
   @spec find_pids() :: [{binary | :closed, pid()}]
   def find_pids() do
     Process.list()
-    |> Enum.filter(&is_circuits_uart_process/1)
+    |> Enum.filter(&circuits_uart_process?/1)
     |> Enum.map(&circuits_uart_info/1)
   end
 
-  defp is_circuits_uart_process(pid) do
+  defp circuits_uart_process?(pid) do
     case Process.info(pid, :dictionary) do
       {:dictionary, dictionary} ->
         Keyword.get(dictionary, :"$initial_call") == {Circuits.UART, :init, 1}
