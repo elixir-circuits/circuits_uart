@@ -6,6 +6,11 @@ possible that would be really nice to have. I just haven't had a project to
 justify them and don't have time. Please consider reaching out if you have time
 and interest.*
 
+## v1.5.3
+
+* Fixes
+  * Fix compilation when Erlang has been installed to a directory with spaces
+
 ## v1.5.2
 
 * Fixes
