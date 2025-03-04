@@ -1,3 +1,18 @@
+# SPDX-FileCopyrightText: 2016 David Hanson
+# SPDX-FileCopyrightText: 2016 Frank Hunleth
+# SPDX-FileCopyrightText: 2017 Rodney Norris
+# SPDX-FileCopyrightText: 2018 Adam Kohring
+# SPDX-FileCopyrightText: 2018 Jon Carstens
+# SPDX-FileCopyrightText: 2018 Michał Kalbarczyk
+# SPDX-FileCopyrightText: 2018 Tallak Tveide
+# SPDX-FileCopyrightText: 2019 Robin Hilliard
+# SPDX-FileCopyrightText: 2020 Mattias Tegmyr
+# SPDX-FileCopyrightText: 2022 Bernhard Hackl
+# SPDX-FileCopyrightText: 2023 Bryan Green
+# SPDX-FileCopyrightText: 2023 Serge Lukianov
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule Circuits.UART do
   @moduledoc """
   Find and use UARTs, serial ports, and more.

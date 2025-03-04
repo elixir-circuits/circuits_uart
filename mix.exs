@@ -39,18 +39,24 @@ defmodule Circuits.UART.MixProject do
   defp package do
     %{
       files: [
+        "CHANGELOG.md",
         "lib",
         "src/*.[ch]",
         "src/ei_copy/*.[ch]",
         "src/Makefile",
         "test",
         "mix.exs",
+        "NOTICE",
         "README.md",
-        "LICENSE",
-        "CHANGELOG.md"
+        "REUSE.toml",
+        "LICENSES"
       ],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => @source_url}
+      links: %{
+        "GitHub" => @source_url,
+        "REUSE Compliance" =>
+          "https://api.reuse.software/info/github.com/nerves-project/nerves_runtime"
+      }
     }
   end
 
