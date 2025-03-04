@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2016 Frank Hunleth
+# SPDX-FileCopyrightText: 2018 Jon Carstens
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule UARTlessTest do
   use ExUnit.Case
   alias Circuits.UART

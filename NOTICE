@@ -1,0 +1,12 @@
+CircuitsUART is open-source software licensed under the Apache License,
+Version 2.0.
+
+Copyright holders include Ericsson AB, David Hanson, Frank Hunleth, John
+Hamelink, Justin Schneck, Sven Bohm, Amos King, Ben Rexin, John Careaga, Rodney
+Norris, Adam Kohring, Arne Ehrlich, Jon Carstens, Michał Kalbarczyk, Tallak
+Tveide, Lee Bannard, Robin Hilliard, Matt Ludwigs, Mattias Tegmyr, Tom Boland,
+Chris D'Ambrosio, John Simmonds, Bernhard Hackl, Bryan Green, Jon Ringle and
+Serge Lukianov.
+
+Authoritative REUSE-compliant copyright and license metadata available at
+https://hex.pm/packages/circuits_uart.

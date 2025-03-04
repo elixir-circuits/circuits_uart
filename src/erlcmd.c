@@ -1,21 +1,8 @@
-/*
- *  Copyright 2016 Frank Hunleth
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Common Erlang->C port communications code
- */
-
+// SPDX-FileCopyrightText: 2016 Frank Hunleth
+// SPDX-FileCopyrightText: 2018 Jon Carstens
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 #include "erlcmd.h"
 #include "util.h"
 
@@ -203,7 +190,7 @@ void erlcmd_send(char *response, size_t len)
         errx(EXIT_FAILURE, "WriteFile to stdout failed (Erlang exit?)");
 #else
     size_t wrote = 0;
-    do {        
+    do {
         ssize_t amount_written = write(STDOUT_FILENO, response + wrote, len - wrote);
         if (amount_written < 0) {
             if (errno == EINTR)

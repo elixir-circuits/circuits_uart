@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2016 Frank Hunleth
+# SPDX-FileCopyrightText: 2017 Amos King
+# SPDX-FileCopyrightText: 2018 Jon Carstens
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule Circuits.UART.Framing do
   @moduledoc """
   A behaviour for implementing framers for data received over a UART.

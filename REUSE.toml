@@ -1,0 +1,95 @@
+version = 1
+
+[[annotations]]
+path = [
+ ".credo.exs",
+ ".ebert.yml",
+ ".formatter.exs",
+ ".github/dependabot.yml",
+ ".github/workflows/ci.yml",
+ ".gitignore",
+ "CHANGELOG.md",
+ "CODE_OF_CONDUCT.md",
+ "CONTRIBUTING.md",
+ "ISSUE_TEMPLATE.md",
+ "NOTICE",
+ "RELEASE.md",
+ "REUSE.toml",
+ "mix.exs",
+ "mix.lock"
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "None"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = [
+ "README.md"
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2016 Frank Hunleth"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# Listing ei_copy files here will make license header update scripts
+# avoid processing these files so that the Ericsson copyright stays
+# like they had it.
+[[annotations]]
+path = [
+ "src/ei_copy/decode_atom.c",
+ "src/ei_copy/decode_big.c",
+ "src/ei_copy/decode_bignum.c",
+ "src/ei_copy/decode_binary.c",
+ "src/ei_copy/decode_boolean.c",
+ "src/ei_copy/decode_char.c",
+ "src/ei_copy/decode_double.c",
+ "src/ei_copy/decode_fun.c",
+ "src/ei_copy/decode_intlist.c",
+ "src/ei_copy/decode_list_header.c",
+ "src/ei_copy/decode_long.c",
+ "src/ei_copy/decode_longlong.c",
+ "src/ei_copy/decode_pid.c",
+ "src/ei_copy/decode_port.c",
+ "src/ei_copy/decode_ref.c",
+ "src/ei_copy/decode_skip.c",
+ "src/ei_copy/decode_skip.h",
+ "src/ei_copy/decode_string.c",
+ "src/ei_copy/decode_trace.c",
+ "src/ei_copy/decode_tuple_header.c",
+ "src/ei_copy/decode_ulong.c",
+ "src/ei_copy/decode_ulonglong.c",
+ "src/ei_copy/decode_version.c",
+ "src/ei_copy/ei.h",
+ "src/ei_copy/ei_decode_term.c",
+ "src/ei_copy/ei_decode_term.h",
+ "src/ei_copy/ei_malloc.c",
+ "src/ei_copy/ei_malloc.h",
+ "src/ei_copy/ei_printterm.c",
+ "src/ei_copy/ei_printterm.h",
+ "src/ei_copy/ei_x_encode.c",
+ "src/ei_copy/ei_x_encode.h",
+ "src/ei_copy/eicode.h",
+ "src/ei_copy/eidef.h",
+ "src/ei_copy/eiext.h",
+ "src/ei_copy/encode_atom.c",
+ "src/ei_copy/encode_big.c",
+ "src/ei_copy/encode_bignum.c",
+ "src/ei_copy/encode_binary.c",
+ "src/ei_copy/encode_boolean.c",
+ "src/ei_copy/encode_char.c",
+ "src/ei_copy/encode_double.c",
+ "src/ei_copy/encode_fun.c",
+ "src/ei_copy/encode_list_header.c",
+ "src/ei_copy/encode_long.c",
+ "src/ei_copy/encode_longlong.c",
+ "src/ei_copy/encode_pid.c",
+ "src/ei_copy/encode_port.c",
+ "src/ei_copy/encode_ref.c",
+ "src/ei_copy/encode_string.c",
+ "src/ei_copy/encode_trace.c",
+ "src/ei_copy/encode_tuple_header.c",
+ "src/ei_copy/encode_ulong.c",
+ "src/ei_copy/encode_ulonglong.c",
+ "src/ei_copy/encode_version.c",
+ "src/ei_copy/get_type.c",
+ "src/ei_copy/putget.h"
+]
