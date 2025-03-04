@@ -8,6 +8,7 @@ jobs:
     strategy:
       matrix:
         beam:
+          - { otp: '27', elixir: '1.18' }
           - { otp: '27', elixir: '1.17' }
           - { otp: '26', elixir: '1.16' }
           - { otp: '26', elixir: '1.15' }
@@ -19,7 +20,7 @@ jobs:
             runner: ubuntu-latest
         include:
           - os: { name: Windows, runner: windows-latest }
-            beam: { otp: '27', elixir: '1.17' }
+            beam: { otp: '27', elixir: '1.18' }
     steps:
       - uses: actions/checkout@v4
 
