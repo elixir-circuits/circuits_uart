@@ -40,7 +40,7 @@ jobs:
       - name: Install tty0tty
         if: runner.os == 'Linux' && steps.tty0tty-cache.outputs.cache-hit != 'true'
         run: |
-          git clone https://github.com/colinleroy/tty0tty.git
+          git clone https://github.com/freemed/tty0tty.git
 
       - name: Set up tty0tty
         if: runner.os == 'Linux'
