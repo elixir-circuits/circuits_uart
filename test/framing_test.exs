@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2016 Frank Hunleth
+# SPDX-FileCopyrightText: 2018 Adam Kohring
+# SPDX-FileCopyrightText: 2018 Jon Carstens
+# SPDX-FileCopyrightText: 2021 Chris D'Ambrosio
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 Code.require_file("uart_test.exs", __DIR__)
 
 defmodule FramingTest do

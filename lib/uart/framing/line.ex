@@ -1,3 +1,11 @@
+# SPDX-FileCopyrightText: 2016 Frank Hunleth
+# SPDX-FileCopyrightText: 2016 Justin Schneck
+# SPDX-FileCopyrightText: 2018 Jon Carstens
+# SPDX-FileCopyrightText: 2020 Matt Ludwigs
+# SPDX-FileCopyrightText: 2021 John Simmonds
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 defmodule Circuits.UART.Framing.Line do
   @behaviour Circuits.UART.Framing
 
