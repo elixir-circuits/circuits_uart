@@ -14,7 +14,7 @@ port connections and more in Elixir. Some highlights:
 * Add and remove framing on serial data - line-based framing included for use
   with GPS, cellular, satellite and other modules
 * Unit tests (uses the [tty0tty](https://github.com/freemed/tty0tty) virtual
-  null modem on Travis)
+  null modem)
 
 Looking for `Nerves.UART`? `Circuits.UART` is the new name. Everything else is
 the same. Update your project by replacing all references to `nerves_uart` and
