@@ -677,7 +677,7 @@ static void continue_in_progress_write(struct uart *port)
     size_t to_write = port->write_len - port->write_offset;
     ssize_t written;
     do {
-        written = write(port->fd, &port->write_data + port->write_offset, to_write);
+        written = write(port->fd, (const uint8_t *)port->write_data + port->write_offset, to_write);
         debug("continue_in_progress_write: wrote %d/%d, errno=%d (%s)", (int) written, (int) to_write, errno, strerror(errno));
     } while (written < 0 && errno == EINTR);
 
