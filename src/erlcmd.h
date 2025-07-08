@@ -14,7 +14,7 @@
 /*
  * Erlang request/response processing
  */
-#define ERLCMD_BUF_SIZE 16384 // Large size is to support large UART writes
+#define ERLCMD_BUF_SIZE 32768 + 30 // Large size is to support large UART writes
 struct erlcmd
 {
     char buffer[ERLCMD_BUF_SIZE];
