@@ -21,16 +21,15 @@ defmodule Circuits.UART.MixProject do
       docs: docs(),
       start_permanent: Mix.env() == :prod,
       dialyzer: dialyzer(),
-      deps: deps(),
-      preferred_cli_env: %{
-        docs: :docs,
-        "hex.publish": :docs,
-        "hex.build": :docs
-      }
+      deps: deps()
     ]
   end
 
   def application, do: []
+
+  def cli do
+    [preferred_envs: %{docs: :docs, "hex.publish": :docs, "hex.build": :docs}]
+  end
 
   defp description do
     "Discover and use UARTs and serial ports in Elixir"
