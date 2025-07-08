@@ -6,6 +6,16 @@ possible that would be really nice to have. I just haven't had a project to
 justify them and don't have time. Please consider reaching out if you have time
 and interest.*
 
+## v1.5.4
+
+* Fixes
+  * Fix continue_in_progress_write() pointer error that when hit would likely
+    include random bursts of 0s in the data stream. Thanks to @ewildgoose for
+    this fix.
+
+* Updates
+  * Update copyright and license info for [REUSE compliance](https://reuse.software/)
+
 ## v1.5.3
 
 * Fixes
