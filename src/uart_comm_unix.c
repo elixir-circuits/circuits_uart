@@ -4,6 +4,7 @@
 // SPDX-FileCopyrightText: 2018 Michał Kalbarczyk
 // SPDX-FileCopyrightText: 2020 Tom Boland
 // SPDX-FileCopyrightText: 2022 Jon Carstens
+// SPDX-FileCopyrightText: 2025 Ed Wildgoose
 //
 // SPDX-License-Identifier: Apache-2.0
 //
