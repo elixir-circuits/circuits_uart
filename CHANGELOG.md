@@ -6,6 +6,12 @@ possible that would be really nice to have. I just haven't had a project to
 justify them and don't have time. Please consider reaching out if you have time
 and interest.*
 
+## v1.5.5
+
+* Fixes
+  * Increase max transfer size from slightly under 16 KB to 32 KB. Thanks to
+    @ewildgoose for this fix.
+
 ## v1.5.4
 
 * Fixes
