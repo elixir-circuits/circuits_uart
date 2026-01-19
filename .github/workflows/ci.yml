@@ -16,8 +16,10 @@ jobs:
           - name: Linux
             runner: ubuntu-latest
         include:
-          - os: { name: Windows, runner: 'win22' }
+          - os: { name: Windows, runner: blacksmith-2vcpu-windows-2025 }
             beam: { otp: '28', elixir: '1.19' }
+            env:
+              ImageOS: win25
     steps:
       - uses: actions/checkout@v4
 
@@ -108,8 +110,8 @@ jobs:
 
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: 26
-          elixir-version: 1.15
+          otp-version: 28
+          elixir-version: 1.19
 
       - name: Retrieve Mix Dependencies Cache
         uses: actions/cache@v3
