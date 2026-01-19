@@ -19,7 +19,7 @@ jobs:
           - name: Linux
             runner: ubuntu-latest
         include:
-          - os: { name: Windows, runner: windows-latest }
+          - os: { name: Windows, runner: blacksmith-2vcpu-windows-2025 }
             beam: { otp: '27', elixir: '1.18' }
     steps:
       - uses: actions/checkout@v4
@@ -104,7 +104,7 @@ jobs:
         run: CIRCUITS_UART_PORT1=tnt0 CIRCUITS_UART_PORT2=tnt1 mix test
 
   checks:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     name: Extra checks
     steps:
       - uses: actions/checkout@v4
