@@ -102,7 +102,7 @@ defmodule Circuits.UART.Framing.Line do
   defp process_data(separator, sep_length, max_length, processed, to_process, lines) do
     case to_process do
       # Handle separater
-      <<^separator::binary-size(sep_length), rest::binary>> ->
+      <<^separator::binary-size(^sep_length), rest::binary>> ->
         new_lines = lines ++ [processed]
         process_data(separator, sep_length, max_length, <<>>, rest, new_lines)
 

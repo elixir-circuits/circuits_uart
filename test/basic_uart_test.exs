@@ -163,7 +163,8 @@ defmodule BasicUARTTest do
     # Don't run against tty0tty since it sends data almost
     # instantaneously. Also, Windows appears to have a deep
     # send buffer. Need to investigate the Windows failure more.
-    if !String.starts_with?(UARTTest.port1(), "tnt") && !:os.type() == {:windows, :nt} do
+
+    if not String.starts_with?(UARTTest.port1(), "tnt") and :os.type() != {:win32, :nt} do
       assert :ok = UART.open(uart1, UARTTest.port1(), speed: 1200)
 
       # Send more than can be sent on a 1200 baud link
