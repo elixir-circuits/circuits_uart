@@ -5,8 +5,6 @@ path = [
  ".credo.exs",
  ".ebert.yml",
  ".formatter.exs",
- ".github/dependabot.yml",
- ".github/workflows/ci.yml",
  ".gitignore",
  "CHANGELOG.md",
  "CODE_OF_CONDUCT.md",

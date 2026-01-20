@@ -1,0 +1,58 @@
+# SPDX-FileCopyrightText: None
+# SPDX-License-Identifier: CC0-1.0
+name: Linux builds
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Linux / OTP ${{matrix.beam.otp}} / Elixir ${{matrix.beam.elixir}}
+    strategy:
+      matrix:
+        beam:
+          - { otp: '28', elixir: '1.19' }
+          - { otp: '28', elixir: '1.18' }
+          - { otp: '27', elixir: '1.17' }
+          - { otp: '26', elixir: '1.16' }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ matrix.beam.otp }}
+          elixir-version: ${{ matrix.beam.elixir }}
+
+      - name: Retrieve tty0tty Cache
+        uses: actions/cache@v3
+        id: tty0tty-cache
+        with:
+          path: tty0tty
+          key: tty0tty
+
+      - name: Install tty0tty
+        if: steps.tty0tty-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/freemed/tty0tty.git
+
+      - name: Set up tty0tty
+        run: |
+          cd tty0tty/module
+          make
+          sudo cp tty0tty.ko /lib/modules/$(uname -r)/kernel/drivers/misc/
+          sudo depmod
+          sudo modprobe tty0tty
+          sudo chmod 666 /dev/tnt*
+
+      - name: Retrieve Mix Dependencies Cache
+        uses: actions/cache@v3
+        id: mix-cache
+        with:
+          path: deps
+          key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+
+      - name: Install Mix dependencies
+        if: steps.mix-cache.outputs.cache-hit != 'true'
+        run: mix deps.get
+
+      - name: mix test
+        run: CIRCUITS_UART_PORT1=tnt0 CIRCUITS_UART_PORT2=tnt1 mix test

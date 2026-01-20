@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: None
+# SPDX-License-Identifier: CC0-1.0
+name: Windows builds
+on: push
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os.runner }}
+    name: ${{ matrix.os.name }} / OTP ${{ matrix.beam.otp }} / Elixir ${{ matrix.beam.elixir }}
+    strategy:
+      matrix:
+        beam:
+          - { otp: '28', elixir: '1.19' }
+        os:
+          - name: Windows 2025
+            runner: blacksmith-2vcpu-windows-2025
+            env:
+              ImageOS: win25
+    env: ${{ matrix.os.env }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@566deebc640988a494af16ecdf6f820fe0d3fea4
+        with:
+          otp-version: ${{ matrix.beam.otp }}
+          elixir-version: ${{ matrix.beam.elixir }}
+
+      - name: Retrieve com0com Cache
+        uses: actions/cache@v3
+        id: com0com-cache
+        with:
+          path: com0com
+          key: com0com
+
+      - name: Install com0com
+        if: steps.com0com-cache.outputs.cache-hit != 'true'
+        run: |
+          $Url = 'https://sourceforge.net/projects/signed-drivers/files/com0com/v3.0/com0com-3.0.0.0-i386-and-x64-signed.zip/download'
+
+          mkdir com0com | cd
+
+          curl --location $Url --output com0com.zip --silent
+          7z e com0com.zip amd64/* -r | Out-Null
+
+          $ExportType = [System.Security.Cryptography.X509Certificates.X509ContentType]::Cert
+          $cert = (Get-AuthenticodeSignature 'com0com.sys').SignerCertificate
+          Export-Certificate -Cert $cert -FilePath com0com.cer
+
+      - name: Set up com0com
+        run: |
+          cd com0com
+          Import-Certificate -FilePath com0com.cer -CertStoreLocation Cert:\LocalMachine\TrustedPublisher
+          ./setupc.exe --silent install - -
+
+      - name: Install Mix dependencies
+        run: mix deps.get
+
+      - name: mix test
+        run: |
+          $Env:CIRCUITS_UART_PORT1 = 'CNCA0'
+          $Env:CIRCUITS_UART_PORT2 = 'CNCB0'
+          mix test

@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: None
+# SPDX-License-Identifier: CC0-1.0
+name: Docs and lint checks
+on: push
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    name: Extra checks
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: 28
+          elixir-version: 1.19
+
+      - name: Retrieve Mix Dependencies Cache
+        uses: actions/cache@v3
+        id: mix-cache
+        with:
+          path: deps
+          key: ${{ runner.os }}-28-1.19-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+
+      - run: mix deps.get
+      - run: mix compile
+      - run: mix docs
+      - run: mix format --check-formatted
+      - run: mix deps.unlock --check-unused
+      - run: mix hex.build
+      - run: mix credo -a
+      - run: mix dialyzer
