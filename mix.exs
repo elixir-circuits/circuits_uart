@@ -8,7 +8,7 @@ defmodule Circuits.UART.MixProject do
     [
       app: :circuits_uart,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.15",
       description: description(),
       package: package(),
       source_url: @source_url,
