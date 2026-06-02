@@ -1,7 +1,7 @@
 # Circuits.UART
 
 [![Hex version](https://img.shields.io/hexpm/v/circuits_uart.svg "Hex version")](https://hex.pm/packages/circuits_uart)
-[![API docs](https://img.shields.io/hexpm/v/circuits_uart.svg?label=hexdocs "API docs")](https://hexdocs.pm/circuits_uart/Circuits.UART.html)
+[![API docs](https://img.shields.io/hexpm/v/circuits_uart.svg?label=hexdocs "API docs")](https://circuits-uart.hexdocs.pm/Circuits.UART.html)
 [![CI](https://github.com/elixir-circuits/circuits_uart/actions/workflows/ci.yml/badge.svg)](https://github.com/elixir-circuits/circuits_uart/actions/workflows/ci.yml)
 [![REUSE status](https://api.reuse.software/badge/github.com/elixir-circuits/circuits_uart)](https://api.reuse.software/info/github.com/elixir-circuits/circuits_uart)
 
@@ -21,7 +21,7 @@ the same. Update your project by replacing all references to `nerves_uart` and
 `Nerves.UART` to `circuits_uart` and `Circuits.UART` and you should be good.
 
 Something doesn't work for you? Check out below and the
-[docs](https://hexdocs.pm/circuits_uart/). Post a question on the [Elixir
+[docs](https://circuits-uart.hexdocs.pm/). Post a question on the [Elixir
 Forum](https://elixirforum.com/) or file an issue or PR.
 
 ## Example use
@@ -320,7 +320,7 @@ out how to work around.
 
 ### How does Circuits.UART communicate with the serial port?
 
-Circuits.UART uses a [Port](https://hexdocs.pm/elixir/Port.html) and C code.
+Circuits.UART uses a [Port](https://elixir.hexdocs.pm/Port.html) and C code.
 Elixir/Erlang ports have nothing to do with the serial ports of the operating
 system.  They share the same name but are different concepts.
 
@@ -337,7 +337,7 @@ To disable this "pollution" you will have to edit:
 
 To learn how to edit those files in your nerves setup you can check the advanced
 configuration documentation of nerves:
-https://hexdocs.pm/nerves/advanced-configuration.html#overwriting-files-in-the-root-filesystem
+https://nerves.hexdocs.pm/advanced-configuration.html#overwriting-files-in-the-root-filesystem
 
 ## Acknowledgments
 
