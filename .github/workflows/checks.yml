@@ -12,15 +12,15 @@ jobs:
 
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: 28
-          elixir-version: 1.19
+          otp-version: '29'
+          elixir-version: '1.20'
 
       - name: Retrieve Mix Dependencies Cache
         uses: actions/cache@v3
         id: mix-cache
         with:
           path: deps
-          key: ${{ runner.os }}-28-1.19-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          key: ${{ runner.os }}-29-1.20-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
 
       - run: mix deps.get
       - run: mix compile
