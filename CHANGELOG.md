@@ -6,6 +6,13 @@ possible that would be really nice to have. I just haven't had a project to
 justify them and don't have time. Please consider reaching out if you have time
 and interest.*
 
+## v1.6.0
+
+* Fixes
+  * Fix Elixir 1.20 warning
+  * Remove support for Elixir 1.14 and earlier due to new compilation errors and
+    lack of support from dependencies
+
 ## v1.5.5
 
 * Fixes
