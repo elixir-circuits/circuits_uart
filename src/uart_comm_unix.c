@@ -231,6 +231,35 @@ static int clear_custom_speed(int fd)
 
 
 /**
+ * @brief Check that the port can do the data bits and parity asked for
+ *
+ * A pseudo-terminal, such as the ones socat makes, can't do parity or any
+ * other than 8 data bits: the kernel drops the request. tcsetattr() still
+ * succeeds the first time, since it changes other settings, and then fails
+ * with EINVAL each time after, since it changes nothing. Fail them all, so
+ * that opening a pty that worked once doesn't stop working.
+ *
+ * @param fd
+ * @param config
+ * @return <0 on error, with errno set to EINVAL
+ */
+static int uart_check_pty(int fd, const struct uart_config *config)
+{
+    char name[64];
+
+    if (ttyname_r(fd, name, sizeof(name)) != 0 || strncmp(name, "/dev/pts/", 9) != 0)
+        return 0;
+
+    if (config->data_bits != 8 ||
+            (config->parity != UART_PARITY_NONE && config->parity != UART_PARITY_IGNORE)) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    return 0;
+}
+
+/**
  * @brief Configure the speed, data bits, stop bits and parity for the port
  *
  * @param fd
@@ -239,6 +268,9 @@ static int clear_custom_speed(int fd)
  */
 static int uart_config_line(int fd, const struct uart_config *config)
 {
+    if (uart_check_pty(fd, config) < 0)
+        return -1;
+
     struct termios options;
     tcgetattr(fd, &options);
 
