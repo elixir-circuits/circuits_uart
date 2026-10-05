@@ -192,6 +192,10 @@ defmodule Circuits.UART do
     of the Circuits.UART server pid as returned by `start_link/1`. The default
     value is `:name`.
 
+  A pseudo-terminal, such as the ones `socat` makes, can't do parity or any
+  other than 8 data bits. Opening one on Linux with other settings fails with
+  `{:error, :einval}`, so use `parity: :none` and `data_bits: 8` for those.
+
   The following options are supported on Linux only:
 
   * `:rs485_enabled` - (`true` or `false`) enable RS485 mode.
