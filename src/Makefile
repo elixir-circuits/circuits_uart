@@ -109,6 +109,10 @@ install: $(PREFIX) $(BUILD) $(BUILD)/ei_copy $(PORTEXE)
 
 $(OBJ): $(HEADERS) src/Makefile
 
+$(OBJ): | $(BUILD) $(BUILD)/ei_copy
+$(PORTEXE): | $(PREFIX)
+$(BUILD)/ei_copy: | $(BUILD)
+
 $(BUILD)/%.o: src/%.c
 	@echo " CC $(notdir $@)"
 	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
