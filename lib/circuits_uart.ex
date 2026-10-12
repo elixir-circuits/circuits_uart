@@ -192,6 +192,11 @@ defmodule Circuits.UART do
     of the Circuits.UART server pid as returned by `start_link/1`. The default
     value is `:name`.
 
+  On Linux and macOS, opening or configuring a port returns `{:error, :einval}`
+  if the driver fails to set the requested data bits, stop bits, or parity.
+  Linux pseudo-terminals, such as those created by `socat`, require
+  `data_bits: 8` and `parity: :none`.
+
   The following options are supported on Linux only:
 
   * `:rs485_enabled` - (`true` or `false`) enable RS485 mode.

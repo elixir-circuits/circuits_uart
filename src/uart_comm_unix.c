@@ -240,7 +240,8 @@ static int clear_custom_speed(int fd)
 static int uart_config_line(int fd, const struct uart_config *config)
 {
     struct termios options;
-    tcgetattr(fd, &options);
+    if (tcgetattr(fd, &options) < 0)
+        return -1;
 
     // Set up the speed
     int baud_constant = to_baudrate_constant(config->speed);
@@ -317,7 +318,28 @@ static int uart_config_line(int fd, const struct uart_config *config)
     options.c_cc[VTIME] = 0;
 
     // Set everything
-    return tcsetattr(fd, TCSANOW, &options);
+    if (tcsetattr(fd, TCSANOW, &options) < 0)
+        return -1;
+
+    struct termios actual;
+    if (tcgetattr(fd, &actual) < 0)
+        return -1;
+
+    // tcsetattr() may succeed even when only some settings were applied.
+    tcflag_t mask = CSIZE | CSTOPB | PARENB;
+    if (options.c_cflag & PARENB) {
+        mask |= PARODD;
+#ifdef CMSPAR
+        mask |= CMSPAR;
+#endif
+    }
+
+    if ((actual.c_cflag & mask) != (options.c_cflag & mask)) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    return 0;
 }
 
 /**
