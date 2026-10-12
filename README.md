@@ -3,7 +3,8 @@
 [![Hex version](https://img.shields.io/hexpm/v/circuits_uart.svg "Hex version")](https://hex.pm/packages/circuits_uart)
 [![API docs](https://img.shields.io/hexpm/v/circuits_uart.svg?label=hexdocs "API docs")](https://circuits-uart.hexdocs.pm/Circuits.UART.html)
 [![Nerves compatibility](https://compatibility.nerves-project.org/badge/circuits_uart.svg)](https://compatibility.nerves-project.org/packages/circuits_uart)
-[![CI](https://github.com/elixir-circuits/circuits_uart/actions/workflows/ci.yml/badge.svg)](https://github.com/elixir-circuits/circuits_uart/actions/workflows/ci.yml)
+[![CI (linux)](https://github.com/elixir-circuits/circuits_uart/actions/workflows/linux.yml/badge.svg)](https://github.com/elixir-circuits/circuits_uart/actions/workflows/linux.yml)
+[![CI (windows)](https://github.com/elixir-circuits/circuits_uart/actions/workflows/windows.yml/badge.svg)](https://github.com/elixir-circuits/circuits_uart/actions/workflows/windows.yml)
 [![REUSE status](https://api.reuse.software/badge/github.com/elixir-circuits/circuits_uart)](https://api.reuse.software/info/github.com/elixir-circuits/circuits_uart)
 
 `Circuits.UART` allows you to use UARTs, serial ports, Bluetooth virtual serial
