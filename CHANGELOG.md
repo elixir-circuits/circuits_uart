@@ -6,6 +6,20 @@ possible that would be really nice to have. I just haven't had a project to
 justify them and don't have time. Please consider reaching out if you have time
 and interest.*
 
+## v1.7.0
+
+IMPORTANT: This release fixes a confusing issue where invalid data bit, stop
+bit, or parity settings were silently ignored. Because of this, upgrading to
+this version could break working code. The specific case it fixes was found when
+using `circuits_uart` with pseudo-terminals created by `socat`. The correct
+setting for these is 8 databits, no parity, and 1 stop bit which is the default.
+
+* Fixes
+  * Return `{:error, :einval}` on Linux and macOS when opening or configuring a
+    port if the driver doesn't apply the requested data bits, stop bits, or
+    parity.
+  * Fix a build dependency race when running parallel `make`.
+
 ## v1.6.0
 
 * Fixes
